@@ -116,7 +116,7 @@ class MainTest extends TestCase {
 	 */
 	public function test_boot(): void {
 		Functions\expect( 'add_action' )
-			->twice()
+			->times( 3 )
 			->with( 'init', Mockery::any() );
 
 		Main::boot();

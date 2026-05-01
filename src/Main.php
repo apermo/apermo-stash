@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash;
 
+use Apermo\LinkStash\PostType\BookmarkMeta;
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\PostType\TagTaxonomy;
 
@@ -76,5 +77,6 @@ class Main {
 	public static function boot(): void {
 		( new BookmarkPostType() )->register();
 		( new TagTaxonomy() )->register();
+		( new BookmarkMeta() )->register();
 	}
 }
