@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash;
 
+use Apermo\LinkStash\Admin\ListColumns;
+use Apermo\LinkStash\Admin\QuickAdd;
+use Apermo\LinkStash\Admin\SettingsPage;
 use Apermo\LinkStash\Auth\BearerTokenAuth;
 use Apermo\LinkStash\Auth\TokenStore;
 use Apermo\LinkStash\PostType\BookmarkMeta;
@@ -93,5 +96,12 @@ class Main {
 			new CheckController(),
 		) )->register();
 		( new CorsHandler() )->register();
+
+		if ( is_admin() ) {
+			$store = new TokenStore();
+			( new ListColumns() )->register();
+			( new QuickAdd( new MetadataFetcher() ) )->register();
+			( new SettingsPage( $store ) )->register();
+		}
 	}
 }

@@ -1,0 +1,176 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Apermo\LinkStash\Admin;
+
+use Apermo\LinkStash\PostType\BookmarkMeta;
+use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\LinkStash\PostType\TagTaxonomy;
+use Apermo\LinkStash\Url\Canonicalizer;
+use Apermo\LinkStash\Url\MetadataFetcher;
+
+/**
+ * Renders the paste-a-URL quick-add form on the bookmark list screen
+ * and handles its submission.
+ */
+class QuickAdd {
+
+	private const ACTION = 'linkstash_quick_add';
+
+	/**
+	 * Holds the metadata fetcher.
+	 *
+	 * @var MetadataFetcher
+	 */
+	private MetadataFetcher $fetcher;
+
+	/**
+	 * Constructs the screen.
+	 *
+	 * @param MetadataFetcher $fetcher Metadata fetcher.
+	 */
+	public function __construct( MetadataFetcher $fetcher ) {
+		$this->fetcher = $fetcher;
+	}
+
+	/**
+	 * Splits the tags input into a list of trimmed values.
+	 *
+	 * @param string $raw Raw comma-separated input.
+	 *
+	 * @return list<string>
+	 */
+	private static function parse_tags( string $raw ): array {
+		if ( $raw === '' ) {
+			return [];
+		}
+
+		$parts  = \explode( ',', $raw );
+		$result = [];
+		foreach ( $parts as $part ) {
+			$part = \trim( $part );
+			if ( $part !== '' ) {
+				$result[] = $part;
+			}
+		}
+
+		return \array_values( \array_unique( $result ) );
+	}
+
+	/**
+	 * Returns the URL of the bookmark list screen, optionally with a notice param.
+	 *
+	 * @param string $notice Notice slug.
+	 *
+	 * @return string
+	 */
+	private static function list_url( string $notice ): string {
+		return add_query_arg(
+			[
+				'post_type'        => BookmarkPostType::POST_TYPE,
+				'linkstash_notice' => $notice,
+			],
+			admin_url( 'edit.php' ),
+		);
+	}
+
+	/**
+	 * Hooks the rendering and submission handlers.
+	 *
+	 * @return void
+	 */
+	public function register(): void {
+		add_action( 'restrict_manage_posts', [ $this, 'render_form' ] );
+		add_action( 'admin_post_' . self::ACTION, [ $this, 'handle_submission' ] );
+	}
+
+	/**
+	 * Renders the quick-add form above the bookmark list table.
+	 *
+	 * @param string $post_type Current screen post type.
+	 *
+	 * @return void
+	 */
+	public function render_form( string $post_type ): void {
+		if ( $post_type !== BookmarkPostType::POST_TYPE ) {
+			return;
+		}
+
+		$action_url = esc_url( admin_url( 'admin-post.php' ) );
+		$nonce      = wp_create_nonce( self::ACTION );
+		?>
+		<form method="post" action="<?php echo $action_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" class="alignleft actions linkstash-quick-add">
+			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
+			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
+			<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required style="min-width: 18rem;" />
+			<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'linkstash' ); ?>" />
+			<label style="margin-left: 0.5rem;">
+				<input type="checkbox" name="public" value="1" />
+				<?php esc_html_e( 'Public', 'linkstash' ); ?>
+			</label>
+			<button type="submit" class="button"><?php esc_html_e( 'Save', 'linkstash' ); ?></button>
+		</form>
+		<?php
+	}
+
+	/**
+	 * Handles the quick-add form submission.
+	 *
+	 * @return void
+	 */
+	public function handle_submission(): void {
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_die( esc_html__( 'You are not allowed to add bookmarks.', 'linkstash' ), '', [ 'response' => 403 ] );
+		}
+
+		check_admin_referer( self::ACTION );
+
+		$url       = isset( $_POST['url'] ) && \is_string( $_POST['url'] )
+			? esc_url_raw( wp_unslash( $_POST['url'] ) )
+			: '';
+		$canonical = Canonicalizer::canonicalize( $url );
+
+		if ( $url === '' || $canonical === '' ) {
+			wp_safe_redirect( self::list_url( 'invalid' ) );
+			exit();
+		}
+
+		$tags_raw = isset( $_POST['tags'] ) && \is_string( $_POST['tags'] )
+			? sanitize_text_field( wp_unslash( $_POST['tags'] ) )
+			: '';
+		$tags     = self::parse_tags( $tags_raw );
+
+		$is_public = isset( $_POST['public'] );
+
+		$meta = $this->fetcher->fetch( $url );
+
+		$post_id = wp_insert_post(
+			[
+				'post_type'    => BookmarkPostType::POST_TYPE,
+				'post_status'  => $is_public ? 'publish' : 'private',
+				'post_title'   => $meta['title'] ?? $url,
+				'post_content' => $meta['description'] ?? '',
+				'post_author'  => get_current_user_id(),
+			],
+			true,
+		);
+
+		if ( is_wp_error( $post_id ) ) {
+			wp_safe_redirect( self::list_url( 'failed' ) );
+			exit();
+		}
+
+		update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
+		update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
+		update_post_meta( $post_id, BookmarkMeta::META_UNREAD, false );
+		update_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, false );
+
+		if ( $tags !== [] ) {
+			wp_set_object_terms( $post_id, $tags, TagTaxonomy::TAXONOMY, false );
+		}
+
+		wp_safe_redirect( self::list_url( 'saved' ) );
+		exit();
+	}
+}

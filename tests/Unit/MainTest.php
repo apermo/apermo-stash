@@ -116,6 +116,7 @@ class MainTest extends TestCase {
 	public function test_boot(): void {
 		Functions\when( 'add_action' )->justReturn( true );
 		Functions\when( 'add_filter' )->justReturn( true );
+		Functions\when( 'is_admin' )->justReturn( false );
 
 		Main::boot();
 	}
