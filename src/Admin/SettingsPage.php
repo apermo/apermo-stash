@@ -102,6 +102,7 @@ class SettingsPage {
 		$nonce      = wp_create_nonce( self::ACTION_CREATE );
 		?>
 		<h2><?php esc_html_e( 'Generate a new token', 'linkstash' ); ?></h2>
+		<?php // $action_url is esc_url'd at assignment; the inline echo is therefore safe. ?>
 		<form method="post" action="<?php echo $action_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>">
 			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION_CREATE ); ?>" />
 			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
@@ -142,7 +143,8 @@ class SettingsPage {
 			<tbody>
 				<?php
 				foreach ( $tokens as $entry ) {
-					self::render_token_row( $entry ); }
+					self::render_token_row( $entry );
+				}
 				?>
 			</tbody>
 		</table>
@@ -172,11 +174,12 @@ class SettingsPage {
 				?>
 			</td>
 			<td>
+				<?php // $revoke_url is esc_url'd at assignment; the inline echo is therefore safe. ?>
 				<form method="post" action="<?php echo $revoke_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" style="display:inline">
 					<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION_REVOKE ); ?>" />
 					<input type="hidden" name="token_id" value="<?php echo esc_attr( $entry['id'] ); ?>" />
 					<?php wp_nonce_field( self::ACTION_REVOKE . ':' . $entry['id'] ); ?>
-					<button type="submit" class="button-link-delete" onclick="return confirm('<?php esc_attr_e( 'Revoke this token?', 'linkstash' ); ?>');"><?php esc_html_e( 'Revoke', 'linkstash' ); ?></button>
+					<button type="submit" class="button-link-delete" onclick="return confirm('<?php echo esc_js( __( 'Revoke this token?', 'linkstash' ) ); ?>');"><?php esc_html_e( 'Revoke', 'linkstash' ); ?></button>
 				</form>
 			</td>
 		</tr>

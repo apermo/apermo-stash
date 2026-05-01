@@ -50,6 +50,7 @@ class ListColumns {
 		foreach ( $terms as $term ) {
 			$names[] = esc_html( $term->name );
 		}
+		// Each name was esc_html-escaped above before being added to $names.
 		echo \implode( ', ', $names ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
@@ -85,6 +86,7 @@ class ListColumns {
 		if ( (bool) get_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, true ) ) {
 			$badges[] = esc_html__( 'Archived', 'linkstash' );
 		}
+		// Each badge label was esc_html__-escaped before being added to $badges.
 		echo $badges === [] ? '—' : \implode( ', ', $badges ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 

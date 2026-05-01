@@ -95,6 +95,7 @@ class TagsController {
 			'post_status'    => $visibility['post_status'],
 			'posts_per_page' => 1,
 			'fields'         => 'ids',
+			// Counting bookmarks per term is exactly what tax_query is for.
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 			'tax_query'      => [
 				[

@@ -21,6 +21,7 @@ class CanonicalizerTest extends TestCase {
 	 * @return array<string, array{0: string, 1: string}>
 	 */
 	public static function urlProvider(): array {
+		// Data provider: each named entry is a representative input/output pair.
 		// phpcs:ignore Apermo.DataStructures.ArrayComplexity.TooManyKeys
 		return [
 			'lowercase scheme + host'    => [ 'HTTPS://Example.tld/Path', 'https://example.tld/Path' ],
@@ -57,6 +58,9 @@ class CanonicalizerTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Monkey\setUp();
+		// Stubbing wp_parse_url with PHP's parse_url is the whole point of
+		// this alias — the suggested wp_parse_url alternative is what the
+		// stub itself is replacing.
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
 		Functions\when( 'wp_parse_url' )->alias( static fn ( string $url ) => \parse_url( $url ) );
 	}

@@ -97,10 +97,9 @@ class QuickAdd {
 			return;
 		}
 
-		$action_url = esc_url( admin_url( 'admin-post.php' ) );
-		$nonce      = wp_create_nonce( self::ACTION );
+		$nonce = wp_create_nonce( self::ACTION );
 		?>
-		<form method="post" action="<?php echo $action_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" class="alignleft actions linkstash-quick-add">
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="alignleft actions linkstash-quick-add">
 			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
 			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
 			<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required style="min-width: 18rem;" />

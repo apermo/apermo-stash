@@ -311,6 +311,8 @@ class BookmarksController {
 
 		$tag = (string) ( $request->get_param( 'tag' ) ?? '' );
 		if ( $tag !== '' ) {
+			// Tag filter is the documented way to scope the listing; the
+			// taxonomy is small in practice (one slug per saved bookmark tag).
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 			$args['tax_query'] = [
 				[
@@ -328,6 +330,8 @@ class BookmarksController {
 
 		$meta_query = self::build_meta_query( $request );
 		if ( $meta_query !== [] ) {
+			// Filtering by unread/archived booleans needs meta_query; the
+			// alternative would be loading every post and filtering in PHP.
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			$args['meta_query'] = $meta_query;
 		}
@@ -341,6 +345,9 @@ class BookmarksController {
 	 * @param WP_REST_Request $request REST request.
 	 *
 	 * @return WP_REST_Response|WP_Error
+	 *
+	 * Linear shape (validate, fetch metadata, dedupe, persist) reads more
+	 * naturally as a single function than as a chain of micro-helpers.
 	 *
 	 * @phpcs:disable SlevomatCodingStandard.Complexity.Cognitive.ComplexityTooHigh
 	 */
@@ -431,6 +438,11 @@ class BookmarksController {
 	 *
 	 * @return WP_REST_Response|WP_Error
 	 *
+	 * The branching mirrors the request shape — each optional field is its
+	 * own conditional. Splitting these out into helpers would mean
+	 * threading the post id through several short methods for no clarity
+	 * gain.
+	 *
 	 * @phpcs:disable SlevomatCodingStandard.Complexity.Cognitive.ComplexityTooHigh
 	 */
 	public function update_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
@@ -463,10 +475,15 @@ class BookmarksController {
 		if ( $request->has_param( 'url' ) ) {
 			$url       = (string) $request->get_param( 'url' );
 			$canonical = Canonicalizer::canonicalize( $url );
-			if ( $canonical !== '' ) {
-				update_post_meta( $post_id, BookmarkMeta::META_URL, esc_url_raw( $url ) );
-				update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
+			if ( $canonical === '' ) {
+				return new WP_Error(
+					'linkstash_invalid_url',
+					__( 'The url is not valid.', 'linkstash' ),
+					[ 'status' => 400 ],
+				);
 			}
+			update_post_meta( $post_id, BookmarkMeta::META_URL, esc_url_raw( $url ) );
+			update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
 		}
 
 		$unread = self::optional_bool( $request, 'unread' );
@@ -572,6 +589,9 @@ class BookmarksController {
 				'author'         => $user_id,
 				'posts_per_page' => 1,
 				'post_status'    => [ 'publish', 'private' ],
+				// Dedupe by canonical URL is the whole point of this query;
+				// the meta key is short and a meta_query lookup is the
+				// idiomatic way to do it.
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 				'meta_query'     => [
 					[

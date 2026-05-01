@@ -28,6 +28,8 @@ class BookmarkPostType {
 	public function register_post_type(): void {
 		register_post_type(
 			self::POST_TYPE,
+			// register_post_type accepts a flat options array; using a typed
+			// object would be busywork.
 			// phpcs:ignore Apermo.DataStructures.ArrayComplexity.TooManyKeys
 			[
 				'labels'             => [

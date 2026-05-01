@@ -68,6 +68,8 @@ class CheckController {
 			'posts_per_page' => 1,
 			'fields'         => 'ids',
 			'no_found_rows'  => true,
+			// Looking up by canonical URL is the whole purpose of this
+			// endpoint; meta_query is the idiomatic shape.
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			'meta_query'     => [
 				[
