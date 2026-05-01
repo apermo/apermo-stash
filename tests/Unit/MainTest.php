@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Plugin_Name\Tests\Unit;
+namespace Apermo\LinkStash\Tests\Unit;
 
+use Apermo\LinkStash\Main;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
-use Plugin_Name\Main;
 
 /**
  * Tests for the Main class.

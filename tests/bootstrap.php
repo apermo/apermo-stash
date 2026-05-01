@@ -20,7 +20,7 @@ if ( $wp_tests_dir !== false && is_dir( $wp_tests_dir ) ) {
 
 	require_once $wp_tests_dir . '/includes/functions.php';
 
-	tests_add_filter( 'muplugins_loaded', 'plugin_name_tests_load_project' );
+	tests_add_filter( 'muplugins_loaded', 'linkstash_tests_load_project' );
 
 	require_once $wp_tests_dir . '/includes/bootstrap.php';
 }
@@ -30,7 +30,7 @@ if ( $wp_tests_dir !== false && is_dir( $wp_tests_dir ) ) {
  *
  * @return void
  */
-function plugin_name_tests_load_project(): void {
+function linkstash_tests_load_project(): void {
 	$plugin_file = dirname( __DIR__ ) . '/plugin.php';
 	if ( file_exists( $plugin_file ) ) {
 		require $plugin_file;

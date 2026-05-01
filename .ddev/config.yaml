@@ -1,4 +1,4 @@
-name: plugin-name
+name: linkstash
 type: php
 docroot: .ddev/wordpress
 php_version: "8.4"

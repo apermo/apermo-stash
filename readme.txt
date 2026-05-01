@@ -1,4 +1,4 @@
-=== Plugin_Name ===
+=== Linkstash ===
 Contributors: flavor
 Tags: wordpress
 Requires at least: 6.4
@@ -12,11 +12,11 @@ A WordPress plugin.
 
 == Description ==
 
-Plugin_Name is a WordPress plugin.
+Linkstash is a WordPress plugin.
 
 == Installation ==
 
-1. Upload the plugin files to `/wp-content/plugins/plugin-name/`
+1. Upload the plugin files to `/wp-content/plugins/linkstash/`
 2. Activate the plugin through the "Plugins" screen in WordPress
 
 == Changelog ==

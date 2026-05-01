@@ -1,6 +1,6 @@
 {
-    "name": "apermo/plugin-name",
-    "description": "A WordPress plugin-name plugin.",
+    "name": "apermo/linkstash",
+    "description": "A WordPress linkstash plugin.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [
@@ -23,12 +23,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Plugin_Name\\": "src/"
+            "Apermo\\LinkStash\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Plugin_Name\\Tests\\": "tests/"
+            "Apermo\\LinkStash\\Tests\\": "tests/"
         }
     },
     "scripts": {
