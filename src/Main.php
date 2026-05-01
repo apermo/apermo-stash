@@ -11,6 +11,7 @@ use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\PostType\TagTaxonomy;
 use Apermo\LinkStash\Rest\BookmarksController;
 use Apermo\LinkStash\Rest\CheckController;
+use Apermo\LinkStash\Rest\CorsHandler;
 use Apermo\LinkStash\Rest\RestController;
 use Apermo\LinkStash\Rest\TagsController;
 use Apermo\LinkStash\Url\MetadataFetcher;
@@ -91,5 +92,6 @@ class Main {
 			new TagsController(),
 			new CheckController(),
 		) )->register();
+		( new CorsHandler() )->register();
 	}
 }
