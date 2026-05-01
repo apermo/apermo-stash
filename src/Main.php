@@ -9,6 +9,11 @@ use Apermo\LinkStash\Auth\TokenStore;
 use Apermo\LinkStash\PostType\BookmarkMeta;
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\PostType\TagTaxonomy;
+use Apermo\LinkStash\Rest\BookmarksController;
+use Apermo\LinkStash\Rest\CheckController;
+use Apermo\LinkStash\Rest\RestController;
+use Apermo\LinkStash\Rest\TagsController;
+use Apermo\LinkStash\Url\MetadataFetcher;
 
 /**
  * Bootstraps the plugin.
@@ -81,5 +86,10 @@ class Main {
 		( new TagTaxonomy() )->register();
 		( new BookmarkMeta() )->register();
 		( new BearerTokenAuth( new TokenStore() ) )->register();
+		( new RestController(
+			new BookmarksController( new MetadataFetcher() ),
+			new TagsController(),
+			new CheckController(),
+		) )->register();
 	}
 }
