@@ -1,7 +1,8 @@
 <?php
 /*
- * Plugin Name: Linkstash
- * Description: A WordPress plugin.
+ * Plugin Name: LinkStash
+ * Plugin URI:  https://github.com/apermo/linkstash
+ * Description: A self-hosted bookmark collection with a token-protected REST API.
  * Version:     0.1.0
  * Author:      Christoph Daum
  * Author URI:  https://apermo.de

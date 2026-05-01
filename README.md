@@ -1,72 +1,140 @@
-# template-wordpress
+# LinkStash
 
-[![PHP CI](https://github.com/apermo/template-wordpress/actions/workflows/ci.yml/badge.svg)](https://github.com/apermo/template-wordpress/actions/workflows/ci.yml)
+[![PHP CI](https://github.com/apermo/linkstash/actions/workflows/ci.yml/badge.svg)](https://github.com/apermo/linkstash/actions/workflows/ci.yml)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPLv2+-blue.svg)](LICENSE)
 
-GitHub template repository for bootstrapping WordPress plugins and themes. Ships both plugin and theme scaffolding; a `setup.sh` script lets developers choose their mode and configures the project accordingly.
+A self-hosted WordPress plugin for collecting bookmarks. Inspired by
+[linkding](https://linkding.link/). Stores URL + title + notes + tags as a
+custom post type and exposes a token-protected REST API so a browser extension
+can save links from anywhere.
+
+Per-bookmark public/private visibility, idempotent save (safe to re-submit),
+and CORS configured for `chrome-extension://*` origins out of the box.
 
 ## Requirements
 
 - PHP 8.1+
-- WordPress 6.4+ (required by `wp_admin_notice()`)
-- Composer
+- WordPress 6.4+
+- Composer (development only — runtime has no Composer dependencies)
 - Node.js 20+ and npm (activates husky pre-commit hook, runs Playwright)
 - [DDEV](https://ddev.readthedocs.io/) (for local development)
 
 ## Installation
 
-1. [Create a new repository from this template](https://github.com/apermo/template-wordpress/generate)
-2. Clone your new repository
-3. Run the setup script:
+1. Clone or download this repository into `wp-content/plugins/linkstash/`.
+2. Run `composer install --no-dev` to generate the autoloader.
+3. Activate the plugin through the WordPress "Plugins" screen.
+4. Visit **Tools → LinkStash** to generate an API token (see Authentication
+   below).
+
+## Authentication
+
+LinkStash accepts two equivalent authentication schemes; pick whichever fits
+your client.
+
+### WordPress Application Passwords (Basic Auth)
+
+Available in WordPress core. Generate one under **Users → Profile → Application
+Passwords** and pass it as Basic Auth:
 
 ```bash
-bash setup.sh
+curl -u "your-username:xxxx xxxx xxxx xxxx xxxx xxxx" \
+     https://example.tld/wp-json/linkstash/v1/bookmarks
 ```
 
-The script prompts for:
-- **Slug** (kebab-case, e.g. `my-plugin`)
-- **Namespace** (e.g. `Apermo\MyPlugin`)
-- **Composer package name**
-- **Mode** (`plugin` or `theme`)
+### LinkStash Bearer Tokens
 
-It replaces all placeholders, removes irrelevant mode files, configures DDEV, and optionally sets up GitHub labels and branch protection.
+Better suited for browser extensions: generate at **Tools → LinkStash → API
+Tokens**. The plain token is shown **once** at creation time — copy it
+immediately. Send it as:
+
+```bash
+curl -H "Authorization: Bearer <token>" \
+     https://example.tld/wp-json/linkstash/v1/bookmarks
+```
+
+Each token is bound to a WordPress user; permission checks run against that
+user's capabilities (`edit_posts` for write endpoints).
+
+## REST API
+
+Base path: `/wp-json/linkstash/v1`.
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/bookmarks` | List bookmarks (filters: `tag`, `q`, `unread`, `archived`, `public`/`private`, `page`, `per_page`) |
+| `POST` | `/bookmarks` | Create a bookmark (idempotent — same URL returns existing record with `X-LinkStash-Existing: 1`) |
+| `GET` | `/bookmarks/{id}` | Fetch a single bookmark |
+| `PATCH` | `/bookmarks/{id}` | Update fields |
+| `DELETE` | `/bookmarks/{id}` | Delete a bookmark |
+| `GET` | `/tags` | List tags with bookmark counts |
+| `GET` | `/check?url=...` | Returns `{exists: bool, id?: int}` for a given URL |
+
+### Examples
+
+Save a bookmark; let the server fetch the title and description:
+
+```bash
+curl -X POST https://example.tld/wp-json/linkstash/v1/bookmarks \
+     -H "Authorization: Bearer <token>" \
+     -H "Content-Type: application/json" \
+     -d '{"url":"https://example.tld/article","tags":["reading"],"public":true}'
+```
+
+Check whether a URL is already saved (browser-extension "already saved" badge):
+
+```bash
+curl -H "Authorization: Bearer <token>" \
+     "https://example.tld/wp-json/linkstash/v1/check?url=https://example.tld/article"
+```
+
+Search and filter:
+
+```bash
+curl -H "Authorization: Bearer <token>" \
+     "https://example.tld/wp-json/linkstash/v1/bookmarks?tag=reading&unread=1"
+```
+
+### Public versus private bookmarks
+
+Bookmarks use WordPress's native `post_status`:
+
+- `publish` (public) — readable without authentication via the REST API.
+- `private` — only the owner (and users with `edit_others_posts`) can read.
+
+Anonymous `GET /bookmarks` returns only public bookmarks. Authenticated users
+see their own bookmarks plus any public bookmarks owned by other users. POST,
+PATCH, DELETE always require authentication.
+
+### CORS
+
+By default LinkStash sends CORS headers permitting `chrome-extension://*`
+origins. Add additional origins via the `linkstash_allowed_origins` filter:
+
+```php
+add_filter( 'linkstash_allowed_origins', static function ( array $origins ): array {
+    $origins[] = 'https://my-frontend.example.tld';
+    return $origins;
+} );
+```
 
 ## Development
 
 ```bash
 composer install
-npm install              # Activates husky hook + installs Playwright
-composer cs              # Run PHPCS
-composer cs:fix          # Fix PHPCS violations
-composer analyse         # Run PHPStan
-composer test            # Run all tests
-composer test:unit       # Run unit tests only
-composer test:integration # Run integration tests only
-npm run test:e2e         # Run Playwright E2E tests (incl. WCAG 2.1 AA a11y checks)
+npm install               # activates husky pre-commit hook
+composer cs               # PHPCS
+composer cs:fix           # PHPCBF
+composer analyse          # PHPStan
+composer test:unit        # unit tests (Brain Monkey)
+composer test:integration # integration tests (wp-phpunit)
+npm run test:e2e          # Playwright E2E
 ```
 
-### Local WordPress Environment
+### Local WordPress environment
 
 ```bash
 ddev start && ddev orchestrate
-```
-
-Uses [ddev-orchestrate](https://github.com/apermo/ddev-orchestrate) to download WordPress, create `wp-config.php`, install, and activate the plugin/theme.
-
-### Git Hooks
-
-The pre-commit hook (PHPCS + PHPStan) is managed by [husky](https://typicode.github.io/husky/)
-and activates automatically after `npm install`. No manual configuration required.
-
-## Template Sync
-
-To pull upstream template changes into a derived project:
-
-```bash
-git remote add template https://github.com/apermo/template-wordpress.git
-git fetch template
-git checkout -b chore/sync-template
-git merge template/main --allow-unrelated-histories
 ```
 
 ## License
