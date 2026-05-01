@@ -14,7 +14,8 @@ namespace Apermo\LinkStash\Auth;
  */
 class TokenStore {
 
-	public const META_KEY = '_linkstash_tokens';
+	public const META_KEY     = '_linkstash_tokens';
+	public const INDEX_OPTION = 'linkstash_token_index';
 
 	private const TOKEN_LENGTH = 40;
 
@@ -89,6 +90,8 @@ class TokenStore {
 		$entries[] = $entry;
 		update_user_meta( $user_id, self::META_KEY, $entries );
 
+		$this->index_set( $entry['hash'], $user_id, $entry['id'] );
+
 		return $plain;
 	}
 
@@ -112,29 +115,40 @@ class TokenStore {
 	 * @return bool True if an entry was removed.
 	 */
 	public function revoke( int $user_id, string $id ): bool {
-		$entries  = $this->raw_entries( $user_id );
-		$filtered = \array_values(
-			\array_filter(
-				$entries,
-				static fn ( array $entry ): bool => $entry['id'] !== $id,
-			),
-		);
+		$entries        = $this->raw_entries( $user_id );
+		$removed_hashes = [];
+		$filtered       = [];
+		foreach ( $entries as $entry ) {
+			if ( $entry['id'] === $id ) {
+				$removed_hashes[] = $entry['hash'];
+				continue;
+			}
+			$filtered[] = $entry;
+		}
 
-		if ( \count( $filtered ) === \count( $entries ) ) {
+		if ( $removed_hashes === [] ) {
 			return false;
 		}
 
-		if ( \count( $filtered ) === 0 ) {
+		if ( $filtered === [] ) {
 			delete_user_meta( $user_id, self::META_KEY );
 		} else {
 			update_user_meta( $user_id, self::META_KEY, $filtered );
+		}
+
+		foreach ( $removed_hashes as $hash ) {
+			$this->index_remove( $hash );
 		}
 
 		return true;
 	}
 
 	/**
-	 * Locates the owner of a plain token, scanning across all users.
+	 * Locates the owner of a plain token via the hash → user index.
+	 *
+	 * Falls back to a one-time per-user scan when an index entry is missing
+	 * (covers tokens minted before the index was introduced) and writes the
+	 * recovered mapping back into the index for next time.
 	 *
 	 * Returns null when no entry matches.
 	 *
@@ -147,11 +161,12 @@ class TokenStore {
 			return null;
 		}
 
-		$hash = self::hash( $plain );
+		$hash  = self::hash( $plain );
+		$index = $this->load_index();
 
-		$user_ids = get_users( [ 'fields' => 'ID' ] );
-		foreach ( $user_ids as $raw_id ) {
-			$user_id = (int) $raw_id;
+		if ( isset( $index[ $hash ] ) ) {
+			$user_id = $index[ $hash ]['user_id'];
+
 			foreach ( $this->raw_entries( $user_id ) as $entry ) {
 				if ( \hash_equals( $entry['hash'], $hash ) ) {
 					return [
@@ -160,9 +175,14 @@ class TokenStore {
 					];
 				}
 			}
+
+			// Entry vanished from user meta; drop the stale index row.
+			$this->index_remove( $hash );
+
+			return null;
 		}
 
-		return null;
+		return $this->find_by_plain_via_scan( $hash );
 	}
 
 	/**
@@ -209,5 +229,84 @@ class TokenStore {
 		$value = get_user_meta( $user_id, self::META_KEY, true );
 
 		return \is_array( $value ) ? \array_values( $value ) : [];
+	}
+
+	/**
+	 * Recovers an unindexed token by scanning every user's tokens.
+	 *
+	 * Used for backwards compatibility with tokens minted before the index
+	 * was introduced; rebuilds the index entry as a side effect so the
+	 * next lookup is O(1).
+	 *
+	 * @param string $hash Hashed token value.
+	 *
+	 * @return array{user_id: int, id: string}|null
+	 */
+	private function find_by_plain_via_scan( string $hash ): ?array {
+		$user_ids = get_users( [ 'fields' => 'ID' ] );
+		foreach ( $user_ids as $raw_id ) {
+			$user_id = (int) $raw_id;
+			foreach ( $this->raw_entries( $user_id ) as $entry ) {
+				if ( \hash_equals( $entry['hash'], $hash ) ) {
+					$this->index_set( $hash, $user_id, $entry['id'] );
+
+					return [
+						'user_id' => $user_id,
+						'id'      => $entry['id'],
+					];
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Loads the global hash → user index, normalizing missing data to an empty array.
+	 *
+	 * @return array<string, array{user_id: int, id: string}>
+	 */
+	private function load_index(): array {
+		$value = get_option( self::INDEX_OPTION, [] );
+
+		return \is_array( $value ) ? $value : [];
+	}
+
+	/**
+	 * Adds (or replaces) an index entry.
+	 *
+	 * @param string $hash    Hashed token value.
+	 * @param int    $user_id Owner user ID.
+	 * @param string $id      Token id.
+	 *
+	 * @return void
+	 */
+	private function index_set( string $hash, int $user_id, string $id ): void {
+		$index          = $this->load_index();
+		$index[ $hash ] = [
+			'user_id' => $user_id,
+			'id'      => $id,
+		];
+		update_option( self::INDEX_OPTION, $index, false );
+	}
+
+	/**
+	 * Removes an index entry, or no-ops when the hash is unknown.
+	 *
+	 * @param string $hash Hashed token value.
+	 *
+	 * @return void
+	 */
+	private function index_remove( string $hash ): void {
+		$index = $this->load_index();
+		if ( ! isset( $index[ $hash ] ) ) {
+			return;
+		}
+		unset( $index[ $hash ] );
+		if ( $index === [] ) {
+			delete_option( self::INDEX_OPTION );
+			return;
+		}
+		update_option( self::INDEX_OPTION, $index, false );
 	}
 }

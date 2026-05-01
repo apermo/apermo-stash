@@ -23,7 +23,8 @@ class TokenStoreTest extends TestCase {
 		parent::setUp();
 		Monkey\setUp();
 
-		$store = [];
+		$store   = [];
+		$options = [];
 
 		Functions\when( 'get_user_meta' )->alias(
 			static function ( int $user_id, string $key ) use ( &$store ) {
@@ -39,6 +40,24 @@ class TokenStoreTest extends TestCase {
 		Functions\when( 'delete_user_meta' )->alias(
 			static function ( int $user_id, string $key ) use ( &$store ): bool {
 				unset( $store[ $user_id ][ $key ] );
+				return true;
+			},
+		);
+		Functions\when( 'get_option' )->alias(
+			// phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound -- mirrors WP signature.
+			static function ( string $key, $default_value = false ) use ( &$options ) {
+				return $options[ $key ] ?? $default_value;
+			},
+		);
+		Functions\when( 'update_option' )->alias(
+			static function ( string $key, $value ) use ( &$options ): bool {
+				$options[ $key ] = $value;
+				return true;
+			},
+		);
+		Functions\when( 'delete_option' )->alias(
+			static function ( string $key ) use ( &$options ): bool {
+				unset( $options[ $key ] );
 				return true;
 			},
 		);
@@ -98,12 +117,12 @@ class TokenStoreTest extends TestCase {
 	}
 
 	/**
-	 * Verifies find_by_plain locates the owning user when the token is valid.
+	 * Verifies find_by_plain locates the owning user via the index alone.
 	 *
 	 * @return void
 	 */
-	public function test_find_by_plain_locates_owner(): void {
-		Functions\when( 'get_users' )->justReturn( [ 7, 9 ] );
+	public function test_find_by_plain_uses_index_without_scanning(): void {
+		Functions\expect( 'get_users' )->never();
 
 		$store = new TokenStore( static fn (): int => 1700000000 );
 		$plain = $store->create( 9, 'x' );
@@ -125,6 +144,27 @@ class TokenStoreTest extends TestCase {
 		$store->create( 7, 'x' );
 
 		self::assertNull( $store->find_by_plain( 'wrong-token' ) );
+	}
+
+	/**
+	 * Verifies the user-meta scan fallback recovers an unindexed token and
+	 * back-fills the index for next time.
+	 *
+	 * @return void
+	 */
+	public function test_find_by_plain_falls_back_to_scan_for_unindexed_tokens(): void {
+		Functions\when( 'get_users' )->justReturn( [ 4, 8 ] );
+
+		$store = new TokenStore( static fn (): int => 1700000000 );
+		$plain = $store->create( 8, 'pre-index' );
+
+		// Wipe the index option to simulate a token minted before indexing
+		// existed; the lookup should still succeed via scan.
+		Functions\when( 'get_option' )->justReturn( [] );
+
+		$found = $store->find_by_plain( $plain );
+		self::assertNotNull( $found );
+		self::assertSame( 8, $found['user_id'] );
 	}
 
 	/**
