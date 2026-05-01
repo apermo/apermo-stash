@@ -42,13 +42,23 @@ class BookmarksController {
 	/**
 	 * Returns the visibility query fragments for the current request.
 	 *
+	 * Anonymous callers see only published bookmarks. Authenticated callers
+	 * see public bookmarks from anyone plus their own private bookmarks
+	 * (via WP_Query's `perm => 'readable'`). Callers with
+	 * `edit_others_posts` see everything.
+	 *
+	 * The optional `public` / `private` query params narrow the result:
+	 * `public=1` returns only public bookmarks (everyone's); `private=1`
+	 * returns only the caller's own private bookmarks (since others'
+	 * private bookmarks are never readable). When both or neither flag is
+	 * set the default "own + public" behaviour applies.
+	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
-	 * @return array{post_status: array<int, string>, author: list<int>|null}
+	 * @return array{post_status: list<string>, author: list<int>|null, perm: ?string}
 	 */
 	public static function visibility_filter( WP_REST_Request $request ): array {
 		$current_user = get_current_user_id();
-
 		$want_public  = (bool) $request->get_param( 'public' );
 		$want_private = (bool) $request->get_param( 'private' );
 
@@ -56,38 +66,39 @@ class BookmarksController {
 			return [
 				'post_status' => [ 'publish' ],
 				'author'      => null,
+				'perm'        => null,
 			];
 		}
 
-		$status = self::status_for_filter( $want_public, $want_private );
+		if ( $want_public !== $want_private ) {
+			if ( $want_public ) {
+				return [
+					'post_status' => [ 'publish' ],
+					'author'      => null,
+					'perm'        => null,
+				];
+			}
+
+			return [
+				'post_status' => [ 'private' ],
+				'author'      => [ $current_user ],
+				'perm'        => null,
+			];
+		}
 
 		if ( current_user_can( 'edit_others_posts' ) ) {
 			return [
-				'post_status' => $status,
+				'post_status' => [ 'publish', 'private' ],
 				'author'      => null,
+				'perm'        => null,
 			];
 		}
 
 		return [
-			'post_status' => $status,
-			'author'      => [ $current_user ],
+			'post_status' => [ 'publish', 'private' ],
+			'author'      => null,
+			'perm'        => 'readable',
 		];
-	}
-
-	/**
-	 * Resolves the post-status filter from the public/private params.
-	 *
-	 * @param bool $want_public  Whether the request explicitly asked for public bookmarks.
-	 * @param bool $want_private Whether the request explicitly asked for private bookmarks.
-	 *
-	 * @return list<string>
-	 */
-	private static function status_for_filter( bool $want_public, bool $want_private ): array {
-		if ( $want_public !== $want_private ) {
-			return $want_public ? [ 'publish' ] : [ 'private' ];
-		}
-
-		return [ 'publish', 'private' ];
 	}
 
 	/**
@@ -306,7 +317,9 @@ class BookmarksController {
 
 		if ( $visibility['author'] !== null ) {
 			$args['author__in'] = $visibility['author'];
-			$args['perm']       = 'readable';
+		}
+		if ( $visibility['perm'] !== null ) {
+			$args['perm'] = $visibility['perm'];
 		}
 
 		$tag = (string) ( $request->get_param( 'tag' ) ?? '' );

@@ -40,6 +40,10 @@ class TagsController {
 	/**
 	 * Lists tags with bookmark counts that respect the requester's visibility.
 	 *
+	 * Counts are computed in two queries total: one to fetch the IDs of all
+	 * bookmarks the caller may see, and one `get_terms` call scoped to those
+	 * IDs (which returns per-term counts in a single aggregated query).
+	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
 	 * @return WP_REST_Response
@@ -47,10 +51,18 @@ class TagsController {
 	public function list_items( WP_REST_Request $request ): WP_REST_Response {
 		$visibility = BookmarksController::visibility_filter( $request );
 
+		$visible_ids = $this->visible_bookmark_ids( $visibility );
+		if ( $visible_ids === [] ) {
+			return rest_ensure_response( [] );
+		}
+
 		$terms = get_terms(
 			[
 				'taxonomy'   => TagTaxonomy::TAXONOMY,
-				'hide_empty' => false,
+				'hide_empty' => true,
+				'object_ids' => $visible_ids,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
 			],
 		);
 
@@ -60,59 +72,42 @@ class TagsController {
 
 		$items = [];
 		foreach ( $terms as $term ) {
-			$count = $this->count_for_term( $term->term_id, $visibility );
-			if ( $count === 0 ) {
-				continue;
-			}
-
 			$items[] = [
 				'id'    => $term->term_id,
 				'slug'  => $term->slug,
 				'name'  => $term->name,
-				'count' => $count,
+				'count' => $term->count,
 			];
 		}
-
-		\usort(
-			$items,
-			static fn ( array $left, array $right ): int => \strcasecmp( $left['name'], $right['name'] ),
-		);
 
 		return rest_ensure_response( $items );
 	}
 
 	/**
-	 * Counts the bookmarks tagged with the given term that satisfy the visibility filter.
+	 * Returns the IDs of every bookmark the caller is allowed to see.
 	 *
-	 * @param int                                                            $term_id    Tag term ID.
-	 * @param array{post_status: array<int, string>, author: list<int>|null} $visibility Visibility constraints.
+	 * @param array{post_status: list<string>, author: list<int>|null, perm: ?string} $visibility Visibility constraints.
 	 *
-	 * @return int
+	 * @return list<int>
 	 */
-	private function count_for_term( int $term_id, array $visibility ): int {
+	private function visible_bookmark_ids( array $visibility ): array {
 		$args = [
 			'post_type'      => BookmarkPostType::POST_TYPE,
 			'post_status'    => $visibility['post_status'],
-			'posts_per_page' => 1,
+			'posts_per_page' => -1,
 			'fields'         => 'ids',
-			// Counting bookmarks per term is exactly what tax_query is for.
-			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-			'tax_query'      => [
-				[
-					'taxonomy' => TagTaxonomy::TAXONOMY,
-					'field'    => 'term_id',
-					'terms'    => $term_id,
-				],
-			],
-			'no_found_rows'  => false,
+			'no_found_rows'  => true,
 		];
 
 		if ( $visibility['author'] !== null ) {
 			$args['author__in'] = $visibility['author'];
 		}
+		if ( $visibility['perm'] !== null ) {
+			$args['perm'] = $visibility['perm'];
+		}
 
 		$query = new WP_Query( $args );
 
-		return $query->found_posts;
+		return \array_values( \array_map( 'intval', $query->posts ) );
 	}
 }

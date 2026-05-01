@@ -82,6 +82,9 @@ class CheckController {
 		if ( $visibility['author'] !== null ) {
 			$args['author__in'] = $visibility['author'];
 		}
+		if ( $visibility['perm'] !== null ) {
+			$args['perm'] = $visibility['perm'];
+		}
 
 		$query = new WP_Query( $args );
 
