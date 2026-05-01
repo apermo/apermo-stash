@@ -1,0 +1,15 @@
+name: WordPress.org Deploy
+
+on:
+    release:
+        types:
+            - published
+
+jobs:
+    deploy:
+        uses: apermo/reusable-workflows/.github/workflows/reusable-wporg-deploy.yml@main
+        with:
+            generate-zip: true
+        secrets:
+            svn-username: ${{ secrets.WPORG_SVN_USERNAME }}
+            svn-password: ${{ secrets.WPORG_SVN_PASSWORD }}

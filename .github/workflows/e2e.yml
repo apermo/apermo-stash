@@ -1,0 +1,16 @@
+name: E2E Tests
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+permissions:
+    contents: read
+
+jobs:
+    e2e:
+        uses: apermo/reusable-workflows/.github/workflows/reusable-wp-e2e.yml@main
+        with:
+            wp-versions: '["latest"]'
+            a11y: true

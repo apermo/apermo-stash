@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="plugin-name"
+    xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PHPCSStandards/PHP_CodeSniffer/master/phpcs.xsd">
+
+    <description>PHPCS configuration for plugin-name.</description>
+
+    <file>.</file>
+    <exclude-pattern>.ddev/*</exclude-pattern>
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>node_modules/*</exclude-pattern>
+
+    <arg name="extensions" value="php"/>
+
+    <rule ref="Apermo"/>
+
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="plugin-name"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!--
+        Project prefix for global functions, hooks, constants,
+        and namespace roots. E.g. prefix "Plugin_Name" allows
+        namespace Plugin_Name\Admin but flags Other\Admin.
+    -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="Plugin_Name"/>
+                <element value="plugin_name"/>
+            </property>
+        </properties>
+        <!-- Test bootstrap uses standard WP test globals, not plugin globals. -->
+        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
+    </rule>
+
+    <config name="minimum_wp_version" value="6.4"/>
+</ruleset>

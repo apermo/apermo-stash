@@ -1,0 +1,41 @@
+name: WP Integration
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+jobs:
+    detect-wp-minimum:
+        name: Detect minimum WP version
+        runs-on: ubuntu-latest
+        outputs:
+            wp-versions: ${{ steps.versions.outputs.wp-versions }}
+        steps:
+            - uses: actions/checkout@v4
+            - id: versions
+              run: |
+                  min=""
+                  if [ -f plugin.php ]; then
+                      min=$(grep -i 'Requires at least:' plugin.php | head -1 | sed 's/.*Requires at least:[[:space:]]*//' | tr -d '[:space:]*/')
+                  fi
+                  if [ -z "$min" ] && [ -f style.css ]; then
+                      min=$(grep -i 'Requires at least:' style.css | head -1 | sed 's/.*Requires at least:[[:space:]]*//' | tr -d '[:space:]*/')
+                  fi
+                  if [ -z "$min" ]; then
+                      echo "wp-versions=[\"latest\"]" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "wp-versions=[\"latest\",\"${min}\"]" >> "$GITHUB_OUTPUT"
+                  fi
+
+    integration:
+        needs: detect-wp-minimum
+        uses: apermo/reusable-workflows/.github/workflows/reusable-wp-integration.yml@main
+        with:
+            php-versions: >-
+                ${{ github.event_name == 'push'
+                    && '["8.2","8.3","8.4"]'
+                    || '["8.2","8.4"]' }}
+            wp-versions: ${{ needs.detect-wp-minimum.outputs.wp-versions }}
+            multisite: 'both'

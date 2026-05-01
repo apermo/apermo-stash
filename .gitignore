@@ -1,0 +1,12 @@
+vendor/
+.phpunit.cache/
+wp-tests-config.php
+.idea/
+node_modules/
+.DS_Store
+.auth/
+playwright-report/
+test-results/
+
+# WordPress core (downloaded by DDEV orchestrate)
+.ddev/wordpress/

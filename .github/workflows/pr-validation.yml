@@ -1,0 +1,14 @@
+name: PR Validation
+
+on:
+    pull_request:
+        types: [opened, synchronize, reopened, edited]
+
+jobs:
+    pr-validation:
+        uses: apermo/reusable-workflows/.github/workflows/reusable-pr-validation.yml@main
+        permissions:
+            contents: read
+            pull-requests: write
+    conventional-commits:
+        uses: apermo/reusable-workflows/.github/workflows/reusable-conventional-commits.yml@main

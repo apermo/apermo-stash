@@ -1,0 +1,19 @@
+name: Plugin Check
+
+on:
+    pull_request:
+        branches: [main]
+    push:
+        branches: [main]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    plugin-check:
+        # Skip on the template repo itself — placeholders, hidden files, and the
+        # dual plugin/theme layout all violate directory policy. Derived projects
+        # (different repo slug) will run it normally.
+        if: github.repository != 'apermo/template-wordpress'
+        uses: apermo/reusable-workflows/.github/workflows/reusable-plugin-check.yml@main

@@ -1,0 +1,19 @@
+# DDEV-generated files
+.ddev-docker-compose-base.yaml
+.ddev-docker-compose-full.yaml
+.dbimageBuild/
+.global_commands/
+.homeadditions/
+.sshimageBuild/
+.webimageBuild/
+db_snapshots/
+sequelpro.spf
+mutagen/
+xhprof/
+
+# Addon files (managed by ddev add-on)
+commands/
+orchestrate/
+
+# WordPress (downloaded by orchestrate)
+wordpress/

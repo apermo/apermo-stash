@@ -1,0 +1,15 @@
+name: Release
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    conventional-commits:
+        uses: apermo/reusable-workflows/.github/workflows/reusable-conventional-commits.yml@main
+    release:
+        uses: apermo/reusable-workflows/.github/workflows/reusable-release.yml@main
+        permissions:
+            contents: write
+            pull-requests: write

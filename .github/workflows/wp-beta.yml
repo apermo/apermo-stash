@@ -1,0 +1,14 @@
+name: WP Beta Compatibility
+
+on:
+    schedule:
+        - cron: '0 6 * * *'
+    workflow_dispatch:
+
+jobs:
+    beta:
+        uses: apermo/reusable-workflows/.github/workflows/reusable-wp-integration.yml@main
+        with:
+            php-versions: '["8.3","8.4"]'
+            wp-versions: '["beta"]'
+            multisite: 'both'

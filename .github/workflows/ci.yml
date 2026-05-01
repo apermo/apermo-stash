@@ -1,0 +1,17 @@
+name: PHP CI
+
+on:
+    pull_request:
+    push:
+        branches:
+            - main
+
+jobs:
+    ci:
+        uses: apermo/reusable-workflows/.github/workflows/reusable-ci.yml@main
+        with:
+            php-versions: '["8.2", "8.3", "8.4"]'
+            test-command: 'test:unit'
+            codecov-upload: true
+        secrets:
+            codecov-token: ${{ secrets.CODECOV_TOKEN }}
