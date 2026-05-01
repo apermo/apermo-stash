@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash;
 
+use Apermo\LinkStash\Auth\BearerTokenAuth;
+use Apermo\LinkStash\Auth\TokenStore;
 use Apermo\LinkStash\PostType\BookmarkMeta;
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\PostType\TagTaxonomy;
@@ -78,5 +80,6 @@ class Main {
 		( new BookmarkPostType() )->register();
 		( new TagTaxonomy() )->register();
 		( new BookmarkMeta() )->register();
+		( new BearerTokenAuth( new TokenStore() ) )->register();
 	}
 }

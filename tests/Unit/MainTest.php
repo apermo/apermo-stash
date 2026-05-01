@@ -118,6 +118,9 @@ class MainTest extends TestCase {
 		Functions\expect( 'add_action' )
 			->times( 3 )
 			->with( 'init', Mockery::any() );
+		Functions\expect( 'add_filter' )
+			->once()
+			->with( 'determine_current_user', Mockery::any() );
 
 		Main::boot();
 	}
