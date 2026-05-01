@@ -7,6 +7,7 @@ namespace Apermo\LinkStash\Tests\Unit;
 use Apermo\LinkStash\Main;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -79,32 +80,44 @@ class MainTest extends TestCase {
 	}
 
 	/**
-	 * Verifies activate can be called without error.
+	 * Verifies activate registers the CPT and flushes rewrites.
 	 *
 	 * @return void
 	 */
 	public function test_activate(): void {
+		Functions\stubs(
+			[
+				'__' => null,
+				'_x' => null,
+			],
+		);
+		Functions\expect( 'register_post_type' )->once();
+		Functions\expect( 'flush_rewrite_rules' )->once();
+
 		Main::activate();
-		$this->assertTrue( true );
 	}
 
 	/**
-	 * Verifies deactivate can be called without error.
+	 * Verifies deactivate flushes rewrites.
 	 *
 	 * @return void
 	 */
 	public function test_deactivate(): void {
+		Functions\expect( 'flush_rewrite_rules' )->once();
+
 		Main::deactivate();
-		$this->assertTrue( true );
 	}
 
 	/**
-	 * Verifies boot can be called without error.
+	 * Verifies boot wires the bookmark post type.
 	 *
 	 * @return void
 	 */
 	public function test_boot(): void {
+		Functions\expect( 'add_action' )
+			->once()
+			->with( 'init', Mockery::any() );
+
 		Main::boot();
-		$this->assertTrue( true );
 	}
 }

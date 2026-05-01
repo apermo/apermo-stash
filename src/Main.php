@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash;
 
+use Apermo\LinkStash\PostType\BookmarkPostType;
+
 /**
  * Bootstraps the plugin.
  */
@@ -45,10 +47,14 @@ class Main {
 	/**
 	 * Activates the plugin.
 	 *
+	 * Registers the CPT once so that subsequent rewrite-rule flushes know the
+	 * post type, then flushes rewrites.
+	 *
 	 * @return void
 	 */
 	public static function activate(): void {
-		// Activation logic.
+		( new BookmarkPostType() )->register_post_type();
+		flush_rewrite_rules();
 	}
 
 	/**
@@ -57,7 +63,7 @@ class Main {
 	 * @return void
 	 */
 	public static function deactivate(): void {
-		// Deactivation logic.
+		flush_rewrite_rules();
 	}
 
 	/**
@@ -66,6 +72,6 @@ class Main {
 	 * @return void
 	 */
 	public static function boot(): void {
-		// Initialize plugin functionality.
+		( new BookmarkPostType() )->register();
 	}
 }
