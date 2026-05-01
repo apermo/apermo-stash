@@ -73,8 +73,11 @@ class CorsHandler {
 	/**
 	 * Returns true when the origin matches a single allow-list entry.
 	 *
-	 * Wildcard support is intentionally minimal: a trailing `*` matches any
-	 * suffix, which is enough for `chrome-extension://*` and similar.
+	 * A trailing `*` matches any suffix, but only at a scheme/path/port
+	 * boundary so that `https://example.tld*` does not match
+	 * `https://example.tld.attacker.tld`. Boundary means the prefix already
+	 * ends in `/` or `:`, or the next character of the origin is `/`, `:`,
+	 * `?`, or `#`, or the origin equals the prefix exactly.
 	 *
 	 * @param string $origin    Origin header value.
 	 * @param string $candidate Allow-list entry.
@@ -86,13 +89,25 @@ class CorsHandler {
 			return true;
 		}
 
-		if ( \str_ends_with( $candidate, '*' ) ) {
-			$prefix = \substr( $candidate, 0, -1 );
-
-			return \str_starts_with( $origin, $prefix );
+		if ( ! \str_ends_with( $candidate, '*' ) ) {
+			return false;
 		}
 
-		return false;
+		$prefix = \substr( $candidate, 0, -1 );
+		if ( ! \str_starts_with( $origin, $prefix ) ) {
+			return false;
+		}
+
+		if ( \str_ends_with( $prefix, '/' ) || \str_ends_with( $prefix, ':' ) ) {
+			return true;
+		}
+
+		$rest = \substr( $origin, \strlen( $prefix ) );
+		if ( $rest === '' ) {
+			return true;
+		}
+
+		return \in_array( $rest[0], [ '/', ':', '?', '#' ], true );
 	}
 
 	/**
@@ -172,7 +187,6 @@ class CorsHandler {
 		}
 
 		\header( 'Access-Control-Allow-Origin: ' . $origin );
-		\header( 'Access-Control-Allow-Credentials: false' );
 		\header( 'Vary: Origin' );
 	}
 
@@ -207,7 +221,6 @@ class CorsHandler {
 		\header( 'Access-Control-Allow-Methods: ' . self::ALLOWED_METHODS );
 		\header( 'Access-Control-Allow-Headers: ' . self::ALLOWED_HEADERS );
 		\header( 'Access-Control-Max-Age: 86400' );
-		\header( 'Access-Control-Allow-Credentials: false' );
 		\header( 'Vary: Origin' );
 		status_header( 204 );
 
