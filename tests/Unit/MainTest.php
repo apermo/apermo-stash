@@ -92,6 +92,7 @@ class MainTest extends TestCase {
 			],
 		);
 		Functions\expect( 'register_post_type' )->once();
+		Functions\expect( 'register_taxonomy' )->once();
 		Functions\expect( 'flush_rewrite_rules' )->once();
 
 		Main::activate();
@@ -115,7 +116,7 @@ class MainTest extends TestCase {
 	 */
 	public function test_boot(): void {
 		Functions\expect( 'add_action' )
-			->once()
+			->twice()
 			->with( 'init', Mockery::any() );
 
 		Main::boot();

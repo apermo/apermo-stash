@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Apermo\LinkStash;
 
 use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\LinkStash\PostType\TagTaxonomy;
 
 /**
  * Bootstraps the plugin.
@@ -54,6 +55,7 @@ class Main {
 	 */
 	public static function activate(): void {
 		( new BookmarkPostType() )->register_post_type();
+		( new TagTaxonomy() )->register_taxonomy();
 		flush_rewrite_rules();
 	}
 
@@ -73,5 +75,6 @@ class Main {
 	 */
 	public static function boot(): void {
 		( new BookmarkPostType() )->register();
+		( new TagTaxonomy() )->register();
 	}
 }
