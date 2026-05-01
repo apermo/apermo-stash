@@ -129,11 +129,13 @@ After running `setup.sh` on a new project derived from this template, remind the
 
 - Add the `CODECOV_TOKEN` repository secret (Settings > Secrets > Actions) for code coverage reporting
 
-## Placeholder conventions
+## Naming
 
-The setup script replaces these across all files:
-- `linkstash` → slug (kebab-case)
-- `Linkstash` → PascalCase
-- `LINKSTASH` → UPPER_SNAKE_CASE
-- `linkstash` → snake_case
-- Placeholder namespace → chosen namespace
+- Plugin slug: `linkstash`
+- Namespace: `Apermo\LinkStash` (PSR-4 root)
+- Constants prefix: `LINKSTASH_`
+- User-facing brand: **LinkStash** (capital S; not `Linkstash`)
+
+The bootstrapping `setup.sh` script that derived this project from
+`apermo/template-wordpress` was removed once it had done its job; the
+template-sync flow above is what brings in upstream changes from now on.
