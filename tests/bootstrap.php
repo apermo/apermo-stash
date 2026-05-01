@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/stubs.php';
 
 $wp_tests_dir = getenv( 'WP_TESTS_DIR' );
 
@@ -12,6 +11,13 @@ if ( $wp_tests_dir === false ) {
 	if ( is_dir( $vendor_dir ) ) {
 		$wp_tests_dir = $vendor_dir;
 	}
+}
+
+// Load the WordPress class stubs only when the real WP suite is not available.
+// In integration runs WP core declares its own WP_Error and friends; double-
+// declaring them here would cause a fatal.
+if ( $wp_tests_dir === false || ! is_dir( $wp_tests_dir ) ) {
+	require_once __DIR__ . '/stubs.php';
 }
 
 if ( $wp_tests_dir !== false && is_dir( $wp_tests_dir ) ) {

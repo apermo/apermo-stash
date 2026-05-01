@@ -35,7 +35,7 @@
         "test": "phpunit",
         "test:unit": "phpunit --testsuite Unit",
         "test:integration": "phpunit --testsuite Integration",
-        "analyse": "phpstan analyse --memory-limit=512M",
+        "analyse": "phpstan analyse --memory-limit=1G",
         "cs": "phpcs",
         "cs:fix": "phpcbf"
     },

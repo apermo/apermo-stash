@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-05-01
+
 ### Added
 
 - Custom post type `linkstash_bookmark` with REST exposure, custom non-hierarchical
