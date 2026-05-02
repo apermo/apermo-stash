@@ -194,6 +194,7 @@ class QuickAdd {
 		update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
 		update_post_meta( $post_id, BookmarkMeta::META_UNREAD, false );
 		update_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, false );
+		update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, ! $meta['reachable'] );
 
 		if ( $tags !== [] ) {
 			wp_set_object_terms( $post_id, $tags, TagTaxonomy::TAXONOMY, false );

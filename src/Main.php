@@ -110,7 +110,7 @@ class Main {
 			( new Notices() )->register();
 			( new QuickAdd( new MetadataFetcher() ) )->register();
 			( new SettingsPage( $store ) )->register();
-			( new BookmarkMetabox() )->register();
+			( new BookmarkMetabox( new MetadataFetcher() ) )->register();
 			( new DashboardWidget() )->register();
 			( new TagAutocomplete() )->register();
 			( new UrlAutoScheme() )->register();

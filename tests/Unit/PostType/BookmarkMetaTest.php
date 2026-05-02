@@ -55,7 +55,7 @@ class BookmarkMetaTest extends TestCase {
 	 */
 	public function test_register_post_meta_registers_all_keys(): void {
 		Functions\expect( 'register_post_meta' )
-			->times( 4 )
+			->times( 5 )
 			->with( BookmarkPostType::POST_TYPE, Mockery::type( 'string' ), Mockery::type( 'array' ) );
 
 		( new BookmarkMeta() )->register_post_meta();

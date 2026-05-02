@@ -10,6 +10,7 @@ use Apermo\LinkStash\PostType\BookmarkMeta;
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\Url\Canonicalizer;
 use Apermo\LinkStash\Url\DisplayUrl;
+use Apermo\LinkStash\Url\MetadataFetcher;
 use WP_Post;
 
 /**
@@ -25,6 +26,22 @@ class BookmarkMetabox {
 
 	private const NONCE_FIELD  = 'linkstash_metabox_nonce';
 	private const NONCE_ACTION = 'linkstash_save_metabox';
+
+	/**
+	 * URL metadata fetcher (used on save to mark unreachable URLs).
+	 *
+	 * @var MetadataFetcher
+	 */
+	private MetadataFetcher $fetcher;
+
+	/**
+	 * Constructs the metabox.
+	 *
+	 * @param MetadataFetcher $fetcher URL metadata fetcher.
+	 */
+	public function __construct( MetadataFetcher $fetcher ) {
+		$this->fetcher = $fetcher;
+	}
 
 	/**
 	 * Returns true when this save_post invocation should persist meta-box state.
@@ -155,9 +172,10 @@ class BookmarkMetabox {
 	 * @return void
 	 */
 	public function render_url_meta_box( WP_Post $post ): void {
-		$url      = (string) get_post_meta( $post->ID, BookmarkMeta::META_URL, true );
-		$unread   = (bool) get_post_meta( $post->ID, BookmarkMeta::META_UNREAD, true );
-		$archived = (bool) get_post_meta( $post->ID, BookmarkMeta::META_ARCHIVED, true );
+		$url         = (string) get_post_meta( $post->ID, BookmarkMeta::META_URL, true );
+		$unread      = (bool) get_post_meta( $post->ID, BookmarkMeta::META_UNREAD, true );
+		$archived    = (bool) get_post_meta( $post->ID, BookmarkMeta::META_ARCHIVED, true );
+		$unreachable = (bool) get_post_meta( $post->ID, BookmarkMeta::META_UNREACHABLE, true );
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_FIELD );
 		?>
 		<p>
@@ -171,6 +189,15 @@ class BookmarkMetabox {
 					placeholder="https://&hellip;"
 					data-linkstash-url-input />
 		</p>
+		<?php if ( $unreachable && $url !== '' ) { ?>
+			<div class="notice notice-warning inline" style="margin: 0.5rem 0; padding: 0.5rem 0.75rem;">
+				<p style="margin: 0;">
+					<strong><?php esc_html_e( 'URL didn\'t respond on last save.', 'linkstash' ); ?></strong>
+					<br />
+					<?php esc_html_e( 'It may be private, behind a VPN or login wall, or temporarily down. The bookmark is saved either way; re-saving will re-check.', 'linkstash' ); ?>
+				</p>
+			</div>
+		<?php } ?>
 		<p>
 			<label>
 				<input type="checkbox" name="linkstash_unread" value="1" <?php checked( $unread ); ?> />
@@ -226,8 +253,17 @@ class BookmarkMetabox {
 		$url       = self::read_text( 'linkstash_url' );
 		$canonical = Canonicalizer::canonicalize( $url );
 		if ( $url !== '' && $canonical !== '' ) {
+			$previous_canonical = (string) get_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, true );
 			update_post_meta( $post_id, BookmarkMeta::META_URL, esc_url_raw( $url ) );
 			update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
+
+			// Re-check reachability whenever the URL actually changes. We
+			// don't refetch on every metabox save because the timeout
+			// (5s) would slow every "tweak the title" save to a crawl.
+			if ( $canonical !== $previous_canonical ) {
+				$result = $this->fetcher->fetch( $url );
+				update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, ! $result['reachable'] );
+			}
 		}
 
 		update_post_meta( $post_id, BookmarkMeta::META_UNREAD, isset( $_POST['linkstash_unread'] ) );

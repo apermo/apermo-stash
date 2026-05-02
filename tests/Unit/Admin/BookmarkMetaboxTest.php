@@ -7,8 +7,10 @@ namespace Apermo\LinkStash\Tests\Unit\Admin;
 use Apermo\LinkStash\Admin\BookmarkMetabox;
 use Apermo\LinkStash\PostType\BookmarkMeta;
 use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\LinkStash\Url\MetadataFetcher;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use WP_Post;
 
@@ -109,7 +111,7 @@ class BookmarkMetaboxTest extends TestCase {
 	 * @return void
 	 */
 	public function test_register_hooks_admin_actions(): void {
-		$metabox = new BookmarkMetabox();
+		$metabox = $this->metabox();
 		$metabox->register();
 
 		$post_type = BookmarkPostType::POST_TYPE;
@@ -124,7 +126,7 @@ class BookmarkMetaboxTest extends TestCase {
 	 * @return void
 	 */
 	public function test_disable_block_editor_only_for_bookmark_cpt(): void {
-		$metabox = new BookmarkMetabox();
+		$metabox = $this->metabox();
 
 		self::assertFalse( $metabox->disable_block_editor( true, BookmarkPostType::POST_TYPE ) );
 		self::assertTrue( $metabox->disable_block_editor( true, 'post' ) );
@@ -139,7 +141,7 @@ class BookmarkMetaboxTest extends TestCase {
 	public function test_register_meta_boxes(): void {
 		Functions\expect( 'add_meta_box' )->twice();
 
-		( new BookmarkMetabox() )->register_meta_boxes();
+		$this->metabox()->register_meta_boxes();
 	}
 
 	/**
@@ -161,7 +163,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$post->ID = 7;
 
 		\ob_start();
-		( new BookmarkMetabox() )->render_url_meta_box( $post );
+		$this->metabox()->render_url_meta_box( $post );
 		$output = (string) \ob_get_clean();
 
 		self::assertStringContainsString( 'name="linkstash_url"', $output );
@@ -181,7 +183,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$post->post_content = 'These are my notes.';
 
 		\ob_start();
-		( new BookmarkMetabox() )->render_note_meta_box( $post );
+		$this->metabox()->render_note_meta_box( $post );
 		$output = (string) \ob_get_clean();
 
 		self::assertStringContainsString( '<textarea', $output );
@@ -197,7 +199,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$post     = new WP_Post();
 		$post->ID = 7;
 
-		( new BookmarkMetabox() )->save_post( 7, $post );
+		$this->metabox()->save_post( 7, $post );
 
 		self::assertSame( [], $this->meta_writes );
 		self::assertSame( [], $this->post_writes );
@@ -220,7 +222,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$post->post_title   = 'My title';
 		$post->post_content = '';
 
-		( new BookmarkMetabox() )->save_post( 7, $post );
+		$this->metabox()->save_post( 7, $post );
 
 		$keys = \array_column( $this->meta_writes, 1 );
 		self::assertContains( BookmarkMeta::META_URL, $keys );
@@ -252,7 +254,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$post->post_title   = '';
 		$post->post_content = '';
 
-		( new BookmarkMetabox() )->save_post( 7, $post );
+		$this->metabox()->save_post( 7, $post );
 
 		$title_write = null;
 		foreach ( $this->post_writes as $write ) {
@@ -282,7 +284,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$post->post_title   = 'T';
 		$post->post_content = 'Old notes';
 
-		( new BookmarkMetabox() )->save_post( 7, $post );
+		$this->metabox()->save_post( 7, $post );
 
 		$content_write = null;
 		foreach ( $this->post_writes as $write ) {
@@ -293,5 +295,25 @@ class BookmarkMetaboxTest extends TestCase {
 		}
 
 		self::assertSame( 'New notes', $content_write );
+	}
+
+	/**
+	 * Builds a metabox wired to a Mockery'd metadata fetcher that reports
+	 * unreachable. The fetcher only runs when the URL changes during save,
+	 * so most tests don't actually invoke it.
+	 *
+	 * @return BookmarkMetabox
+	 */
+	private function metabox(): BookmarkMetabox {
+		$fetcher = Mockery::mock( MetadataFetcher::class );
+		$fetcher->shouldReceive( 'fetch' )->andReturn(
+			[
+				'title'       => null,
+				'description' => null,
+				'reachable'   => false,
+			],
+		);
+
+		return new BookmarkMetabox( $fetcher );
 	}
 }
