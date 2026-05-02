@@ -83,6 +83,7 @@ class QuickAddTest extends TestCase {
 		$quick->register();
 
 		self::assertNotFalse( has_action( 'all_admin_notices', [ $quick, 'maybe_render_form' ] ) );
+		self::assertNotFalse( has_action( 'admin_enqueue_scripts', [ $quick, 'maybe_enqueue_position_script' ] ) );
 		self::assertNotFalse( has_action( 'admin_post_linkstash_quick_add', [ $quick, 'handle_submission' ] ) );
 	}
 

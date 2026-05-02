@@ -6,6 +6,7 @@ namespace Apermo\LinkStash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
+use Apermo\LinkStash\Main;
 use Apermo\LinkStash\PostType\BookmarkMeta;
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\PostType\TagTaxonomy;
@@ -111,12 +112,48 @@ class QuickAdd {
 	}
 
 	/**
+	 * Returns the inline script that moves the form below the page heading.
+	 *
+	 * @return string
+	 */
+	private static function position_script(): string {
+		return "( function () {\n"
+			. "\tfunction move() {\n"
+			. "\t\tvar form = document.querySelector( 'form.linkstash-quick-add' );\n"
+			. "\t\tvar marker = document.querySelector( 'hr.wp-header-end' );\n"
+			. "\t\tif ( form && marker && marker.parentNode ) {\n"
+			. "\t\t\tmarker.parentNode.insertBefore( form, marker.nextSibling );\n"
+			. "\t\t}\n"
+			. "\t}\n"
+			. "\tif ( document.readyState === 'loading' ) {\n"
+			. "\t\tdocument.addEventListener( 'DOMContentLoaded', move );\n"
+			. "\t} else {\n"
+			. "\t\tmove();\n"
+			. "\t}\n"
+			. "} )();\n";
+	}
+
+	/**
+	 * Returns true when the current admin screen is the bookmark list table.
+	 *
+	 * @return bool
+	 */
+	private static function is_target_screen(): bool {
+		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		return $screen !== null
+			&& $screen->base === 'edit'
+			&& $screen->post_type === BookmarkPostType::POST_TYPE;
+	}
+
+	/**
 	 * Hooks the rendering and submission handlers.
 	 *
 	 * @return void
 	 */
 	public function register(): void {
 		add_action( 'all_admin_notices', [ $this, 'maybe_render_form' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'maybe_enqueue_position_script' ] );
 		add_action( 'admin_post_' . self::ACTION, [ $this, 'handle_submission' ] );
 	}
 
@@ -126,21 +163,36 @@ class QuickAdd {
 	 * Hooked to `all_admin_notices` rather than `restrict_manage_posts` so
 	 * that the standalone `<form>` does not nest inside the list table's
 	 * own `#posts-filter` form (which `restrict_manage_posts` fires inside
-	 * of). The notices area sits above the list table in `<div class="wrap">`
-	 * but outside any other form.
+	 * of). `all_admin_notices` fires from `wp-admin/admin-header.php`, which
+	 * runs before `edit.php` outputs the `<h1>` and `<hr class="wp-header-end">`,
+	 * so the rendered form lands above the page heading. A small admin
+	 * script (registered via `maybe_enqueue_position_script`) moves it
+	 * back below the heading on DOMContentLoaded — the same trick core
+	 * uses for `.notice` / `.updated` / `.error` elements.
 	 *
 	 * @return void
 	 */
 	public function maybe_render_form(): void {
-		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-		if ( $screen === null
-			|| $screen->base !== 'edit'
-			|| $screen->post_type !== BookmarkPostType::POST_TYPE
-		) {
+		if ( ! self::is_target_screen() ) {
 			return;
 		}
 
 		self::render_form_html( 'linkstash-quick-add' );
+	}
+
+	/**
+	 * Enqueues the inline reposition script on the bookmark list screen.
+	 *
+	 * @return void
+	 */
+	public function maybe_enqueue_position_script(): void {
+		if ( ! self::is_target_screen() ) {
+			return;
+		}
+
+		wp_register_script( 'linkstash-quick-add-position', false, [], Main::VERSION, true );
+		wp_enqueue_script( 'linkstash-quick-add-position' );
+		wp_add_inline_script( 'linkstash-quick-add-position', self::position_script() );
 	}
 
 	/**
