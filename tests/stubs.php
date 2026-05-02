@@ -10,6 +10,81 @@
 
 declare(strict_types=1);
 
+if ( ! class_exists( 'WP_REST_Request' ) ) {
+	/**
+	 * Minimal WP_REST_Request stand-in for unit tests.
+	 *
+	 * Mirrors only the surface that LinkStash code touches: `get_param`,
+	 * `has_param`, and `ArrayAccess`. Mockery extends this class to mock
+	 * specific methods per test.
+	 *
+	 * @implements \ArrayAccess<string, mixed>
+	 */
+	class WP_REST_Request implements \ArrayAccess {
+
+		/**
+		 * Holds request parameters.
+		 *
+		 * @var array<string, mixed>
+		 */
+		public array $params = [];
+
+		/**
+		 * Returns the value of a parameter, or null when absent.
+		 *
+		 * @param string $key Parameter name.
+		 *
+		 * @return mixed
+		 */
+		public function get_param( string $key ) {
+			return $this->params[ $key ] ?? null;
+		}
+
+		/**
+		 * Returns whether a parameter is set.
+		 *
+		 * @param string $key Parameter name.
+		 *
+		 * @return bool
+		 */
+		public function has_param( string $key ): bool {
+			return \array_key_exists( $key, $this->params );
+		}
+
+		/**
+		 * @param mixed $offset Offset.
+		 */
+		public function offsetExists( $offset ): bool {
+			return $this->has_param( (string) $offset );
+		}
+
+		/**
+		 * @param mixed $offset Offset.
+		 *
+		 * @return mixed
+		 */
+		#[\ReturnTypeWillChange]
+		public function offsetGet( $offset ) {
+			return $this->get_param( (string) $offset );
+		}
+
+		/**
+		 * @param mixed $offset Offset.
+		 * @param mixed $value  Value.
+		 */
+		public function offsetSet( $offset, $value ): void {
+			$this->params[ (string) $offset ] = $value;
+		}
+
+		/**
+		 * @param mixed $offset Offset.
+		 */
+		public function offsetUnset( $offset ): void {
+			unset( $this->params[ (string) $offset ] );
+		}
+	}
+}
+
 if ( ! class_exists( 'WP_Error' ) ) {
 	/**
 	 * Minimal WP_Error stand-in for unit tests.
