@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ba6bcaded3e4a393201207f4b918ef7",
+    "content-hash": "8c4a8588f64259c87c104d7055e7ed02",
     "packages": [],
     "packages-dev": [
         {
@@ -57,16 +57,16 @@
         },
         {
             "name": "apermo/apermo-coding-standards",
-            "version": "v2.9.0",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/apermo/apermo-coding-standards.git",
-                "reference": "36a507e08ca248c2e3074b38b7cc08910cfe1321"
+                "reference": "61f264eb411bb1a4ca581ca6c60740426596a85e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/apermo/apermo-coding-standards/zipball/36a507e08ca248c2e3074b38b7cc08910cfe1321",
-                "reference": "36a507e08ca248c2e3074b38b7cc08910cfe1321",
+                "url": "https://api.github.com/repos/apermo/apermo-coding-standards/zipball/61f264eb411bb1a4ca581ca6c60740426596a85e",
+                "reference": "61f264eb411bb1a4ca581ca6c60740426596a85e",
                 "shasum": ""
             },
             "require": {
@@ -112,7 +112,7 @@
                 "issues": "https://github.com/apermo/apermo-coding-standards/issues",
                 "source": "https://github.com/apermo/apermo-coding-standards"
             },
-            "time": "2026-04-20T07:27:42+00:00"
+            "time": "2026-05-02T12:32:03+00:00"
         },
         {
             "name": "apermo/phpstan-wordpress-rules",

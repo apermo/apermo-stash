@@ -13,7 +13,7 @@
         "php": ">=8.1"
     },
     "require-dev": {
-        "apermo/apermo-coding-standards": "^2.9",
+        "apermo/apermo-coding-standards": "^3.0",
         "apermo/phpstan-wordpress-rules": "^0.2",
         "brain/monkey": "^2.6",
         "phpstan/extension-installer": "^1.4",
