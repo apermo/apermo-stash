@@ -3,6 +3,7 @@
 /.gemini/           export-ignore
 /.github/           export-ignore
 /.wordpress-org/    export-ignore
+/branding/          export-ignore
 /.husky/            export-ignore
 /.gitattributes     export-ignore
 /.gitignore         export-ignore
