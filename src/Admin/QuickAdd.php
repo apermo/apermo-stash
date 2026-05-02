@@ -117,17 +117,18 @@ class QuickAdd {
 	 */
 	private static function position_script(): string {
 		return "( function () {\n"
-			. "\tfunction move() {\n"
-			. "\t\tvar form = document.querySelector( 'form.linkstash-quick-add' );\n"
+			. "\tfunction place() {\n"
+			. "\t\tvar tpl = document.getElementById( 'linkstash-quick-add-template' );\n"
 			. "\t\tvar marker = document.querySelector( 'hr.wp-header-end' );\n"
-			. "\t\tif ( form && marker && marker.parentNode ) {\n"
-			. "\t\t\tmarker.parentNode.insertBefore( form, marker.nextSibling );\n"
-			. "\t\t}\n"
+			. "\t\tif ( ! tpl || ! marker || ! marker.parentNode ) { return; }\n"
+			. "\t\tvar form = tpl.content.querySelector( 'form.linkstash-quick-add' );\n"
+			. "\t\tif ( ! form ) { return; }\n"
+			. "\t\tmarker.parentNode.insertBefore( form, marker.nextSibling );\n"
 			. "\t}\n"
 			. "\tif ( document.readyState === 'loading' ) {\n"
-			. "\t\tdocument.addEventListener( 'DOMContentLoaded', move );\n"
+			. "\t\tdocument.addEventListener( 'DOMContentLoaded', place );\n"
 			. "\t} else {\n"
-			. "\t\tmove();\n"
+			. "\t\tplace();\n"
 			. "\t}\n"
 			. "} )();\n";
 	}
@@ -176,7 +177,12 @@ class QuickAdd {
 			return;
 		}
 
+		// Wrapped in <template> so the browser doesn't render the form
+		// at this position (above the page heading). The footer script
+		// extracts the form node and inserts it after .wp-header-end.
+		echo '<template id="linkstash-quick-add-template">';
 		self::render_form_html( 'linkstash-quick-add' );
+		echo '</template>';
 	}
 
 	/**

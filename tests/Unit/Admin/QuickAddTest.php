@@ -117,6 +117,10 @@ class QuickAddTest extends TestCase {
 		self::assertStringContainsString( 'linkstash-quick-add', $output );
 		self::assertStringContainsString( 'name="url"', $output );
 		self::assertStringContainsString( 'name="tags"', $output );
+		// Form is wrapped in a <template> so the browser doesn't render
+		// it at the all_admin_notices position; the footer script
+		// extracts and places it after .wp-header-end.
+		self::assertStringContainsString( '<template id="linkstash-quick-add-template">', $output );
 		self::assertStringContainsString( 'name="public"', $output );
 	}
 
