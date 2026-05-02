@@ -77,40 +77,19 @@ class BookmarkMetabox {
 	 * Updates the given post fields without re-triggering save_post handlers.
 	 *
 	 * Detaches our own save_post hook for the duration of the update so the
-	 * fallback-title write does not cause an infinite loop.
+	 * fallback-title write does not recurse into save_post.
 	 *
 	 * @param int                  $post_id Post ID.
 	 * @param array<string, mixed> $fields  Fields to update.
 	 *
 	 * @return void
 	 */
-	private static function update_post_fields( int $post_id, array $fields ): void {
-		$instance = null;
-		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-		global $wp_filter;
+	private function update_post_fields( int $post_id, array $fields ): void {
 		$hook_name = 'save_post_' . BookmarkPostType::POST_TYPE;
-		if ( isset( $wp_filter[ $hook_name ] ) ) {
-			foreach ( $wp_filter[ $hook_name ]->callbacks as $callbacks ) {
-				foreach ( $callbacks as $entry ) {
-					$callback = $entry['function'] ?? null;
-					if ( \is_array( $callback ) && $callback[0] instanceof self ) {
-						$instance = $callback[0];
-						break 2;
-					}
-				}
-			}
-		}
-		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
-		if ( $instance !== null ) {
-			remove_action( $hook_name, [ $instance, 'save_post' ], 10 );
-		}
-
+		remove_action( $hook_name, [ $this, 'save_post' ], 10 );
 		wp_update_post( \array_merge( [ 'ID' => $post_id ], $fields ) );
-
-		if ( $instance !== null ) {
-			add_action( $hook_name, [ $instance, 'save_post' ], 10, 2 );
-		}
+		add_action( $hook_name, [ $this, 'save_post' ], 10, 2 );
 	}
 
 	/**
@@ -257,17 +236,23 @@ class BookmarkMetabox {
 		$note_raw = isset( $_POST['linkstash_note'] ) && \is_string( $_POST['linkstash_note'] )
 			? wp_kses_post( wp_unslash( $_POST['linkstash_note'] ) )
 			: '';
-		if ( $note_raw !== $post->post_content ) {
-			self::update_post_fields( $post_id, [ 'post_content' => $note_raw ] );
-		}
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		$update = [];
+		if ( $note_raw !== $post->post_content ) {
+			$update['post_content'] = $note_raw;
+		}
 
 		if ( \trim( $post->post_title ) === '' ) {
 			$resolved_url = $url !== '' ? $url : (string) get_post_meta( $post_id, BookmarkMeta::META_URL, true );
 			$display      = DisplayUrl::simplify( $resolved_url );
 			if ( $display !== '' ) {
-				self::update_post_fields( $post_id, [ 'post_title' => $display ] );
+				$update['post_title'] = $display;
 			}
+		}
+
+		if ( $update !== [] ) {
+			$this->update_post_fields( $post_id, $update );
 		}
 	}
 }
