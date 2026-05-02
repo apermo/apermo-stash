@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   companion Chrome extension.
 - "Settings" link in the plugin row actions on the Plugins listing
   screen.
+- Custom admin-menu icon: a monochromatic LinkStash logo
+  (`assets/menu-icon.svg`) used as a CSS `mask-image` so the icon
+  adopts the WordPress admin color scheme — grey-ish in idle state,
+  the scheme's highlight on hover/active — instead of the brand's
+  blue/orange. Replaces the previous `dashicons-admin-links` icon.
 
 ### Changed
 
