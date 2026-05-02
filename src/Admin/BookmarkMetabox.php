@@ -261,7 +261,7 @@ class BookmarkMetabox {
 			// up should clear the warning automatically the next time
 			// the user touches the bookmark.
 			$result = $this->fetcher->fetch( $url );
-			update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, ! $result['reachable'] );
+			update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, BookmarkMeta::bool_to_meta( ! $result['reachable'] ) );
 		}
 
 		update_post_meta( $post_id, BookmarkMeta::META_UNREAD, isset( $_POST['linkstash_unread'] ) );
