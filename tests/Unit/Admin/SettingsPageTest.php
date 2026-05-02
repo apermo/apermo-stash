@@ -49,6 +49,10 @@ class SettingsPageTest extends TestCase {
 		Functions\when( 'wp_create_nonce' )->justReturn( 'nonce-value' );
 		Functions\when( 'wp_nonce_field' )->justReturn( '' );
 		Functions\when( 'wp_date' )->justReturn( '2026-05-01 00:00' );
+		Functions\when( 'get_option' )->alias(
+			static fn ( string $key ) => $key === 'date_format' ? 'Y-m-d' : 'H:i',
+		);
+		Functions\when( 'human_time_diff' )->justReturn( '5 minutes' );
 		Functions\when( 'current_user_can' )->justReturn( true );
 		Functions\when( 'get_current_user_id' )->justReturn( 7 );
 		Functions\when( 'get_transient' )->justReturn( false );
@@ -136,7 +140,7 @@ class SettingsPageTest extends TestCase {
 					'id'        => 'tok-2',
 					'name'      => 'Office',
 					'created'   => 1700000000,
-					'last_used' => 1700000100,
+					'last_used' => \time() - 60,
 				],
 			],
 		);
@@ -148,6 +152,8 @@ class SettingsPageTest extends TestCase {
 		self::assertStringContainsString( 'My laptop', $output );
 		self::assertStringContainsString( 'Office', $output );
 		self::assertStringContainsString( 'never', $output );
+		// Recent last_used hits the human_time_diff branch ("5 minutes ago").
+		self::assertStringContainsString( 'ago', $output );
 	}
 
 	/**

@@ -63,16 +63,34 @@ class SettingsPage {
 	}
 
 	/**
-	 * Formats a Unix timestamp for display, falling back to em-dash.
+	 * Formats a Unix timestamp the way WP admin list tables do.
+	 *
+	 * Returns "x ago" (via human_time_diff) for events younger than 24h
+	 * and falls back to "<site date format> at <site time format>" for
+	 * older ones. Mirrors WP_Privacy_Requests_Table::get_timestamp_as_date().
 	 *
 	 * @param int $timestamp Unix timestamp.
 	 *
 	 * @return string
 	 */
 	private static function formatted_date( int $timestamp ): string {
-		$formatted = wp_date( 'Y-m-d H:i', $timestamp );
+		if ( $timestamp <= 0 ) {
+			return '—';
+		}
 
-		return $formatted === false ? '—' : $formatted;
+		$time_diff = \time() - $timestamp;
+
+		if ( $time_diff >= 0 && $time_diff < \DAY_IN_SECONDS ) {
+			/* translators: %s: Human-readable time difference. */
+			return \sprintf( __( '%s ago', 'linkstash' ), human_time_diff( $timestamp ) );
+		}
+
+		return \sprintf(
+			/* translators: 1: token date, 2: token time. */
+			__( '%1$s at %2$s', 'linkstash' ),
+			wp_date( (string) get_option( 'date_format' ), $timestamp ),
+			wp_date( (string) get_option( 'time_format' ), $timestamp ),
+		);
 	}
 
 	/**

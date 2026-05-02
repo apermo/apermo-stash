@@ -23,6 +23,13 @@ if ( ! $loading_wp && ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/' );
 }
 
+// WP normally defines DAY_IN_SECONDS in wp-includes/default-constants.php.
+// Provide it for unit-only runs so code that checks against it (e.g.
+// SettingsPage::formatted_date) works without bringing in WP.
+if ( ! $loading_wp && ! defined( 'DAY_IN_SECONDS' ) ) {
+	define( 'DAY_IN_SECONDS', 86400 );
+}
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Load the WordPress class stubs only when the real WP suite is not available.
