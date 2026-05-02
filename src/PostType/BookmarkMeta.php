@@ -17,6 +17,34 @@ class BookmarkMeta {
 	public const META_ARCHIVED      = '_linkstash_archived';
 
 	/**
+	 * Normalises a boolean flag for `update_post_meta()` storage.
+	 *
+	 * Plain booleans round-trip through update_post_meta as `'1'` and
+	 * empty string, which breaks `meta_query` comparisons against `'0'`
+	 * for the false case. Storing the explicit string here keeps reads,
+	 * writes, and queries on the same shape.
+	 *
+	 * @param bool $flag Boolean flag.
+	 *
+	 * @return string `'1'` for true, `'0'` for false.
+	 */
+	public static function bool_to_meta( bool $flag ): string {
+		return $flag ? '1' : '0';
+	}
+
+	/**
+	 * Sanitises a flag value coming from the REST API into the storage shape.
+	 *
+	 * @param mixed $value Raw value.
+	 *
+	 * @return string `'1'` or `'0'`.
+	 */
+	public static function sanitize_bool_meta( mixed $value ): string {
+		// @phpstan-ignore argument.templateType
+		return self::bool_to_meta( rest_sanitize_boolean( \is_scalar( $value ) ? $value : false ) );
+	}
+
+	/**
 	 * Registers the WordPress hook that triggers meta registration.
 	 *
 	 * @return void
@@ -66,9 +94,9 @@ class BookmarkMeta {
 				'type'              => 'boolean',
 				'single'            => true,
 				'show_in_rest'      => true,
-				'sanitize_callback' => 'rest_sanitize_boolean',
+				'sanitize_callback' => [ self::class, 'sanitize_bool_meta' ],
 				'auth_callback'     => $auth_callback,
-				'default'           => false,
+				'default'           => '0',
 			],
 		);
 
@@ -79,9 +107,9 @@ class BookmarkMeta {
 				'type'              => 'boolean',
 				'single'            => true,
 				'show_in_rest'      => true,
-				'sanitize_callback' => 'rest_sanitize_boolean',
+				'sanitize_callback' => [ self::class, 'sanitize_bool_meta' ],
 				'auth_callback'     => $auth_callback,
-				'default'           => false,
+				'default'           => '0',
 			],
 		);
 	}

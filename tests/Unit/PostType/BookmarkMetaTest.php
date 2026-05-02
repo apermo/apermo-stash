@@ -72,4 +72,32 @@ class BookmarkMetaTest extends TestCase {
 		self::assertSame( '_linkstash_unread', BookmarkMeta::META_UNREAD );
 		self::assertSame( '_linkstash_archived', BookmarkMeta::META_ARCHIVED );
 	}
+
+	/**
+	 * Confirms bool_to_meta yields the canonical "1"/"0" storage shape.
+	 *
+	 * @return void
+	 */
+	public function test_bool_to_meta(): void {
+		self::assertSame( '1', BookmarkMeta::bool_to_meta( true ) );
+		self::assertSame( '0', BookmarkMeta::bool_to_meta( false ) );
+	}
+
+	/**
+	 * Confirms sanitize_bool_meta routes raw values through rest_sanitize_boolean.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_bool_meta(): void {
+		Functions\when( 'rest_sanitize_boolean' )->alias(
+			static fn ( $value ): bool => \in_array( $value, [ true, 1, '1', 'true', 'on', 'yes' ], true ),
+		);
+
+		self::assertSame( '1', BookmarkMeta::sanitize_bool_meta( true ) );
+		self::assertSame( '1', BookmarkMeta::sanitize_bool_meta( '1' ) );
+		self::assertSame( '0', BookmarkMeta::sanitize_bool_meta( false ) );
+		self::assertSame( '0', BookmarkMeta::sanitize_bool_meta( '' ) );
+		// Non-scalar input is treated as false.
+		self::assertSame( '0', BookmarkMeta::sanitize_bool_meta( [ 'unexpected' ] ) );
+	}
 }
