@@ -31,7 +31,7 @@ use Apermo\LinkStash\Url\MetadataFetcher;
  */
 class Main {
 
-	public const VERSION = '0.1.0';
+	public const VERSION = '0.1.1';
 
 	/**
 	 * Holds the main plugin file path.

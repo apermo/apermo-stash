@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-05-02
+
+### Added
+
+- WordPress.org listing assets directory (`.wordpress-org/`) with
+  documentation of the required image dimensions (icon-128 / icon-256,
+  banner-772 / banner-1544, screenshot-N).
+- Expanded `readme.txt` for the WordPress.org plugin directory —
+  highlights, REST API summary, FAQ, screenshot captions, link to the
+  companion Chrome extension.
+
+### Changed
+
+- Bumped the `Version` plugin header, `Main::VERSION`, and `readme.txt`
+  Stable tag to 0.1.1.
+
 ## [0.1.0] - 2026-05-01
 
 ### Added
