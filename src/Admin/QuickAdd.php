@@ -108,9 +108,9 @@ class QuickAdd {
 		}
 
 		?>
-		<form method="post" action="<?= esc_url( admin_url( 'admin-post.php' ) ) ?>" class="linkstash-quick-add" style="margin: 0.5rem 0;">
-			<input type="hidden" name="action" value="<?= esc_attr( self::ACTION ) ?>" />
-			<input type="hidden" name="_wpnonce" value="<?= esc_attr( wp_create_nonce( self::ACTION ) ) ?>" />
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="linkstash-quick-add" style="margin: 0.5rem 0;">
+			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
+			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( wp_create_nonce( self::ACTION ) ); ?>" />
 			<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required style="min-width: 18rem;" />
 			<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'linkstash' ); ?>" />
 			<label style="margin-left: 0.5rem;">
