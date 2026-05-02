@@ -27,18 +27,23 @@ class TokenStoreTest extends TestCase {
 		$options = [];
 
 		Functions\when( 'get_user_meta' )->alias(
-			static function ( int $user_id, string $key ) use ( &$store ) {
+			// Match WP's 3-arg signature; the SUT calls get_user_meta( id, key, true ).
+			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+			static function ( int $user_id, string $key, bool $single = false ) use ( &$store ) {
 				return $store[ $user_id ][ $key ] ?? '';
 			},
 		);
 		Functions\when( 'update_user_meta' )->alias(
-			static function ( int $user_id, string $key, $value ) use ( &$store ): bool {
+			// Match WP's 4-arg signature; the SUT only uses the first three.
+			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+			static function ( int $user_id, string $key, $value, $prev_value = '' ) use ( &$store ): bool {
 				$store[ $user_id ][ $key ] = $value;
 				return true;
 			},
 		);
 		Functions\when( 'delete_user_meta' )->alias(
-			static function ( int $user_id, string $key ) use ( &$store ): bool {
+			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+			static function ( int $user_id, string $key, $value = '' ) use ( &$store ): bool {
 				unset( $store[ $user_id ][ $key ] );
 				return true;
 			},
@@ -50,7 +55,9 @@ class TokenStoreTest extends TestCase {
 			},
 		);
 		Functions\when( 'update_option' )->alias(
-			static function ( string $key, $value ) use ( &$options ): bool {
+			// Match WP's 3-arg signature; the SUT passes $autoload=false.
+			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+			static function ( string $key, $value, $autoload = null ) use ( &$options ): bool {
 				$options[ $key ] = $value;
 				return true;
 			},
@@ -62,7 +69,10 @@ class TokenStoreTest extends TestCase {
 			},
 		);
 		Functions\when( 'wp_generate_password' )->alias(
-			static fn ( int $length = 12 ): string => \str_repeat( 'A', $length ),
+			// Match WP's 3-arg signature; the SUT passes $special_chars=false.
+			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+			static fn ( int $length = 12, bool $special_chars = true, bool $extra_special_chars = false ): string
+				=> \str_repeat( 'A', $length ),
 		);
 		Functions\when( 'wp_generate_uuid4' )->alias(
 			static fn (): string => 'uuid-' . \uniqid( '', true ),
@@ -147,24 +157,22 @@ class TokenStoreTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the user-meta scan fallback recovers an unindexed token and
-	 * back-fills the index for next time.
+	 * Verifies find_by_plain refuses to scan when the index does not contain
+	 * the hash. This guards against a Bearer-DoS where invalid tokens force
+	 * a full users iteration on every authentication attempt.
 	 *
 	 * @return void
 	 */
-	public function test_find_by_plain_falls_back_to_scan_for_unindexed_tokens(): void {
-		Functions\when( 'get_users' )->justReturn( [ 4, 8 ] );
+	public function test_find_by_plain_does_not_scan_users_on_unknown_hash(): void {
+		Functions\expect( 'get_users' )->never();
 
 		$store = new TokenStore( static fn (): int => 1700000000 );
-		$plain = $store->create( 8, 'pre-index' );
+		$store->create( 7, 'x' );
 
-		// Wipe the index option to simulate a token minted before indexing
-		// existed; the lookup should still succeed via scan.
+		// Wipe the index option so the would-be hash is missing.
 		Functions\when( 'get_option' )->justReturn( [] );
 
-		$found = $store->find_by_plain( $plain );
-		self::assertNotNull( $found );
-		self::assertSame( 8, $found['user_id'] );
+		self::assertNull( $store->find_by_plain( 'whatever' ) );
 	}
 
 	/**

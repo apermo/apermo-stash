@@ -24,7 +24,7 @@ class MetadataFetcher {
 		if ( \preg_match( '#<title[^>]*>(.*?)</title>#is', $html, $match ) !== 1 ) {
 			return null;
 		}
-		$title = \trim( \html_entity_decode( $match[1], \ENT_QUOTES | \ENT_HTML5, 'UTF-8' ) );
+		$title = \trim( wp_strip_all_tags( \html_entity_decode( $match[1], \ENT_QUOTES | \ENT_HTML5, 'UTF-8' ) ) );
 
 		return $title === '' ? null : $title;
 	}
@@ -74,7 +74,7 @@ class MetadataFetcher {
 			}
 		}
 
-		$content = \trim( \html_entity_decode( $match[1], \ENT_QUOTES | \ENT_HTML5, 'UTF-8' ) );
+		$content = \trim( wp_strip_all_tags( \html_entity_decode( $match[1], \ENT_QUOTES | \ENT_HTML5, 'UTF-8' ) ) );
 
 		return $content === '' ? null : $content;
 	}

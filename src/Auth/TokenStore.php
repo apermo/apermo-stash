@@ -148,11 +148,11 @@ class TokenStore {
 	/**
 	 * Locates the owner of a plain token via the hash → user index.
 	 *
-	 * Falls back to a one-time per-user scan when an index entry is missing
-	 * (covers tokens minted before the index was introduced) and writes the
-	 * recovered mapping back into the index for next time.
-	 *
-	 * Returns null when no entry matches.
+	 * Returns null when the hash is not in the index, even if a matching
+	 * token entry exists in user meta. The index is the only source of
+	 * truth — `create()` writes both sides atomically — and an unindexed
+	 * lookup would otherwise let an unauthenticated caller force a full
+	 * `get_users()` scan via repeated invalid Bearer tokens (DoS).
 	 *
 	 * @param string $plain Plain token value.
 	 *
@@ -166,25 +166,25 @@ class TokenStore {
 		$hash  = self::hash( $plain );
 		$index = $this->load_index();
 
-		if ( isset( $index[ $hash ] ) ) {
-			$user_id = $index[ $hash ]['user_id'];
-
-			foreach ( $this->raw_entries( $user_id ) as $entry ) {
-				if ( \hash_equals( $entry['hash'], $hash ) ) {
-					return [
-						'user_id' => $user_id,
-						'id'      => $entry['id'],
-					];
-				}
-			}
-
-			// Entry vanished from user meta; drop the stale index row.
-			$this->index_remove( $hash );
-
+		if ( ! isset( $index[ $hash ] ) ) {
 			return null;
 		}
 
-		return $this->find_by_plain_via_scan( $hash );
+		$user_id = $index[ $hash ]['user_id'];
+
+		foreach ( $this->raw_entries( $user_id ) as $entry ) {
+			if ( \hash_equals( $entry['hash'], $hash ) ) {
+				return [
+					'user_id' => $user_id,
+					'id'      => $entry['id'],
+				];
+			}
+		}
+
+		// Entry vanished from user meta; drop the stale index row.
+		$this->index_remove( $hash );
+
+		return null;
 	}
 
 	/**
@@ -231,36 +231,6 @@ class TokenStore {
 		$value = get_user_meta( $user_id, self::META_KEY, true );
 
 		return \is_array( $value ) ? \array_values( $value ) : [];
-	}
-
-	/**
-	 * Recovers an unindexed token by scanning every user's tokens.
-	 *
-	 * Used for backwards compatibility with tokens minted before the index
-	 * was introduced; rebuilds the index entry as a side effect so the
-	 * next lookup is O(1).
-	 *
-	 * @param string $hash Hashed token value.
-	 *
-	 * @return array{user_id: int, id: string}|null
-	 */
-	private function find_by_plain_via_scan( string $hash ): ?array {
-		$user_ids = get_users( [ 'fields' => 'ID' ] );
-		foreach ( $user_ids as $raw_id ) {
-			$user_id = (int) $raw_id;
-			foreach ( $this->raw_entries( $user_id ) as $entry ) {
-				if ( \hash_equals( $entry['hash'], $hash ) ) {
-					$this->index_set( $hash, $user_id, $entry['id'] );
-
-					return [
-						'user_id' => $user_id,
-						'id'      => $entry['id'],
-					];
-				}
-			}
-		}
-
-		return null;
 	}
 
 	/**

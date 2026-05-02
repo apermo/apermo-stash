@@ -21,6 +21,7 @@ class CorsHandler {
 
 	private const ALLOWED_HEADERS = 'Authorization, Content-Type, X-WP-Nonce, X-Requested-With';
 	private const ALLOWED_METHODS = 'GET, POST, PATCH, PUT, DELETE, OPTIONS';
+	private const EXPOSED_HEADERS = 'X-LinkStash-Existing, X-WP-Total, X-WP-TotalPages, Link';
 
 	/**
 	 * Returns the origin from the current request, or an empty string.
@@ -199,6 +200,7 @@ class CorsHandler {
 		}
 
 		\header( 'Access-Control-Allow-Origin: ' . $origin );
+		\header( 'Access-Control-Expose-Headers: ' . self::EXPOSED_HEADERS );
 		\header( 'Vary: Origin' );
 	}
 
@@ -232,6 +234,7 @@ class CorsHandler {
 		\header( 'Access-Control-Allow-Origin: ' . $origin );
 		\header( 'Access-Control-Allow-Methods: ' . self::ALLOWED_METHODS );
 		\header( 'Access-Control-Allow-Headers: ' . self::ALLOWED_HEADERS );
+		\header( 'Access-Control-Expose-Headers: ' . self::EXPOSED_HEADERS );
 		\header( 'Access-Control-Max-Age: 86400' );
 		\header( 'Vary: Origin' );
 		status_header( 204 );

@@ -30,6 +30,7 @@ class MetadataFetcherTest extends TestCase {
 		Functions\when( 'wp_remote_retrieve_response_code' )->alias(
 			static fn ( array $response ): int => (int) ( $response['response']['code'] ?? 0 ),
 		);
+		Functions\when( 'wp_strip_all_tags' )->returnArg();
 		Functions\when( 'wp_remote_retrieve_body' )->alias(
 			static fn ( array $response ): string => (string) ( $response['body'] ?? '' ),
 		);
