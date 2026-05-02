@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\PostType;
 
+\defined( 'ABSPATH' ) || exit();
+
 /**
  * Registers the linkstash_tag taxonomy attached to the bookmark CPT.
  */

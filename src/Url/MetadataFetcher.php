@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Url;
 
+\defined( 'ABSPATH' ) || exit();
+
 /**
  * Fetches the title and description metadata for a remote URL.
  */

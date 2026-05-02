@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Rest;
 
+\defined( 'ABSPATH' ) || exit();
+
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\PostType\TagTaxonomy;
 use WP_Query;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Rest;
 
+\defined( 'ABSPATH' ) || exit();
+
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use WP_Error;
 use WP_REST_Request;

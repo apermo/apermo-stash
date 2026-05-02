@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Auth;
 
+\defined( 'ABSPATH' ) || exit();
+
 /**
  * Authenticates REST API requests carrying a `Authorization: Bearer <token>` header.
  */

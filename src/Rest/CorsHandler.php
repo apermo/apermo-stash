@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Rest;
 
+\defined( 'ABSPATH' ) || exit();
+
 /**
  * Sends CORS headers for the LinkStash REST namespace and short-circuits
  * `OPTIONS` preflight requests.

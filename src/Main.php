@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash;
 
+\defined( 'ABSPATH' ) || exit();
+
 use Apermo\LinkStash\Admin\ListColumns;
 use Apermo\LinkStash\Admin\QuickAdd;
 use Apermo\LinkStash\Admin\SettingsPage;

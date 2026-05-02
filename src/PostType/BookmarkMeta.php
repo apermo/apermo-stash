@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\PostType;
 
+\defined( 'ABSPATH' ) || exit();
+
 /**
  * Registers post-meta keys for the bookmark CPT.
  */

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Auth;
 
+\defined( 'ABSPATH' ) || exit();
+
 /**
  * Persists plugin-issued API tokens as WordPress user meta.
  *

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Admin;
 
+\defined( 'ABSPATH' ) || exit();
+
 use Apermo\LinkStash\Auth\TokenStore;
 
 /**

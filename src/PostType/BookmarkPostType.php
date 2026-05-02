@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\PostType;
 
+\defined( 'ABSPATH' ) || exit();
+
 /**
  * Registers the linkstash_bookmark custom post type.
  */

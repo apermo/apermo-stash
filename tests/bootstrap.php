@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+// Source files include `defined( 'ABSPATH' ) || exit();` guards so that direct
+// HTTP access from outside WordPress is rejected; PHPUnit autoloads those
+// files, so define the constant here before the autoloader runs.
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $wp_tests_dir = getenv( 'WP_TESTS_DIR' );

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Rest;
 
+\defined( 'ABSPATH' ) || exit();
+
 /**
  * Registers the linkstash/v1 REST namespace and routes.
  */
