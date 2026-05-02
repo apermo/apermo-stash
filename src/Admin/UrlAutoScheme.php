@@ -47,27 +47,25 @@ class UrlAutoScheme {
 	 * @return string
 	 */
 	private static function handler_js(): string {
-		return <<<'JS'
-( function () {
-	function attach( input ) {
-		input.addEventListener( 'blur', function () {
-			var value = input.value.trim();
-			if ( value === '' ) { return; }
-			// Already scheme-prefixed (http://, mailto:, chrome-extension://, …) or protocol-relative — leave alone.
-			if ( /^[a-z][a-z0-9+.\-]*:|^\/\//i.test( value ) ) { return; }
-			input.value = 'https://' + value;
-		} );
-	}
-	function init() {
-		document.querySelectorAll( 'input[data-linkstash-url-input]' ).forEach( attach );
-	}
-	if ( document.readyState === 'loading' ) {
-		document.addEventListener( 'DOMContentLoaded', init );
-	} else {
-		init();
-	}
-} )();
-JS;
+		return "( function () {\n"
+			. "\tfunction attach( input ) {\n"
+			. "\t\tinput.addEventListener( 'blur', function () {\n"
+			. "\t\t\tvar value = input.value.trim();\n"
+			. "\t\t\tif ( value === '' ) { return; }\n"
+			. "\t\t\t// Already scheme-prefixed or protocol-relative — leave alone.\n"
+			. "\t\t\tif ( /^[a-z][a-z0-9+.\\-]*:|^\\/\\//i.test( value ) ) { return; }\n"
+			. "\t\t\tinput.value = 'https://' + value;\n"
+			. "\t\t} );\n"
+			. "\t}\n"
+			. "\tfunction init() {\n"
+			. "\t\tdocument.querySelectorAll( 'input[data-linkstash-url-input]' ).forEach( attach );\n"
+			. "\t}\n"
+			. "\tif ( document.readyState === 'loading' ) {\n"
+			. "\t\tdocument.addEventListener( 'DOMContentLoaded', init );\n"
+			. "\t} else {\n"
+			. "\t\tinit();\n"
+			. "\t}\n"
+			. "} )();\n";
 	}
 
 	/**

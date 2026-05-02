@@ -67,48 +67,46 @@ class TagAutocomplete {
 	private static function adapter_js(): string {
 		$taxonomy = TagTaxonomy::TAXONOMY;
 
-		return <<<JS
-( function ( \$ ) {
-	\$( function () {
-		\$( 'input[data-linkstash-tag-autocomplete]' ).each( function () {
-			var \$input = \$( this );
-			var taxonomy = \$input.data( 'linkstashTagAutocomplete' ) || '{$taxonomy}';
-			\$input.autocomplete( {
-				minLength: 1,
-				source: function ( request, response ) {
-					var term = request.term.split( /,\\s*/ ).pop();
-					if ( term.length < 1 ) {
-						response( [] );
-						return;
-					}
-					\$.get( window.ajaxurl, {
-						action: 'ajax-tag-search',
-						tax: taxonomy,
-						q: term
-					}, function ( data ) {
-						response( ( data || '' ).split( '\\n' ).filter( Boolean ) );
-					} );
-				},
-				search: function () {
-					var term = this.value.split( /,\\s*/ ).pop();
-					if ( term.length < 1 ) {
-						return false;
-					}
-				},
-				focus: function () { return false; },
-				select: function ( event, ui ) {
-					var terms = this.value.split( /,\\s*/ );
-					terms.pop();
-					terms.push( ui.item.value );
-					terms.push( '' );
-					this.value = terms.join( ', ' );
-					return false;
-				}
-			} );
-		} );
-	} );
-} )( jQuery );
-JS;
+		return "( function ( \$ ) {\n"
+			. "\t\$( function () {\n"
+			. "\t\t\$( 'input[data-linkstash-tag-autocomplete]' ).each( function () {\n"
+			. "\t\t\tvar \$input = \$( this );\n"
+			. "\t\t\tvar taxonomy = \$input.data( 'linkstashTagAutocomplete' ) || '" . $taxonomy . "';\n"
+			. "\t\t\t\$input.autocomplete( {\n"
+			. "\t\t\t\tminLength: 1,\n"
+			. "\t\t\t\tsource: function ( request, response ) {\n"
+			. "\t\t\t\t\tvar term = request.term.split( /,\\s*/ ).pop();\n"
+			. "\t\t\t\t\tif ( term.length < 1 ) {\n"
+			. "\t\t\t\t\t\tresponse( [] );\n"
+			. "\t\t\t\t\t\treturn;\n"
+			. "\t\t\t\t\t}\n"
+			. "\t\t\t\t\t\$.get( window.ajaxurl, {\n"
+			. "\t\t\t\t\t\taction: 'ajax-tag-search',\n"
+			. "\t\t\t\t\t\ttax: taxonomy,\n"
+			. "\t\t\t\t\t\tq: term\n"
+			. "\t\t\t\t\t}, function ( data ) {\n"
+			. "\t\t\t\t\t\tresponse( ( data || '' ).split( '\\n' ).filter( Boolean ) );\n"
+			. "\t\t\t\t\t} );\n"
+			. "\t\t\t\t},\n"
+			. "\t\t\t\tsearch: function () {\n"
+			. "\t\t\t\t\tvar term = this.value.split( /,\\s*/ ).pop();\n"
+			. "\t\t\t\t\tif ( term.length < 1 ) {\n"
+			. "\t\t\t\t\t\treturn false;\n"
+			. "\t\t\t\t\t}\n"
+			. "\t\t\t\t},\n"
+			. "\t\t\t\tfocus: function () { return false; },\n"
+			. "\t\t\t\tselect: function ( event, ui ) {\n"
+			. "\t\t\t\t\tvar terms = this.value.split( /,\\s*/ );\n"
+			. "\t\t\t\t\tterms.pop();\n"
+			. "\t\t\t\t\tterms.push( ui.item.value );\n"
+			. "\t\t\t\t\tterms.push( '' );\n"
+			. "\t\t\t\t\tthis.value = terms.join( ', ' );\n"
+			. "\t\t\t\t\treturn false;\n"
+			. "\t\t\t\t}\n"
+			. "\t\t\t} );\n"
+			. "\t\t} );\n"
+			. "\t} );\n"
+			. "} )( jQuery );\n";
 	}
 
 	/**
