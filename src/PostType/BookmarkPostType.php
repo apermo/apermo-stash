@@ -57,7 +57,7 @@ class BookmarkPostType {
 				'menu_icon'          => 'dashicons-admin-links',
 				'capability_type'    => 'post',
 				'map_meta_cap'       => true,
-				'supports'           => [ 'title', 'editor', 'custom-fields' ],
+				'supports'           => [ 'title' ],
 				'has_archive'        => false,
 				'hierarchical'       => false,
 				'rewrite'            => false,
