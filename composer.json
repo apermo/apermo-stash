@@ -1,6 +1,6 @@
 {
-    "name": "apermo/plugin-name",
-    "description": "A WordPress plugin-name plugin.",
+    "name": "apermo/linkstash",
+    "description": "A WordPress linkstash plugin.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [
@@ -13,7 +13,7 @@
         "php": ">=8.1"
     },
     "require-dev": {
-        "apermo/apermo-coding-standards": "^2.9",
+        "apermo/apermo-coding-standards": "^3.0",
         "apermo/phpstan-wordpress-rules": "^0.2",
         "brain/monkey": "^2.6",
         "phpstan/extension-installer": "^1.4",
@@ -23,19 +23,19 @@
     },
     "autoload": {
         "psr-4": {
-            "Plugin_Name\\": "src/"
+            "Apermo\\LinkStash\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Plugin_Name\\Tests\\": "tests/"
+            "Apermo\\LinkStash\\Tests\\": "tests/"
         }
     },
     "scripts": {
         "test": "phpunit",
         "test:unit": "phpunit --testsuite Unit",
         "test:integration": "phpunit --testsuite Integration",
-        "analyse": "phpstan analyse --memory-limit=512M",
+        "analyse": "phpstan analyse --memory-limit=1G",
         "cs": "phpcs",
         "cs:fix": "phpcbf"
     },

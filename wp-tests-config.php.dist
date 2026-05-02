@@ -8,7 +8,7 @@
  * WP_TESTS_MULTISITE is intentionally omitted — it is controlled at runtime
  * via the WP_MULTISITE environment variable in the test bootstrap.
  *
- * @package Plugin_Name
+ * @package LinkStash
  */
 
 define( 'DB_NAME', '{{DB_NAME}}' );

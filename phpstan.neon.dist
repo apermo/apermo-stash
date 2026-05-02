@@ -4,4 +4,3 @@ parameters:
         - src
         - plugin.php
         - uninstall.php
-        - functions.php

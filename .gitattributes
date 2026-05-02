@@ -1,5 +1,6 @@
 /.ddev/             export-ignore
 /.editorconfig      export-ignore
+/.gemini/           export-ignore
 /.github/           export-ignore
 /.wordpress-org/    export-ignore
 /.husky/            export-ignore
@@ -18,5 +19,7 @@
 /package.json       export-ignore
 /.lighthouserc.js   export-ignore
 /.wp-env.json       export-ignore
+/package-lock.json  export-ignore
+/codecov.yml        export-ignore
 CHANGELOG.md        export-ignore
 CLAUDE.md           export-ignore

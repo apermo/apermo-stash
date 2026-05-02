@@ -12,8 +12,25 @@ permissions:
 
 jobs:
     plugin-check:
-        # Skip on the template repo itself — placeholders, hidden files, and the
-        # dual plugin/theme layout all violate directory policy. Derived projects
-        # (different repo slug) will run it normally.
+        # Skip on the upstream template repo itself (where placeholder names
+        # plus the dual plugin/theme layout violate directory policy).
         if: github.repository != 'apermo/template-wordpress'
-        uses: apermo/reusable-workflows/.github/workflows/reusable-plugin-check.yml@main
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.2'
+                  coverage: none
+
+            - name: Install Composer dependencies (no dev)
+              run: composer install --no-dev --no-progress --no-interaction
+
+            - name: Run Plugin Check
+              uses: WordPress/plugin-check-action@v1
+              with:
+                  build-dir: '.'
+                  exclude-directories: 'tests,e2e,vendor,node_modules,.ddev,.github,.gemini,.husky,.wordpress-org'
+                  exclude-files: 'composer.json,composer.lock,package.json,package-lock.json,phpcs.xml.dist,phpstan.neon.dist,phpunit.xml.dist,wp-tests-config.php.dist,playwright.config.js,codecov.yml,CLAUDE.md,CHANGELOG.md,LICENSE,.editorconfig,.gitattributes,.gitignore,.lintstagedrc.js,.wp-env.json,.lighthouserc.js'
