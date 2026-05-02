@@ -10,6 +10,256 @@
 
 declare(strict_types=1);
 
+if ( ! class_exists( 'WP_Query' ) ) {
+	/**
+	 * Minimal WP_Query stand-in for unit tests.
+	 *
+	 * Each `new WP_Query(...)` consumes the next entry from the static
+	 * `$results` queue, so a test can pre-load the responses it expects.
+	 * Construction args are recorded in the public `$args` property so
+	 * tests can assert what the SUT requested.
+	 */
+	class WP_Query {
+
+		/**
+		 * Holds the args the SUT passed to the constructor.
+		 *
+		 * @var array<string, mixed>
+		 */
+		public array $args = [];
+
+		/**
+		 * Holds the IDs (or post objects) returned for this query.
+		 *
+		 * @var array<int, mixed>
+		 */
+		public array $posts = [];
+
+		/**
+		 * Holds the total found posts (independent of pagination).
+		 *
+		 * @var int
+		 */
+		public int $found_posts = 0;
+
+		/**
+		 * Holds the max page count.
+		 *
+		 * @var int
+		 */
+		public int $max_num_pages = 1;
+
+		/**
+		 * Holds queued query results.
+		 *
+		 * @var list<array{posts?: array<int, mixed>, found_posts?: int, max_num_pages?: int}>
+		 */
+		public static array $results = [];
+
+		/**
+		 * Constructs the stub.
+		 *
+		 * @param array<string, mixed> $args Query args.
+		 */
+		public function __construct( array $args = [] ) {
+			$this->args = $args;
+			if ( self::$results !== [] ) {
+				$next                = \array_shift( self::$results );
+				$this->posts         = $next['posts'] ?? [];
+				$this->found_posts   = $next['found_posts'] ?? \count( $this->posts );
+				$this->max_num_pages = $next['max_num_pages'] ?? 1;
+			}
+		}
+	}
+}
+
+if ( ! class_exists( 'WP_Post' ) ) {
+	/**
+	 * Minimal WP_Post stand-in for unit tests.
+	 */
+	class WP_Post {
+
+		/**
+		 * Stores the post ID.
+		 *
+		 * @var int
+		 */
+		public int $ID = 0; // phpcs:ignore WordPress.NamingConventions.ValidVariableName
+
+		/**
+		 * Stores the post status.
+		 *
+		 * @var string
+		 */
+		public string $post_status = 'publish';
+
+		/**
+		 * Stores the post type.
+		 *
+		 * @var string
+		 */
+		public string $post_type = '';
+
+		/**
+		 * Stores the post title.
+		 *
+		 * @var string
+		 */
+		public string $post_title = '';
+
+		/**
+		 * Stores the post content.
+		 *
+		 * @var string
+		 */
+		public string $post_content = '';
+
+		/**
+		 * Stores the post author.
+		 *
+		 * @var int
+		 */
+		public int $post_author = 0;
+
+		/**
+		 * Stores the GMT created date.
+		 *
+		 * @var string
+		 */
+		public string $post_date_gmt = '2026-05-01 00:00:00';
+
+		/**
+		 * Stores the GMT modified date.
+		 *
+		 * @var string
+		 */
+		public string $post_modified_gmt = '2026-05-01 00:00:00';
+	}
+}
+
+if ( ! class_exists( 'WP_Term' ) ) {
+	/**
+	 * Minimal WP_Term stand-in for unit tests.
+	 */
+	class WP_Term {
+
+		/**
+		 * Stores the term ID.
+		 *
+		 * @var int
+		 */
+		public int $term_id = 0;
+
+		/**
+		 * Stores the term slug.
+		 *
+		 * @var string
+		 */
+		public string $slug = '';
+
+		/**
+		 * Stores the term name.
+		 *
+		 * @var string
+		 */
+		public string $name = '';
+
+		/**
+		 * Stores the count of attached posts.
+		 *
+		 * @var int
+		 */
+		public int $count = 0;
+	}
+}
+
+if ( ! class_exists( 'WP_REST_Server' ) ) {
+	/**
+	 * Minimal WP_REST_Server constants for unit tests.
+	 */
+	class WP_REST_Server {
+
+		public const READABLE  = 'GET';
+		public const CREATABLE = 'POST';
+		public const EDITABLE  = 'POST, PUT, PATCH';
+		public const DELETABLE = 'DELETE';
+	}
+}
+
+if ( ! class_exists( 'WP_REST_Response' ) ) {
+	/**
+	 * Minimal WP_REST_Response stand-in for unit tests.
+	 */
+	class WP_REST_Response {
+
+		/**
+		 * Stores the response payload.
+		 *
+		 * @var mixed
+		 */
+		public $data;
+
+		/**
+		 * Stores response headers.
+		 *
+		 * @var array<string, string>
+		 */
+		public array $headers = [];
+
+		/**
+		 * Stores the HTTP status.
+		 *
+		 * @var int
+		 */
+		public int $status = 200;
+
+		/**
+		 * Constructs the stub.
+		 *
+		 * @param mixed $data    Payload.
+		 * @param int   $status  HTTP status.
+		 * @param array<string, string> $headers Headers.
+		 */
+		public function __construct( $data = null, int $status = 200, array $headers = [] ) {
+			$this->data    = $data;
+			$this->status  = $status;
+			$this->headers = $headers;
+		}
+
+		/**
+		 * Sets a header.
+		 *
+		 * @param string $key   Header name.
+		 * @param string $value Header value.
+		 *
+		 * @return void
+		 */
+		public function header( string $key, string $value ): void {
+			$this->headers[ $key ] = $value;
+		}
+
+		/**
+		 * Sets the HTTP status.
+		 *
+		 * @param int $status Status.
+		 *
+		 * @return void
+		 */
+		public function set_status( int $status ): void {
+			$this->status = $status;
+		}
+
+		/**
+		 * Returns the response data.
+		 *
+		 * @return mixed
+		 */
+		public function get_data() {
+			return $this->data;
+		}
+	}
+}
+
 if ( ! class_exists( 'WP_REST_Request' ) ) {
 	/**
 	 * Minimal WP_REST_Request stand-in for unit tests.

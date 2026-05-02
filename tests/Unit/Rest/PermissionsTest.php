@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Tests\Unit\Rest;
 
+use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\Rest\Permissions;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use WP_Error;
+use WP_Post;
 use WP_REST_Request;
 
 /**
@@ -103,6 +105,99 @@ class PermissionsTest extends TestCase {
 		$request->shouldReceive( 'offsetGet' )->with( 'id' )->andReturn( 42 );
 
 		$result = Permissions::can_delete_bookmark( $request );
+		self::assertInstanceOf( WP_Error::class, $result );
+	}
+
+	/**
+	 * Verifies can_read_bookmark returns 404 for an unknown post.
+	 *
+	 * @return void
+	 */
+	public function test_can_read_bookmark_404_when_post_missing(): void {
+		Functions\when( 'get_post' )->justReturn( null );
+
+		$request         = new WP_REST_Request();
+		$request->params = [ 'id' => 999 ];
+
+		$result = Permissions::can_read_bookmark( $request );
+		self::assertInstanceOf( WP_Error::class, $result );
+		self::assertSame( 'linkstash_not_found', $result->code );
+	}
+
+	/**
+	 * Verifies can_read_bookmark allows anyone when the bookmark is public.
+	 *
+	 * @return void
+	 */
+	public function test_can_read_bookmark_allows_publish(): void {
+		$post              = new WP_Post();
+		$post->post_type   = BookmarkPostType::POST_TYPE;
+		$post->post_status = 'publish';
+		Functions\when( 'get_post' )->justReturn( $post );
+
+		$request         = new WP_REST_Request();
+		$request->params = [ 'id' => 7 ];
+
+		self::assertTrue( Permissions::can_read_bookmark( $request ) );
+	}
+
+	/**
+	 * Verifies can_read_bookmark allows the owner on a private bookmark.
+	 *
+	 * @return void
+	 */
+	public function test_can_read_bookmark_allows_owner_on_private(): void {
+		$post              = new WP_Post();
+		$post->post_type   = BookmarkPostType::POST_TYPE;
+		$post->post_status = 'private';
+		$post->post_author = 11;
+		Functions\when( 'get_post' )->justReturn( $post );
+		Functions\when( 'get_current_user_id' )->justReturn( 11 );
+
+		$request         = new WP_REST_Request();
+		$request->params = [ 'id' => 7 ];
+
+		self::assertTrue( Permissions::can_read_bookmark( $request ) );
+	}
+
+	/**
+	 * Verifies can_read_bookmark allows users with edit_others_posts.
+	 *
+	 * @return void
+	 */
+	public function test_can_read_bookmark_allows_admin(): void {
+		$post              = new WP_Post();
+		$post->post_type   = BookmarkPostType::POST_TYPE;
+		$post->post_status = 'private';
+		$post->post_author = 11;
+		Functions\when( 'get_post' )->justReturn( $post );
+		Functions\when( 'get_current_user_id' )->justReturn( 99 );
+		Functions\when( 'current_user_can' )->justReturn( true );
+
+		$request         = new WP_REST_Request();
+		$request->params = [ 'id' => 7 ];
+
+		self::assertTrue( Permissions::can_read_bookmark( $request ) );
+	}
+
+	/**
+	 * Verifies can_read_bookmark denies a non-owner without admin caps.
+	 *
+	 * @return void
+	 */
+	public function test_can_read_bookmark_denies_non_owner(): void {
+		$post              = new WP_Post();
+		$post->post_type   = BookmarkPostType::POST_TYPE;
+		$post->post_status = 'private';
+		$post->post_author = 11;
+		Functions\when( 'get_post' )->justReturn( $post );
+		Functions\when( 'get_current_user_id' )->justReturn( 22 );
+		Functions\when( 'current_user_can' )->justReturn( false );
+
+		$request         = new WP_REST_Request();
+		$request->params = [ 'id' => 7 ];
+
+		$result = Permissions::can_read_bookmark( $request );
 		self::assertInstanceOf( WP_Error::class, $result );
 	}
 }

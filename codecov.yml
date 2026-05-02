@@ -4,15 +4,9 @@ coverage:
       default:
         target: auto
         threshold: 1%
-    # Patch coverage is reported but does not block the PR. Most of the diff
-    # is WordPress-side controllers and admin screens whose meaningful
-    # coverage comes from the integration suite (separate workflow, not
-    # uploaded), not from Brain Monkey unit tests. Hard-blocking on patch
-    # coverage here would incentivise mocking-the-world tests over real
-    # integration ones.
     patch:
       default:
-        informational: true
+        target: 80%
 
 ignore:
   - "tests/**"
