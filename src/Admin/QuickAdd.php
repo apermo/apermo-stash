@@ -78,6 +78,39 @@ class QuickAdd {
 	}
 
 	/**
+	 * Renders the standalone quick-add form HTML.
+	 *
+	 * Shared by the bookmark list screen and the dashboard widget so the
+	 * markup, nonce, and submit target stay in lockstep.
+	 *
+	 * @param string $css_class Extra CSS class to apply to the form element.
+	 *
+	 * @return void
+	 */
+	public static function render_form_html( string $css_class = 'linkstash-quick-add' ): void {
+		$nonce = wp_create_nonce( self::ACTION );
+		?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="<?php echo esc_attr( $css_class ); ?>" style="margin: 0.5rem 0;">
+			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
+			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
+			<p>
+				<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required class="widefat" />
+			</p>
+			<p>
+				<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'linkstash' ); ?>" class="widefat" />
+			</p>
+			<p>
+				<label>
+					<input type="checkbox" name="public" value="1" />
+					<?php esc_html_e( 'Public', 'linkstash' ); ?>
+				</label>
+				<button type="submit" class="button button-primary alignright"><?php esc_html_e( 'Save bookmark', 'linkstash' ); ?></button>
+			</p>
+		</form>
+		<?php
+	}
+
+	/**
 	 * Hooks the rendering and submission handlers.
 	 *
 	 * @return void
@@ -107,20 +140,7 @@ class QuickAdd {
 			return;
 		}
 
-		$nonce = wp_create_nonce( self::ACTION );
-		?>
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="linkstash-quick-add" style="margin: 0.5rem 0;">
-			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
-			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
-			<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required style="min-width: 18rem;" />
-			<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'linkstash' ); ?>" />
-			<label style="margin-left: 0.5rem;">
-				<input type="checkbox" name="public" value="1" />
-				<?php esc_html_e( 'Public', 'linkstash' ); ?>
-			</label>
-			<button type="submit" class="button button-primary"><?php esc_html_e( 'Save bookmark', 'linkstash' ); ?></button>
-		</form>
-		<?php
+		self::render_form_html( 'linkstash-quick-add' );
 	}
 
 	/**
