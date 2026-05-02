@@ -19,8 +19,6 @@
 /package.json       export-ignore
 /.lighthouserc.js   export-ignore
 /.wp-env.json       export-ignore
-/composer.json      export-ignore
-/composer.lock      export-ignore
 /package-lock.json  export-ignore
 /codecov.yml        export-ignore
 CHANGELOG.md        export-ignore

@@ -322,7 +322,7 @@ class BookmarksController {
 			$args['perm'] = $visibility['perm'];
 		}
 
-		$tag = (string) ( $request->get_param( 'tag' ) ?? '' );
+		$tag = sanitize_text_field( (string) ( $request->get_param( 'tag' ) ?? '' ) );
 		if ( $tag !== '' ) {
 			// Tag filter is the documented way to scope the listing; the
 			// taxonomy is small in practice (one slug per saved bookmark tag).
@@ -336,7 +336,7 @@ class BookmarksController {
 			];
 		}
 
-		$search = (string) ( $request->get_param( 'q' ) ?? '' );
+		$search = sanitize_text_field( (string) ( $request->get_param( 'q' ) ?? '' ) );
 		if ( $search !== '' ) {
 			$args['s'] = $search;
 		}
@@ -378,8 +378,8 @@ class BookmarksController {
 		$user_id  = get_current_user_id();
 		$existing = $this->find_by_canonical( $user_id, $canonical );
 
-		$title       = (string) ( $request->get_param( 'title' ) ?? '' );
-		$description = (string) ( $request->get_param( 'description' ) ?? '' );
+		$title       = sanitize_text_field( (string) ( $request->get_param( 'title' ) ?? '' ) );
+		$description = sanitize_textarea_field( (string) ( $request->get_param( 'description' ) ?? '' ) );
 
 		if ( $title === '' || $description === '' ) {
 			$meta = $this->fetcher->fetch( $url );
@@ -468,10 +468,10 @@ class BookmarksController {
 		$update = [ 'ID' => $post_id ];
 
 		if ( $request->has_param( 'title' ) ) {
-			$update['post_title'] = (string) $request->get_param( 'title' );
+			$update['post_title'] = sanitize_text_field( (string) $request->get_param( 'title' ) );
 		}
 		if ( $request->has_param( 'description' ) ) {
-			$update['post_content'] = (string) $request->get_param( 'description' );
+			$update['post_content'] = sanitize_textarea_field( (string) $request->get_param( 'description' ) );
 		}
 		$is_public = self::optional_bool( $request, 'public' );
 		if ( $is_public !== null ) {

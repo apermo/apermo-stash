@@ -108,6 +108,6 @@ class TagsController {
 
 		$query = new WP_Query( $args );
 
-		return \array_values( \array_map( 'intval', $query->posts ) );
+		return \array_values( \array_map( '\intval', $query->posts ) );
 	}
 }

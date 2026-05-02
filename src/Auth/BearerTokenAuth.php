@@ -61,7 +61,7 @@ class BearerTokenAuth {
 			$headers = apache_request_headers();
 			foreach ( $headers as $name => $value ) {
 				if ( \strcasecmp( (string) $name, 'Authorization' ) === 0 ) {
-					return (string) $value;
+					return sanitize_text_field( wp_unslash( (string) $value ) );
 				}
 			}
 		}

@@ -137,9 +137,19 @@ class CorsHandler {
 	/**
 	 * Reads the current REST route from the request URI.
 	 *
+	 * Supports both pretty permalinks (`/wp-json/<namespace>/...`) and the
+	 * `?rest_route=/<namespace>/...` fallback used when permalinks are
+	 * disabled.
+	 *
 	 * @return string
 	 */
 	private static function current_route(): string {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only inspection of the incoming request shape.
+		if ( isset( $_GET['rest_route'] ) && \is_string( $_GET['rest_route'] ) ) {
+			return sanitize_text_field( wp_unslash( $_GET['rest_route'] ) );
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
 		if ( ! isset( $_SERVER['REQUEST_URI'] ) || ! \is_string( $_SERVER['REQUEST_URI'] ) ) {
 			return '';
 		}

@@ -34,6 +34,8 @@ class BookmarksControllerTest extends TestCase {
 
 		Functions\when( '__' )->returnArg();
 		Functions\when( 'esc_url_raw' )->returnArg();
+		Functions\when( 'sanitize_text_field' )->returnArg();
+		Functions\when( 'sanitize_textarea_field' )->returnArg();
 		Functions\when( 'rest_ensure_response' )->alias(
 			static fn ( $data ) => $data instanceof WP_REST_Response ? $data : new WP_REST_Response( $data ),
 		);

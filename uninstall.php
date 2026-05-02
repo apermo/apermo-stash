@@ -21,12 +21,10 @@ delete_metadata( 'user', 0, '_linkstash_tokens', '', true );
 // Drop the global hash → user index that backs O(1) token lookups.
 delete_option( 'linkstash_token_index' );
 
-// Drop one-shot transients used to surface freshly-issued tokens. A direct
-// query is used here because the user IDs are not enumerated and per-user
-// delete_transient() calls would require iterating every user. Caching is
-// not relevant during uninstall.
-// Direct query: per-user delete_transient calls would require enumerating
-// every user; caching is irrelevant during uninstall.
+// Drop the one-shot transients used to surface freshly-issued tokens. A
+// direct query is used here because user IDs are not enumerated and
+// per-user delete_transient() calls would require iterating every user.
+// Caching is irrelevant during uninstall.
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 $wpdb->query(
 	$wpdb->prepare(
