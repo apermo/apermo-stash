@@ -107,7 +107,7 @@ class SettingsPage {
 		?>
 		<div class="notice notice-success">
 			<p><strong><?php esc_html_e( 'New token created. Copy it now — it will not be shown again.', 'linkstash' ); ?></strong></p>
-			<p><code style="display:inline-block;padding:.5rem 1rem;background:#f0f0f1;"><?php echo esc_html( $token ); ?></code></p>
+			<p><code style="display:inline-block;padding:.5rem 1rem;background:#f0f0f1;"><?= esc_html( $token ) ?></code></p>
 		</div>
 		<?php
 	}
@@ -118,14 +118,11 @@ class SettingsPage {
 	 * @return void
 	 */
 	private static function render_create_form(): void {
-		$action_url = esc_url( admin_url( 'admin-post.php' ) );
-		$nonce      = wp_create_nonce( self::ACTION_CREATE );
 		?>
 		<h2><?php esc_html_e( 'Generate a new token', 'linkstash' ); ?></h2>
-		<?php // $action_url is esc_url'd at assignment; the inline echo is therefore safe. ?>
-		<form method="post" action="<?php echo $action_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>">
-			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION_CREATE ); ?>" />
-			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
+		<form method="post" action="<?= esc_url( admin_url( 'admin-post.php' ) ) ?>">
+			<input type="hidden" name="action" value="<?= esc_attr( self::ACTION_CREATE ) ?>" />
+			<input type="hidden" name="_wpnonce" value="<?= esc_attr( wp_create_nonce( self::ACTION_CREATE ) ) ?>" />
 			<p>
 				<label for="linkstash-token-name"><?php esc_html_e( 'Name', 'linkstash' ); ?></label>
 				<input id="linkstash-token-name" type="text" name="token_name" required class="regular-text" placeholder="<?php esc_attr_e( 'Chrome extension on laptop', 'linkstash' ); ?>" />
@@ -179,11 +176,10 @@ class SettingsPage {
 	 * @return void
 	 */
 	private static function render_token_row( array $entry ): void {
-		$revoke_url = esc_url( admin_url( 'admin-post.php' ) );
 		?>
 		<tr>
-			<td><?php echo esc_html( $entry['name'] ); ?></td>
-			<td><?php echo esc_html( self::formatted_date( $entry['created'] ) ); ?></td>
+			<td><?= esc_html( $entry['name'] ) ?></td>
+			<td><?= esc_html( self::formatted_date( $entry['created'] ) ) ?></td>
 			<td>
 				<?php
 				if ( $entry['last_used'] === null ) {
@@ -194,12 +190,11 @@ class SettingsPage {
 				?>
 			</td>
 			<td>
-				<?php // $revoke_url is esc_url'd at assignment; the inline echo is therefore safe. ?>
-				<form method="post" action="<?php echo $revoke_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" style="display:inline">
-					<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION_REVOKE ); ?>" />
-					<input type="hidden" name="token_id" value="<?php echo esc_attr( $entry['id'] ); ?>" />
+				<form method="post" action="<?= esc_url( admin_url( 'admin-post.php' ) ) ?>" style="display:inline">
+					<input type="hidden" name="action" value="<?= esc_attr( self::ACTION_REVOKE ) ?>" />
+					<input type="hidden" name="token_id" value="<?= esc_attr( $entry['id'] ) ?>" />
 					<?php wp_nonce_field( self::ACTION_REVOKE . ':' . $entry['id'] ); ?>
-					<button type="submit" class="button-link-delete" onclick="return confirm('<?php echo esc_js( __( 'Revoke this token?', 'linkstash' ) ); ?>');"><?php esc_html_e( 'Revoke', 'linkstash' ); ?></button>
+					<button type="submit" class="button-link-delete" onclick="return confirm('<?= esc_js( __( 'Revoke this token?', 'linkstash' ) ) ?>');"><?php esc_html_e( 'Revoke', 'linkstash' ); ?></button>
 				</form>
 			</td>
 		</tr>
