@@ -7,6 +7,7 @@ namespace Apermo\LinkStash;
 \defined( 'ABSPATH' ) || exit();
 
 use Apermo\LinkStash\Admin\ListColumns;
+use Apermo\LinkStash\Admin\Notices;
 use Apermo\LinkStash\Admin\QuickAdd;
 use Apermo\LinkStash\Admin\SettingsPage;
 use Apermo\LinkStash\Auth\BearerTokenAuth;
@@ -102,6 +103,7 @@ class Main {
 		if ( is_admin() ) {
 			$store = new TokenStore();
 			( new ListColumns() )->register();
+			( new Notices() )->register();
 			( new QuickAdd( new MetadataFetcher() ) )->register();
 			( new SettingsPage( $store ) )->register();
 		}

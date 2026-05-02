@@ -21,7 +21,7 @@ class CorsHandler {
 
 	private const ALLOWED_HEADERS = 'Authorization, Content-Type, X-WP-Nonce, X-Requested-With';
 	private const ALLOWED_METHODS = 'GET, POST, PATCH, PUT, DELETE, OPTIONS';
-	private const EXPOSED_HEADERS = 'X-LinkStash-Existing, X-WP-Total, X-WP-TotalPages, Link';
+	private const EXPOSED_HEADERS = 'X-LinkStash-Existing, X-LinkStash-Meta-Fetched, X-WP-Total, X-WP-TotalPages, Link';
 
 	/**
 	 * Returns the origin from the current request, or an empty string.

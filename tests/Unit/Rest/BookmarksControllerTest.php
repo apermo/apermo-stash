@@ -365,6 +365,7 @@ class BookmarksControllerTest extends TestCase {
 			[
 				'title'       => null,
 				'description' => null,
+				'reachable'   => false,
 			],
 		);
 

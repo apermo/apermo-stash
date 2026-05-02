@@ -380,18 +380,11 @@ class BookmarksController {
 		$user_id  = get_current_user_id();
 		$existing = $this->find_by_canonical( $user_id, $canonical );
 
-		$title       = sanitize_text_field( (string) ( $request->get_param( 'title' ) ?? '' ) );
-		$description = sanitize_textarea_field( (string) ( $request->get_param( 'description' ) ?? '' ) );
+		$title        = sanitize_text_field( (string) ( $request->get_param( 'title' ) ?? '' ) );
+		$description  = sanitize_textarea_field( (string) ( $request->get_param( 'description' ) ?? '' ) );
+		$meta_fetched = null;
 
-		if ( $title === '' || $description === '' ) {
-			$meta = $this->fetcher->fetch( $url );
-			if ( $title === '' && $meta['title'] !== null ) {
-				$title = $meta['title'];
-			}
-			if ( $description === '' && $meta['description'] !== null ) {
-				$description = $meta['description'];
-			}
-		}
+		[ $title, $description, $meta_fetched ] = $this->enrich_metadata( $url, $title, $description );
 
 		$tags      = $this->normalize_tags( $request->get_param( 'tags' ) );
 		$is_public = self::optional_bool( $request, 'public' );
@@ -426,6 +419,9 @@ class BookmarksController {
 
 		$response = rest_ensure_response( $this->prepare_response( get_post( $post_id ) ) );
 		$response->set_status( 201 );
+		if ( $meta_fetched !== null ) {
+			$response->header( 'X-LinkStash-Meta-Fetched', $meta_fetched ? '1' : '0' );
+		}
 
 		return $response;
 	}
@@ -591,6 +587,44 @@ class BookmarksController {
 		$response->header( 'X-LinkStash-Existing', '1' );
 
 		return $response;
+	}
+
+	/**
+	 * Locates a bookmark for the user by canonical URL.
+	 *
+	 * @param int    $user_id   User ID.
+	 * @param string $canonical Canonical URL.
+	 *
+	 * @return WP_Post|null
+	 */
+	/**
+	 * Fills missing title/description from the metadata fetcher.
+	 *
+	 * Skips the network round-trip when the caller supplied both fields.
+	 * Returns the resolved title, description, and a `reachable` flag that
+	 * is null when the fetcher wasn't called and bool when it was.
+	 *
+	 * @param string $url         Bookmark URL.
+	 * @param string $title       Caller-supplied title.
+	 * @param string $description Caller-supplied description.
+	 *
+	 * @return array{0: string, 1: string, 2: ?bool}
+	 */
+	private function enrich_metadata( string $url, string $title, string $description ): array {
+		if ( $title !== '' && $description !== '' ) {
+			return [ $title, $description, null ];
+		}
+
+		$meta = $this->fetcher->fetch( $url );
+
+		if ( $title === '' && $meta['title'] !== null ) {
+			$title = $meta['title'];
+		}
+		if ( $description === '' && $meta['description'] !== null ) {
+			$description = $meta['description'];
+		}
+
+		return [ $title, $description, $meta['reachable'] ];
 	}
 
 	/**

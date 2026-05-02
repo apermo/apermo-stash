@@ -70,6 +70,7 @@ class MetadataFetcherTest extends TestCase {
 
 		self::assertSame( 'Hello & World', $result['title'] );
 		self::assertSame( 'A great article', $result['description'] );
+		self::assertTrue( $result['reachable'] );
 	}
 
 	/**
@@ -111,6 +112,7 @@ class MetadataFetcherTest extends TestCase {
 
 		self::assertNull( $result['title'] );
 		self::assertNull( $result['description'] );
+		self::assertFalse( $result['reachable'] );
 	}
 
 	/**
@@ -132,5 +134,6 @@ class MetadataFetcherTest extends TestCase {
 
 		self::assertNull( $result['title'] );
 		self::assertNull( $result['description'] );
+		self::assertFalse( $result['reachable'] );
 	}
 }

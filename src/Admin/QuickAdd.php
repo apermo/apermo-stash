@@ -179,7 +179,7 @@ class QuickAdd {
 			wp_set_object_terms( $post_id, $tags, TagTaxonomy::TAXONOMY, false );
 		}
 
-		wp_safe_redirect( self::list_url( 'saved' ) );
+		wp_safe_redirect( self::list_url( $meta['reachable'] ? 'saved' : 'saved-unreachable' ) );
 		exit();
 	}
 }

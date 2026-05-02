@@ -80,23 +80,35 @@ class MetadataFetcher {
 	}
 
 	/**
-	 * Returns the empty result shape.
+	 * Returns the unreachable result shape.
 	 *
-	 * @return array{title: null, description: null}
+	 * Used when the host wouldn't talk to us (DNS failure, timeout, non-200,
+	 * empty body). The bookmark is still saved by the caller; the
+	 * `reachable: false` flag lets the UI raise a "URL saved, but the
+	 * content didn't load" warning while still allowing private/VPN/
+	 * OAuth-only links through.
+	 *
+	 * @return array{title: null, description: null, reachable: false}
 	 */
-	private static function empty_result(): array {
+	private static function unreachable(): array {
 		return [
 			'title'       => null,
 			'description' => null,
+			'reachable'   => false,
 		];
 	}
 
 	/**
-	 * Returns the title and description for the given URL, or nulls on failure.
+	 * Fetches the title, description, and reachability for the given URL.
+	 *
+	 * `reachable` is true iff the request returned a 200 with a body — the
+	 * extracted title/description may still be null in that case if the
+	 * page doesn't expose them. Network failures, redirects to non-200,
+	 * and empty bodies all result in `reachable: false`.
 	 *
 	 * @param string $url Remote URL to scrape.
 	 *
-	 * @return array{title: ?string, description: ?string}
+	 * @return array{title: ?string, description: ?string, reachable: bool}
 	 */
 	public function fetch( string $url ): array {
 		$response = wp_safe_remote_get(
@@ -109,21 +121,22 @@ class MetadataFetcher {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return self::empty_result();
+			return self::unreachable();
 		}
 
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			return self::empty_result();
+			return self::unreachable();
 		}
 
 		$body = wp_remote_retrieve_body( $response );
 		if ( $body === '' ) {
-			return self::empty_result();
+			return self::unreachable();
 		}
 
 		return [
 			'title'       => self::extract_title( $body ),
 			'description' => self::extract_description( $body ),
+			'reachable'   => true,
 		];
 	}
 }
