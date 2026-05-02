@@ -13,6 +13,7 @@ use Apermo\LinkStash\Admin\Notices;
 use Apermo\LinkStash\Admin\QuickAdd;
 use Apermo\LinkStash\Admin\SettingsPage;
 use Apermo\LinkStash\Admin\TagAutocomplete;
+use Apermo\LinkStash\Admin\UrlAutoScheme;
 use Apermo\LinkStash\Auth\BearerTokenAuth;
 use Apermo\LinkStash\Auth\TokenStore;
 use Apermo\LinkStash\PostType\BookmarkMeta;
@@ -112,6 +113,7 @@ class Main {
 			( new BookmarkMetabox() )->register();
 			( new DashboardWidget() )->register();
 			( new TagAutocomplete() )->register();
+			( new UrlAutoScheme() )->register();
 		}
 	}
 }

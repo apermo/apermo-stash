@@ -189,7 +189,8 @@ class BookmarkMetabox {
 					value="<?php echo esc_attr( $url ); ?>"
 					required
 					class="widefat"
-					placeholder="https://&hellip;" />
+					placeholder="https://&hellip;"
+					data-linkstash-url-input />
 		</p>
 		<p>
 			<label>

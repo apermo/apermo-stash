@@ -94,7 +94,7 @@ class QuickAdd {
 			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
 			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
 			<p>
-				<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required class="widefat" />
+				<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required class="widefat" data-linkstash-url-input />
 			</p>
 			<p>
 				<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'linkstash' ); ?>" class="widefat" data-linkstash-tag-autocomplete="<?php echo esc_attr( TagTaxonomy::TAXONOMY ); ?>" autocomplete="off" />
