@@ -6,6 +6,7 @@ namespace Apermo\LinkStash;
 
 \defined( 'ABSPATH' ) || exit();
 
+use Apermo\LinkStash\Admin\BookmarkMetabox;
 use Apermo\LinkStash\Admin\ListColumns;
 use Apermo\LinkStash\Admin\Notices;
 use Apermo\LinkStash\Admin\QuickAdd;
@@ -106,6 +107,7 @@ class Main {
 			( new Notices() )->register();
 			( new QuickAdd( new MetadataFetcher() ) )->register();
 			( new SettingsPage( $store ) )->register();
+			( new BookmarkMetabox() )->register();
 		}
 	}
 }

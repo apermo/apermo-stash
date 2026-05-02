@@ -29,7 +29,7 @@ class BookmarkPostTypeTest extends TestCase {
 			&& $args['show_in_rest'] === true
 			&& $args['rest_base'] === 'bookmarks'
 			&& $args['capability_type'] === 'post'
-			&& $args['supports'] === [ 'title', 'editor', 'custom-fields' ]
+			&& $args['supports'] === [ 'title' ]
 			&& $args['has_archive'] === false
 			&& $args['hierarchical'] === false;
 	}

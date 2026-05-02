@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Url;
 
+\defined( 'ABSPATH' ) || exit();
+
 /**
  * Renders a URL as a short, human-readable string for display fallbacks.
  *
