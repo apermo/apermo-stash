@@ -580,7 +580,11 @@ class BookmarksController {
 			update_post_meta( $existing->ID, BookmarkMeta::META_ARCHIVED, $archived );
 		}
 
-		$response = rest_ensure_response( $this->prepare_response( get_post( $existing ) ) );
+		// Re-fetch by ID so prepare_response sees the post_status that
+		// wp_update_post just persisted, not the stale $existing snapshot.
+		// phpcs:ignore Apermo.WordPress.ImplicitPostFunction.IntegerArgument
+		$fresh = get_post( $existing->ID );
+		$response = rest_ensure_response( $this->prepare_response( $fresh ) );
 		$response->set_status( 200 );
 		$response->header( 'X-LinkStash-Existing', '1' );
 

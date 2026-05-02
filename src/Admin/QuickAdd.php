@@ -81,25 +81,33 @@ class QuickAdd {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'restrict_manage_posts', [ $this, 'render_form' ] );
+		add_action( 'all_admin_notices', [ $this, 'maybe_render_form' ] );
 		add_action( 'admin_post_' . self::ACTION, [ $this, 'handle_submission' ] );
 	}
 
 	/**
-	 * Renders the quick-add form above the bookmark list table.
+	 * Renders the quick-add form on the bookmark list screen.
 	 *
-	 * @param string $post_type Current screen post type.
+	 * Hooked to `all_admin_notices` rather than `restrict_manage_posts` so
+	 * that the standalone `<form>` does not nest inside the list table's
+	 * own `#posts-filter` form (which `restrict_manage_posts` fires inside
+	 * of). The notices area sits above the list table in `<div class="wrap">`
+	 * but outside any other form.
 	 *
 	 * @return void
 	 */
-	public function render_form( string $post_type ): void {
-		if ( $post_type !== BookmarkPostType::POST_TYPE ) {
+	public function maybe_render_form(): void {
+		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( $screen === null
+			|| $screen->base !== 'edit'
+			|| $screen->post_type !== BookmarkPostType::POST_TYPE
+		) {
 			return;
 		}
 
 		$nonce = wp_create_nonce( self::ACTION );
 		?>
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="alignleft actions linkstash-quick-add">
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="linkstash-quick-add" style="margin: 0.5rem 0;">
 			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
 			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
 			<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required style="min-width: 18rem;" />
@@ -108,7 +116,7 @@ class QuickAdd {
 				<input type="checkbox" name="public" value="1" />
 				<?php esc_html_e( 'Public', 'linkstash' ); ?>
 			</label>
-			<button type="submit" class="button"><?php esc_html_e( 'Save', 'linkstash' ); ?></button>
+			<button type="submit" class="button button-primary"><?php esc_html_e( 'Save bookmark', 'linkstash' ); ?></button>
 		</form>
 		<?php
 	}

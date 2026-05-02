@@ -137,6 +137,28 @@ if ( ! class_exists( 'WP_Post' ) ) {
 	}
 }
 
+if ( ! class_exists( 'WP_Screen' ) ) {
+	/**
+	 * Minimal WP_Screen stand-in for unit tests.
+	 */
+	class WP_Screen {
+
+		/**
+		 * Holds the screen base (e.g. "edit", "post").
+		 *
+		 * @var string
+		 */
+		public string $base = '';
+
+		/**
+		 * Holds the screen post type, when applicable.
+		 *
+		 * @var string
+		 */
+		public string $post_type = '';
+	}
+}
+
 if ( ! class_exists( 'WP_Term' ) ) {
 	/**
 	 * Minimal WP_Term stand-in for unit tests.

@@ -12,6 +12,7 @@ use Brain\Monkey\Functions;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use WP_Screen;
 
 /**
  * Tests the bookmark list-screen quick-add form.
@@ -20,6 +21,22 @@ use ReflectionClass;
  * exercised here.
  */
 class QuickAddTest extends TestCase {
+
+	/**
+	 * Builds a WP_Screen-shaped stub for the get_current_screen mock.
+	 *
+	 * @param string $base      Screen base.
+	 * @param string $post_type Screen post type.
+	 *
+	 * @return WP_Screen
+	 */
+	private static function screen( string $base, string $post_type ): WP_Screen {
+		$screen            = new WP_Screen();
+		$screen->base      = $base;
+		$screen->post_type = $post_type;
+
+		return $screen;
+	}
 
 	/**
 	 * Sets up Brain Monkey.
@@ -65,31 +82,35 @@ class QuickAddTest extends TestCase {
 		$quick = $this->quick_add();
 		$quick->register();
 
-		self::assertNotFalse( has_action( 'restrict_manage_posts', [ $quick, 'render_form' ] ) );
+		self::assertNotFalse( has_action( 'all_admin_notices', [ $quick, 'maybe_render_form' ] ) );
 		self::assertNotFalse( has_action( 'admin_post_linkstash_quick_add', [ $quick, 'handle_submission' ] ) );
 	}
 
 	/**
-	 * Verifies render_form is a no-op for non-bookmark screens.
+	 * Verifies maybe_render_form is a no-op outside the bookmark list screen.
 	 *
 	 * @return void
 	 */
-	public function test_render_form_skips_other_post_types(): void {
+	public function test_render_form_skips_other_screens(): void {
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', 'post' ) );
+
 		\ob_start();
-		$this->quick_add()->render_form( 'post' );
+		$this->quick_add()->maybe_render_form();
 		$output = (string) \ob_get_clean();
 
 		self::assertSame( '', $output );
 	}
 
 	/**
-	 * Verifies render_form outputs the form on the bookmark list screen.
+	 * Verifies maybe_render_form outputs the form on the bookmark list screen.
 	 *
 	 * @return void
 	 */
 	public function test_render_form_outputs_form(): void {
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
+
 		\ob_start();
-		$this->quick_add()->render_form( BookmarkPostType::POST_TYPE );
+		$this->quick_add()->maybe_render_form();
 		$output = (string) \ob_get_clean();
 
 		self::assertStringContainsString( 'linkstash-quick-add', $output );
