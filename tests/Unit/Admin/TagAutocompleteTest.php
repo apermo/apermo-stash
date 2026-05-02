@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Apermo\LinkStash\Tests\Unit\Admin;
 
 use Apermo\LinkStash\Admin\TagAutocomplete;
-use Apermo\LinkStash\PostType\BookmarkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
-use WP_Screen;
 
 /**
  * Tests the tag autocomplete enqueue.
@@ -64,26 +62,6 @@ class TagAutocompleteTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the bookmark list-screen enqueues the script.
-	 *
-	 * @return void
-	 */
-	public function test_enqueues_on_bookmark_list(): void {
-		$screen            = new WP_Screen();
-		$screen->base      = 'edit';
-		$screen->post_type = BookmarkPostType::POST_TYPE;
-		Functions\when( 'get_current_screen' )->justReturn( $screen );
-
-		Functions\expect( 'wp_enqueue_script' )->once();
-		Functions\when( 'wp_register_style' )->justReturn( true );
-		Functions\when( 'wp_enqueue_style' )->justReturn();
-		Functions\when( 'wp_add_inline_script' )->justReturn( true );
-		Functions\when( 'wp_add_inline_style' )->justReturn( true );
-
-		( new TagAutocomplete() )->maybe_enqueue( 'edit.php' );
-	}
-
-	/**
 	 * Verifies it skips an unrelated screen.
 	 *
 	 * @return void
@@ -95,16 +73,12 @@ class TagAutocompleteTest extends TestCase {
 	}
 
 	/**
-	 * Verifies it skips edit.php for unrelated post types.
+	 * Verifies it skips the bookmark list screen — the quick-add form
+	 * is no longer rendered there, so there are no inputs to bind to.
 	 *
 	 * @return void
 	 */
-	public function test_skips_edit_for_other_cpts(): void {
-		$screen            = new WP_Screen();
-		$screen->base      = 'edit';
-		$screen->post_type = 'post';
-		Functions\when( 'get_current_screen' )->justReturn( $screen );
-
+	public function test_skips_bookmark_list_screen(): void {
 		Functions\expect( 'wp_enqueue_script' )->never();
 
 		( new TagAutocomplete() )->maybe_enqueue( 'edit.php' );
