@@ -50,10 +50,9 @@ class ListColumns {
 
 		$names = [];
 		foreach ( $terms as $term ) {
-			$names[] = esc_html( $term->name );
+			$names[] = $term->name;
 		}
-		// Each name was esc_html-escaped above before being added to $names.
-		echo \implode( ', ', $names ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo esc_html( \implode( ', ', $names ) );
 	}
 
 	/**
@@ -83,13 +82,16 @@ class ListColumns {
 	private static function render_flags( int $post_id ): void {
 		$badges = [];
 		if ( (bool) get_post_meta( $post_id, BookmarkMeta::META_UNREAD, true ) ) {
-			$badges[] = esc_html__( 'Unread', 'linkstash' );
+			$badges[] = __( 'Unread', 'linkstash' );
 		}
 		if ( (bool) get_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, true ) ) {
-			$badges[] = esc_html__( 'Archived', 'linkstash' );
+			$badges[] = __( 'Archived', 'linkstash' );
 		}
-		// Each badge label was esc_html__-escaped before being added to $badges.
-		echo $badges === [] ? '—' : \implode( ', ', $badges ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		if ( $badges === [] ) {
+			echo '—';
+			return;
+		}
+		echo esc_html( \implode( ', ', $badges ) );
 	}
 
 	/**
