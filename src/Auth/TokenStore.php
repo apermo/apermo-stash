@@ -152,10 +152,17 @@ class TokenStore {
 	 * Locates the owner of a plain token via the hash → user index.
 	 *
 	 * Returns null when the hash is not in the index, even if a matching
-	 * token entry exists in user meta. The index is the only source of
-	 * truth — `create()` writes both sides atomically — and an unindexed
-	 * lookup would otherwise let an unauthenticated caller force a full
-	 * `get_users()` scan via repeated invalid Bearer tokens (DoS).
+	 * token entry exists in user meta. Falling back to a `get_users()`
+	 * scan on an unindexed token would let an unauthenticated caller
+	 * force the full scan via repeated invalid Bearer tokens (DoS).
+	 *
+	 * The index is treated as authoritative for lookups, but it is a
+	 * cache: `create()` writes user meta and the index in two separate
+	 * operations, so a fatal between them can leave a token in user
+	 * meta without an index row. Such a token will never authenticate
+	 * — it is effectively orphaned and the user must re-issue. (A
+	 * future `reindex()` admin tool could rebuild the index by walking
+	 * all users; not implemented.)
 	 *
 	 * @param string $plain Plain token value.
 	 *
