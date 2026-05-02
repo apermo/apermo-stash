@@ -105,7 +105,10 @@ class TokenStore {
 	 * @return list<array{id: string, name: string, created: int, last_used: ?int}>
 	 */
 	public function list( int $user_id ): array {
-		return \array_map( [ self::class, 'public_view' ], $this->raw_entries( $user_id ) );
+		return \array_map(
+			[ self::class, 'public_view' ],
+			$this->raw_entries( $user_id ),
+		);
 	}
 
 	/**
@@ -197,16 +200,16 @@ class TokenStore {
 	 */
 	public function touch_last_used( int $user_id, string $id ): void {
 		$entries = $this->raw_entries( $user_id );
-		$dirty   = false;
+		$changed = false;
 		foreach ( $entries as $key => $entry ) {
 			if ( $entry['id'] === $id ) {
 				$entries[ $key ]['last_used'] = $this->now();
-				$dirty                        = true;
+				$changed                      = true;
 				break;
 			}
 		}
 
-		if ( $dirty ) {
+		if ( $changed ) {
 			update_user_meta( $user_id, self::META_KEY, $entries );
 		}
 	}
