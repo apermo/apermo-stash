@@ -17,11 +17,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Expanded `readme.txt` for the WordPress.org plugin directory —
   highlights, REST API summary, FAQ, screenshot captions, link to the
   companion Chrome extension.
+- "Settings" link in the plugin row actions on the Plugins listing
+  screen.
 
 ### Changed
 
+- Settings page moved from **Tools → LinkStash** to **Settings →
+  LinkStash** (`tools.php?page=linkstash` → `options-general.php?page=linkstash`).
+  Existing tokens are unaffected; only the menu location and URL move.
 - Bumped the `Version` plugin header, `Main::VERSION`, and `readme.txt`
   Stable tag to 0.1.1.
+
+### Removed
+
+- The redundant quick-add form on the bookmark list screen. The
+  dashboard widget covers the same flow and is the single quick-add
+  surface going forward. `TagAutocomplete` and `UrlAutoScheme` no
+  longer enqueue on `edit.php` since their target inputs are gone
+  there.
 
 ## [0.1.0] - 2026-05-01
 

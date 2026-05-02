@@ -7,9 +7,10 @@ namespace Apermo\LinkStash\Admin;
 \defined( 'ABSPATH' ) || exit();
 
 use Apermo\LinkStash\Auth\TokenStore;
+use Apermo\LinkStash\Main;
 
 /**
- * Renders the Tools → LinkStash settings page that manages API tokens.
+ * Renders the Settings → LinkStash page that manages API tokens.
  */
 class SettingsPage {
 
@@ -59,7 +60,7 @@ class SettingsPage {
 	 * @return string
 	 */
 	private static function settings_url(): string {
-		return admin_url( 'tools.php?page=' . self::PAGE_SLUG );
+		return admin_url( 'options-general.php?page=' . self::PAGE_SLUG );
 	}
 
 	/**
@@ -210,21 +211,44 @@ class SettingsPage {
 		add_action( 'admin_menu', [ $this, 'register_menu' ] );
 		add_action( 'admin_post_' . self::ACTION_CREATE, [ $this, 'handle_create' ] );
 		add_action( 'admin_post_' . self::ACTION_REVOKE, [ $this, 'handle_revoke' ] );
+		add_filter(
+			'plugin_action_links_' . plugin_basename( Main::file() ),
+			[ $this, 'plugin_action_links' ],
+		);
 	}
 
 	/**
-	 * Registers the Tools → LinkStash menu entry.
+	 * Registers the Settings → LinkStash menu entry.
 	 *
 	 * @return void
 	 */
 	public function register_menu(): void {
-		add_management_page(
+		add_options_page(
 			__( 'LinkStash', 'linkstash' ),
 			__( 'LinkStash', 'linkstash' ),
 			'manage_options',
 			self::PAGE_SLUG,
 			[ $this, 'render' ],
 		);
+	}
+
+	/**
+	 * Prepends a "Settings" link to the plugin row actions.
+	 *
+	 * @param array<int|string, string> $links Existing action links.
+	 *
+	 * @return array<int|string, string>
+	 */
+	public function plugin_action_links( array $links ): array {
+		$settings = \sprintf(
+			'<a href="%1$s">%2$s</a>',
+			esc_url( self::settings_url() ),
+			esc_html__( 'Settings', 'linkstash' ),
+		);
+
+		\array_unshift( $links, $settings );
+
+		return $links;
 	}
 
 	/**

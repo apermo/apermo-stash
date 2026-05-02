@@ -30,13 +30,12 @@ extensions and your own scripts.
   ones only you should see. Anonymous REST clients see only public;
   authenticated users see public + their own private; admins see
   everything.
-* **Quick-add form on the bookmark list.** Paste a URL, optionally type
-  tags (with autocomplete) and pick public/private, hit save. The
-  plugin fetches the page title and meta description automatically and
-  records whether the URL responded so you know later when a link rots.
-* **Dashboard widget.** A QuickDraft-style "Add bookmark" tile lives on
-  the WordPress dashboard for one-step capture from anywhere in the
-  admin.
+* **Dashboard widget for quick capture.** A QuickDraft-style "Add
+  bookmark" tile lives on the WordPress dashboard. Paste a URL,
+  optionally type tags (with autocomplete) and pick public/private,
+  hit save. The plugin fetches the page title and meta description
+  automatically and records whether the URL responded so you know
+  later when a link rots.
 * **Classic editor for bookmark detail.** No Gutenberg overhead — the
   Add/Edit screen is a small classic-editor form with URL, title,
   optional notes, and tags. Title falls back to a simplified URL when
@@ -64,7 +63,7 @@ extensions and your own scripts.
 * `GET /tags?q=` (tag listing with counts; respects visibility)
 * `GET /check?url=` (browser-extension "is this saved?" check)
 
-Token CRUD lives under **Tools → LinkStash**. New tokens are shown
+Token CRUD lives under **Settings → LinkStash**. New tokens are shown
 once at creation time; their hash is stored in user meta and never
 recoverable.
 
@@ -84,7 +83,7 @@ or edit the current tab from the popup, and offers a right-click
 3. Visit **Settings → Permalinks** and pick anything other than
    "Plain" — the REST API needs rewrite rules. Most installs default
    to a sensible setting already.
-4. Visit **Tools → LinkStash** to generate an API token for your
+4. Visit **Settings → LinkStash** to generate an API token for your
    browser extension or scripting.
 
 == Frequently Asked Questions ==
@@ -124,10 +123,10 @@ sharing page is on the roadmap.
 
 == Screenshots ==
 
-1. Quick-add form on the bookmark list screen.
-2. Bookmark edit screen with URL meta box and unreachable-URL warning.
-3. Dashboard widget for one-click capture from anywhere in the admin.
-4. Tools → LinkStash token settings page.
+1. Dashboard widget for one-click capture from anywhere in the admin.
+2. Bookmark list screen with the URL / tags / visibility / flags columns.
+3. Bookmark edit screen with URL meta box and unreachable-URL warning.
+4. Settings → LinkStash token settings page.
 
 == Changelog ==
 
@@ -141,4 +140,4 @@ sharing page is on the roadmap.
   bookmark, CORS for `chrome-extension://*`, admin list columns,
   quick-add form, classic-editor metaboxes, dashboard widget, tag
   autocomplete, https:// auto-prepend, URL-reachability check,
-  Tools → LinkStash settings page, uninstall cleanup.
+  Settings → LinkStash settings page, uninstall cleanup.

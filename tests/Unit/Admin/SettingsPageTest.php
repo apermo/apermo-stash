@@ -6,6 +6,7 @@ namespace Apermo\LinkStash\Tests\Unit\Admin;
 
 use Apermo\LinkStash\Admin\SettingsPage;
 use Apermo\LinkStash\Auth\TokenStore;
+use Apermo\LinkStash\Main;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -56,7 +57,8 @@ class SettingsPageTest extends TestCase {
 		Functions\when( 'current_user_can' )->justReturn( true );
 		Functions\when( 'get_current_user_id' )->justReturn( 7 );
 		Functions\when( 'get_transient' )->justReturn( false );
-		Functions\when( 'add_management_page' )->justReturn( '' );
+		Functions\when( 'add_options_page' )->justReturn( '' );
+		Functions\when( 'plugin_basename' )->returnArg();
 	}
 
 	/**
@@ -81,6 +83,23 @@ class SettingsPageTest extends TestCase {
 		self::assertNotFalse( has_action( 'admin_menu', [ $page, 'register_menu' ] ) );
 		self::assertNotFalse( has_action( 'admin_post_linkstash_token_create', [ $page, 'handle_create' ] ) );
 		self::assertNotFalse( has_action( 'admin_post_linkstash_token_revoke', [ $page, 'handle_revoke' ] ) );
+		self::assertNotFalse( has_filter( 'plugin_action_links_' . Main::file() ) );
+	}
+
+	/**
+	 * Verifies plugin_action_links prepends a Settings link pointing at the page.
+	 *
+	 * @return void
+	 */
+	public function test_plugin_action_links_prepends_settings(): void {
+		$existing = [ 'deactivate' => '<a href="x">Deactivate</a>' ];
+
+		$links = $this->page()->plugin_action_links( $existing );
+
+		self::assertCount( 2, $links );
+		self::assertStringContainsString( 'options-general.php?page=linkstash', $links[0] );
+		self::assertStringContainsString( 'Settings', $links[0] );
+		self::assertSame( $existing['deactivate'], $links['deactivate'] );
 	}
 
 	/**

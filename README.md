@@ -24,7 +24,7 @@ and CORS configured for `chrome-extension://*` origins out of the box.
 1. Clone or download this repository into `wp-content/plugins/linkstash/`.
 2. Run `composer install --no-dev` to generate the autoloader.
 3. Activate the plugin through the WordPress "Plugins" screen.
-4. Visit **Tools → LinkStash** to generate an API token (see Authentication
+4. Visit **Settings → LinkStash** to generate an API token (see Authentication
    below).
 
 ## Authentication
@@ -44,7 +44,7 @@ curl -u "your-username:xxxx xxxx xxxx xxxx xxxx xxxx" \
 
 ### LinkStash Bearer Tokens
 
-Better suited for browser extensions: generate at **Tools → LinkStash → API
+Better suited for browser extensions: generate at **Settings → LinkStash → API
 Tokens**. The plain token is shown **once** at creation time — copy it
 immediately. Send it as:
 
