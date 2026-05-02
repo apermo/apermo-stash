@@ -6,7 +6,6 @@ namespace Apermo\LinkStash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\Main;
 use Apermo\LinkStash\PostType\BookmarkMeta;
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\PostType\TagTaxonomy;
@@ -153,7 +152,7 @@ class QuickAdd {
 	 */
 	public function register(): void {
 		add_action( 'all_admin_notices', [ $this, 'maybe_render_form' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'maybe_enqueue_position_script' ] );
+		add_action( 'admin_print_footer_scripts', [ $this, 'maybe_print_position_script' ] );
 		add_action( 'admin_post_' . self::ACTION, [ $this, 'handle_submission' ] );
 	}
 
@@ -181,18 +180,21 @@ class QuickAdd {
 	}
 
 	/**
-	 * Enqueues the inline reposition script on the bookmark list screen.
+	 * Prints the inline reposition script on the bookmark list screen.
+	 *
+	 * Hooked to `admin_print_footer_scripts` rather than enqueued via
+	 * `wp_register_script` + `wp_add_inline_script` so the `<script>`
+	 * tag is unconditionally emitted in the admin footer regardless of
+	 * how WP's script-loader handles a placeholder handle with no src.
 	 *
 	 * @return void
 	 */
-	public function maybe_enqueue_position_script(): void {
+	public function maybe_print_position_script(): void {
 		if ( ! self::is_target_screen() ) {
 			return;
 		}
 
-		wp_register_script( 'linkstash-quick-add-position', false, [], Main::VERSION, true );
-		wp_enqueue_script( 'linkstash-quick-add-position' );
-		wp_add_inline_script( 'linkstash-quick-add-position', self::position_script() );
+		echo "<script>\n" . self::position_script() . "</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- self::position_script() is a constant string with no user data.
 	}
 
 	/**
