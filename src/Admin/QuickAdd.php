@@ -111,96 +111,18 @@ class QuickAdd {
 	}
 
 	/**
-	 * Returns the inline script that moves the form below the page heading.
+	 * Hooks the submission handler.
 	 *
-	 * @return string
-	 */
-	private static function position_script(): string {
-		return "( function () {\n"
-			. "\tfunction place() {\n"
-			. "\t\tvar tpl = document.getElementById( 'linkstash-quick-add-template' );\n"
-			. "\t\tvar marker = document.querySelector( 'hr.wp-header-end' );\n"
-			. "\t\tif ( ! tpl || ! marker || ! marker.parentNode ) { return; }\n"
-			. "\t\tvar form = tpl.content.querySelector( 'form.linkstash-quick-add' );\n"
-			. "\t\tif ( ! form ) { return; }\n"
-			. "\t\tmarker.parentNode.insertBefore( form, marker.nextSibling );\n"
-			. "\t}\n"
-			. "\tif ( document.readyState === 'loading' ) {\n"
-			. "\t\tdocument.addEventListener( 'DOMContentLoaded', place );\n"
-			. "\t} else {\n"
-			. "\t\tplace();\n"
-			. "\t}\n"
-			. "} )();\n";
-	}
-
-	/**
-	 * Returns true when the current admin screen is the bookmark list table.
-	 *
-	 * @return bool
-	 */
-	private static function is_target_screen(): bool {
-		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-
-		return $screen !== null
-			&& $screen->base === 'edit'
-			&& $screen->post_type === BookmarkPostType::POST_TYPE;
-	}
-
-	/**
-	 * Hooks the rendering and submission handlers.
+	 * The list-screen quick-add form is no longer rendered — capture
+	 * happens through the dashboard widget (which calls
+	 * `render_form_html()` directly). This class still handles the
+	 * `admin-post.php` POST that the dashboard form (and any future
+	 * caller of `render_form_html`) submits.
 	 *
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'all_admin_notices', [ $this, 'maybe_render_form' ] );
-		add_action( 'admin_print_footer_scripts', [ $this, 'maybe_print_position_script' ] );
 		add_action( 'admin_post_' . self::ACTION, [ $this, 'handle_submission' ] );
-	}
-
-	/**
-	 * Renders the quick-add form on the bookmark list screen.
-	 *
-	 * Hooked to `all_admin_notices` rather than `restrict_manage_posts` so
-	 * that the standalone `<form>` does not nest inside the list table's
-	 * own `#posts-filter` form (which `restrict_manage_posts` fires inside
-	 * of). `all_admin_notices` fires from `wp-admin/admin-header.php`, which
-	 * runs before `edit.php` outputs the `<h1>` and `<hr class="wp-header-end">`,
-	 * so the rendered form lands above the page heading. A small admin
-	 * script (registered via `maybe_enqueue_position_script`) moves it
-	 * back below the heading on DOMContentLoaded — the same trick core
-	 * uses for `.notice` / `.updated` / `.error` elements.
-	 *
-	 * @return void
-	 */
-	public function maybe_render_form(): void {
-		if ( ! self::is_target_screen() ) {
-			return;
-		}
-
-		// Wrapped in <template> so the browser doesn't render the form
-		// at this position (above the page heading). The footer script
-		// extracts the form node and inserts it after .wp-header-end.
-		echo '<template id="linkstash-quick-add-template">';
-		self::render_form_html( 'linkstash-quick-add' );
-		echo '</template>';
-	}
-
-	/**
-	 * Prints the inline reposition script on the bookmark list screen.
-	 *
-	 * Hooked to `admin_print_footer_scripts` rather than enqueued via
-	 * `wp_register_script` + `wp_add_inline_script` so the `<script>`
-	 * tag is unconditionally emitted in the admin footer regardless of
-	 * how WP's script-loader handles a placeholder handle with no src.
-	 *
-	 * @return void
-	 */
-	public function maybe_print_position_script(): void {
-		if ( ! self::is_target_screen() ) {
-			return;
-		}
-
-		echo "<script>\n" . self::position_script() . "</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- self::position_script() is a constant string with no user data.
 	}
 
 	/**
