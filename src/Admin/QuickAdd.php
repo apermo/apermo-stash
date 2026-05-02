@@ -97,7 +97,7 @@ class QuickAdd {
 				<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required class="widefat" />
 			</p>
 			<p>
-				<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'linkstash' ); ?>" class="widefat" />
+				<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'linkstash' ); ?>" class="widefat" data-linkstash-tag-autocomplete="<?php echo esc_attr( TagTaxonomy::TAXONOMY ); ?>" autocomplete="off" />
 			</p>
 			<p>
 				<label>
