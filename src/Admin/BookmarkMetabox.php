@@ -146,12 +146,15 @@ class BookmarkMetabox {
 	 * @return void
 	 */
 	public function register_meta_boxes(): void {
+		// Both meta boxes live in the main (normal) column. The URL panel
+		// uses 'high' priority so it renders directly under the title and
+		// above the Notes panel.
 		add_meta_box(
 			'linkstash_bookmark_url',
 			__( 'Bookmark URL', 'linkstash' ),
 			[ $this, 'render_url_meta_box' ],
 			BookmarkPostType::POST_TYPE,
-			'side',
+			'normal',
 			'high',
 		);
 
