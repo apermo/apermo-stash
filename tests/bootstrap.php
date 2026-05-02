@@ -30,6 +30,17 @@ if ( ! $loading_wp && ! defined( 'DAY_IN_SECONDS' ) ) {
 	define( 'DAY_IN_SECONDS', 86400 );
 }
 
+// WP defines these wpdb output-format constants in wp-includes/wp-db.php
+// (loaded as part of WP boot). Mirror them here for unit-only runs so
+// callers of `$wpdb->get_results( ..., ARRAY_A )` don't trip on a
+// missing constant when WP isn't around.
+if ( ! $loading_wp && ! defined( 'ARRAY_A' ) ) {
+	define( 'OBJECT', 'OBJECT' );
+	define( 'OBJECT_K', 'OBJECT_K' );
+	define( 'ARRAY_A', 'ARRAY_A' );
+	define( 'ARRAY_N', 'ARRAY_N' );
+}
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Load the WordPress class stubs only when the real WP suite is not available.

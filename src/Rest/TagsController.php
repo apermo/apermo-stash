@@ -8,7 +8,6 @@ namespace Apermo\LinkStash\Rest;
 
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\PostType\TagTaxonomy;
-use WP_Query;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -17,6 +16,80 @@ use WP_REST_Server;
  * Serves tag listings over REST.
  */
 class TagsController {
+
+	/**
+	 * Runs the per-tag aggregate query and returns the raw rows.
+	 *
+	 * @param array{post_status: list<string>, author: list<int>|null, perm: ?string} $visibility Visibility constraints.
+	 *
+	 * @return list<array{id: int|string, slug: string, name: string, count: int|string}>
+	 */
+	private static function fetch_term_counts( array $visibility ): array {
+		global $wpdb;
+
+		[ $where, $args ] = self::build_where_clause( $visibility );
+
+		// Single aggregate replacing the previous "fetch every visible
+		// bookmark id, then ask get_terms for counts" fan-out. Joins to
+		// indexed columns (post_type, post_status, taxonomy) keep this
+		// fast as the bookmark library grows.
+		$sql = "SELECT t.term_id AS id, t.name, t.slug, COUNT(DISTINCT p.ID) AS count
+				FROM {$wpdb->terms} t
+				INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+				INNER JOIN {$wpdb->term_relationships} tr ON tt.term_taxonomy_id = tr.term_taxonomy_id
+				INNER JOIN {$wpdb->posts} p ON tr.object_id = p.ID
+				WHERE {$where}
+				GROUP BY t.term_id, t.name, t.slug
+				ORDER BY t.name ASC";
+
+		// $sql is built from table-name constants + placeholder fragments
+		// — every user-controlled value flows through wpdb::prepare. The
+		// direct query is the whole point of this rewrite (it replaces
+		// the slow N+1 from the previous get_terms loop).
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $args ), \ARRAY_A );
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+		return \is_array( $rows ) ? \array_values( $rows ) : [];
+	}
+
+	/**
+	 * Builds the SQL WHERE fragment + placeholder args for a visibility spec.
+	 *
+	 * Returned as `[$where, $args]` where `$where` is intended to be
+	 * concatenated into a `wpdb::prepare()` template and `$args` is the
+	 * matching ordered parameter list.
+	 *
+	 * @param array{post_status: list<string>, author: list<int>|null, perm: ?string} $visibility Visibility constraints.
+	 *
+	 * @return array{0: string, 1: list<string|int>}
+	 */
+	public static function build_where_clause( array $visibility ): array {
+		$args  = [
+			BookmarkPostType::POST_TYPE,
+			TagTaxonomy::TAXONOMY,
+		];
+		$where = 'p.post_type = %s AND tt.taxonomy = %s';
+
+		$statuses     = $visibility['post_status'];
+		$placeholders = \implode( ', ', \array_fill( 0, \count( $statuses ), '%s' ) );
+		$where        .= " AND p.post_status IN ({$placeholders})";
+		$args         = \array_merge( $args, $statuses );
+
+		if ( $visibility['author'] !== null ) {
+			$authors             = \array_map( '\intval', $visibility['author'] );
+			$author_placeholders = \implode( ', ', \array_fill( 0, \count( $authors ), '%d' ) );
+			$where               .= " AND p.post_author IN ({$author_placeholders})";
+			$args                = \array_merge( $args, $authors );
+		}
+
+		if ( $visibility['perm'] === 'readable' ) {
+			$where .= " AND (p.post_status = 'publish' OR p.post_author = %d)";
+			$args[] = get_current_user_id();
+		}
+
+		return [ $where, $args ];
+	}
 
 	/**
 	 * Registers the tags route.
@@ -42,9 +115,10 @@ class TagsController {
 	/**
 	 * Lists tags with bookmark counts that respect the requester's visibility.
 	 *
-	 * Counts are computed in two queries total: one to fetch the IDs of all
-	 * bookmarks the caller may see, and one `get_terms` call scoped to those
-	 * IDs (which returns per-term counts in a single aggregated query).
+	 * Counts are computed in a single aggregate SQL statement that joins
+	 * the terms/term_taxonomy/term_relationships tables to the posts
+	 * table, applying the same visibility constraints used by the
+	 * bookmarks list endpoint.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -52,64 +126,18 @@ class TagsController {
 	 */
 	public function list_items( WP_REST_Request $request ): WP_REST_Response {
 		$visibility = BookmarksController::visibility_filter( $request );
-
-		$visible_ids = $this->visible_bookmark_ids( $visibility );
-		if ( $visible_ids === [] ) {
-			return rest_ensure_response( [] );
-		}
-
-		$terms = get_terms(
-			[
-				'taxonomy'   => TagTaxonomy::TAXONOMY,
-				'hide_empty' => true,
-				'object_ids' => $visible_ids,
-				'orderby'    => 'name',
-				'order'      => 'ASC',
-			],
-		);
-
-		if ( ! \is_array( $terms ) ) {
-			return rest_ensure_response( [] );
-		}
+		$rows       = self::fetch_term_counts( $visibility );
 
 		$items = [];
-		foreach ( $terms as $term ) {
+		foreach ( $rows as $row ) {
 			$items[] = [
-				'id'    => $term->term_id,
-				'slug'  => $term->slug,
-				'name'  => $term->name,
-				'count' => $term->count,
+				'id'    => (int) $row['id'],
+				'slug'  => $row['slug'],
+				'name'  => $row['name'],
+				'count' => (int) $row['count'],
 			];
 		}
 
 		return rest_ensure_response( $items );
-	}
-
-	/**
-	 * Returns the IDs of every bookmark the caller is allowed to see.
-	 *
-	 * @param array{post_status: list<string>, author: list<int>|null, perm: ?string} $visibility Visibility constraints.
-	 *
-	 * @return list<int>
-	 */
-	private function visible_bookmark_ids( array $visibility ): array {
-		$args = [
-			'post_type'      => BookmarkPostType::POST_TYPE,
-			'post_status'    => $visibility['post_status'],
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'no_found_rows'  => true,
-		];
-
-		if ( $visibility['author'] !== null ) {
-			$args['author__in'] = $visibility['author'];
-		}
-		if ( $visibility['perm'] !== null ) {
-			$args['perm'] = $visibility['perm'];
-		}
-
-		$query = new WP_Query( $args );
-
-		return \array_values( \array_map( '\intval', $query->posts ) );
 	}
 }
