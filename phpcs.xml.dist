@@ -25,8 +25,8 @@
 
     <!--
         Project prefix for global functions, hooks, constants,
-        and namespace roots. E.g. prefix "Linkstash" allows
-        namespace Linkstash\Admin but flags Other\Admin.
+        and namespace roots. E.g. prefix "Apermo\LinkStash" allows
+        namespace Apermo\LinkStash\Admin but flags Other\Admin.
     -->
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
         <properties>
