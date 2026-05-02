@@ -24,6 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   adopts the WordPress admin color scheme — grey-ish in idle state,
   the scheme's highlight on hover/active — instead of the brand's
   blue/orange. Replaces the previous `dashicons-admin-links` icon.
+- Contextual help tabs on the bookmark list screen
+  (`edit.php?post_type=linkstash_bookmark`): Overview (what each
+  list column means), Adding bookmarks (Add New / dashboard widget /
+  browser extension / REST API), and Browser extension (Chrome Web
+  Store review status + install-from-source pointer + configuration
+  walk-through). Plus a sidebar with quick links to the GitHub
+  repos and the Settings page.
 
 ### Changed
 

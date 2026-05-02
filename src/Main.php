@@ -8,6 +8,7 @@ namespace Apermo\LinkStash;
 
 use Apermo\LinkStash\Admin\BookmarkMetabox;
 use Apermo\LinkStash\Admin\DashboardWidget;
+use Apermo\LinkStash\Admin\HelpTabs;
 use Apermo\LinkStash\Admin\ListColumns;
 use Apermo\LinkStash\Admin\Notices;
 use Apermo\LinkStash\Admin\QuickAdd;
@@ -114,6 +115,7 @@ class Main {
 			( new DashboardWidget() )->register();
 			( new TagAutocomplete() )->register();
 			( new UrlAutoScheme() )->register();
+			( new HelpTabs() )->register();
 		}
 	}
 }
