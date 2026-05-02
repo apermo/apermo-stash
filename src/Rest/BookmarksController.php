@@ -210,8 +210,7 @@ class BookmarksController {
 		if ( $unread !== null ) {
 			$meta_query[] = [
 				'key'   => BookmarkMeta::META_UNREAD,
-				// @phpstan-ignore argument.templateType
-				'value' => rest_sanitize_boolean( \is_scalar( $unread ) ? $unread : false ) ? '1' : '0',
+				'value' => BookmarkMeta::sanitize_bool_meta( $unread ),
 			];
 		}
 
@@ -219,8 +218,7 @@ class BookmarksController {
 		if ( $archived !== null ) {
 			$meta_query[] = [
 				'key'   => BookmarkMeta::META_ARCHIVED,
-				// @phpstan-ignore argument.templateType
-				'value' => rest_sanitize_boolean( \is_scalar( $archived ) ? $archived : false ) ? '1' : '0',
+				'value' => BookmarkMeta::sanitize_bool_meta( $archived ),
 			];
 		}
 
@@ -367,7 +365,7 @@ class BookmarksController {
 	 * @phpcs:disable SlevomatCodingStandard.Complexity.Cognitive.ComplexityTooHigh
 	 */
 	public function create_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$url = (string) $request->get_param( 'url' );
+		$url = esc_url_raw( (string) $request->get_param( 'url' ) );
 		if ( $url === '' ) {
 			return new WP_Error( 'linkstash_missing_url', __( 'A url is required.', 'linkstash' ), [ 'status' => 400 ] );
 		}
@@ -390,7 +388,7 @@ class BookmarksController {
 		$is_public = self::optional_bool( $request, 'public' );
 
 		if ( $existing !== null ) {
-			return $this->update_existing( $existing, $request, $tags );
+			return $this->update_existing( $existing, $request, $tags, $title, $description );
 		}
 
 		$post_id = wp_insert_post(
@@ -408,10 +406,10 @@ class BookmarksController {
 			return $post_id;
 		}
 
-		update_post_meta( $post_id, BookmarkMeta::META_URL, esc_url_raw( $url ) );
+		update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
 		update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
-		update_post_meta( $post_id, BookmarkMeta::META_UNREAD, self::optional_bool( $request, 'unread' ) ?? false );
-		update_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, self::optional_bool( $request, 'archived' ) ?? false );
+		update_post_meta( $post_id, BookmarkMeta::META_UNREAD, BookmarkMeta::bool_to_meta( self::optional_bool( $request, 'unread' ) ?? false ) );
+		update_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, BookmarkMeta::bool_to_meta( self::optional_bool( $request, 'archived' ) ?? false ) );
 
 		if ( $tags !== [] ) {
 			wp_set_object_terms( $post_id, $tags, TagTaxonomy::TAXONOMY, false );
@@ -484,7 +482,7 @@ class BookmarksController {
 		}
 
 		if ( $request->has_param( 'url' ) ) {
-			$url       = (string) $request->get_param( 'url' );
+			$url       = esc_url_raw( (string) $request->get_param( 'url' ) );
 			$canonical = Canonicalizer::canonicalize( $url );
 			if ( $canonical === '' ) {
 				return new WP_Error(
@@ -493,17 +491,17 @@ class BookmarksController {
 					[ 'status' => 400 ],
 				);
 			}
-			update_post_meta( $post_id, BookmarkMeta::META_URL, esc_url_raw( $url ) );
+			update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
 			update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
 		}
 
 		$unread = self::optional_bool( $request, 'unread' );
 		if ( $unread !== null ) {
-			update_post_meta( $post_id, BookmarkMeta::META_UNREAD, $unread );
+			update_post_meta( $post_id, BookmarkMeta::META_UNREAD, BookmarkMeta::bool_to_meta( $unread ) );
 		}
 		$archived = self::optional_bool( $request, 'archived' );
 		if ( $archived !== null ) {
-			update_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, $archived );
+			update_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, BookmarkMeta::bool_to_meta( $archived ) );
 		}
 
 		if ( $request->has_param( 'tags' ) ) {
@@ -542,20 +540,40 @@ class BookmarksController {
 	}
 
 	/**
-	 * Updates an existing bookmark with merged tags and selectively-sent fields.
+	 * Updates an existing bookmark to match the create-item request body.
 	 *
-	 * @param WP_Post           $existing Existing bookmark.
-	 * @param WP_REST_Request   $request  REST request.
-	 * @param array<int,string> $tags     Tags from the request.
+	 * Treats POST as idempotent: tags replace the existing set (rather than
+	 * append), and any field present in the request — title, description,
+	 * unread, archived, public — overwrites what is currently stored. Fields
+	 * the caller did not send are left alone.
+	 *
+	 * @param WP_Post           $existing    Existing bookmark.
+	 * @param WP_REST_Request   $request     REST request.
+	 * @param array<int,string> $tags        Tags from the request (may be empty).
+	 * @param string            $title       Resolved title (post-enrichment).
+	 * @param string            $description Resolved description (post-enrichment).
 	 *
 	 * @return WP_REST_Response|WP_Error
 	 */
-	private function update_existing( WP_Post $existing, WP_REST_Request $request, array $tags ): WP_REST_Response|WP_Error {
-		if ( $tags !== [] ) {
-			wp_set_object_terms( $existing->ID, $tags, TagTaxonomy::TAXONOMY, true );
+	private function update_existing(
+		WP_Post $existing,
+		WP_REST_Request $request,
+		array $tags,
+		string $title,
+		string $description
+	): WP_REST_Response|WP_Error {
+		if ( $request->has_param( 'tags' ) ) {
+			wp_set_object_terms( $existing->ID, $tags, TagTaxonomy::TAXONOMY, false );
 		}
 
 		$update = [ 'ID' => $existing->ID ];
+
+		if ( $request->has_param( 'title' ) && $title !== '' ) {
+			$update['post_title'] = $title;
+		}
+		if ( $request->has_param( 'description' ) ) {
+			$update['post_content'] = $description;
+		}
 
 		$is_public = self::optional_bool( $request, 'public' );
 		if ( $is_public !== null ) {
@@ -571,11 +589,11 @@ class BookmarksController {
 
 		$unread = self::optional_bool( $request, 'unread' );
 		if ( $unread !== null ) {
-			update_post_meta( $existing->ID, BookmarkMeta::META_UNREAD, $unread );
+			update_post_meta( $existing->ID, BookmarkMeta::META_UNREAD, BookmarkMeta::bool_to_meta( $unread ) );
 		}
 		$archived = self::optional_bool( $request, 'archived' );
 		if ( $archived !== null ) {
-			update_post_meta( $existing->ID, BookmarkMeta::META_ARCHIVED, $archived );
+			update_post_meta( $existing->ID, BookmarkMeta::META_ARCHIVED, BookmarkMeta::bool_to_meta( $archived ) );
 		}
 
 		// Re-fetch by ID so prepare_response sees the post_status that
