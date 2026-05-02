@@ -253,17 +253,15 @@ class BookmarkMetabox {
 		$url       = self::read_text( 'linkstash_url' );
 		$canonical = Canonicalizer::canonicalize( $url );
 		if ( $url !== '' && $canonical !== '' ) {
-			$previous_canonical = (string) get_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, true );
 			update_post_meta( $post_id, BookmarkMeta::META_URL, esc_url_raw( $url ) );
 			update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
 
-			// Re-check reachability whenever the URL actually changes. We
-			// don't refetch on every metabox save because the timeout
-			// (5s) would slow every "tweak the title" save to a crawl.
-			if ( $canonical !== $previous_canonical ) {
-				$result = $this->fetcher->fetch( $url );
-				update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, ! $result['reachable'] );
-			}
+			// Re-check reachability on every save, even when the URL
+			// itself didn't change — a previously-down host coming back
+			// up should clear the warning automatically the next time
+			// the user touches the bookmark.
+			$result = $this->fetcher->fetch( $url );
+			update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, ! $result['reachable'] );
 		}
 
 		update_post_meta( $post_id, BookmarkMeta::META_UNREAD, isset( $_POST['linkstash_unread'] ) );
