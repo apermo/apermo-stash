@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-// Source files include `defined( 'ABSPATH' ) || exit();` guards so that direct
-// HTTP access from outside WordPress is rejected; PHPUnit autoloads those
-// files, so define the constant here before the autoloader runs.
-if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', __DIR__ . '/' );
-}
-
-require_once __DIR__ . '/../vendor/autoload.php';
-
 $wp_tests_dir = getenv( 'WP_TESTS_DIR' );
 
 if ( $wp_tests_dir === false ) {
@@ -20,14 +11,28 @@ if ( $wp_tests_dir === false ) {
 	}
 }
 
+$loading_wp = $wp_tests_dir !== false && is_dir( $wp_tests_dir );
+
+// Source files include `defined( 'ABSPATH' ) || exit();` guards. In unit-only
+// runs nothing else defines ABSPATH, so the autoloader would exit() the
+// moment it loaded a class. Pre-define it here for that case. When the WP
+// test suite is loading we leave it alone — WP defines its own ABSPATH that
+// points at the WordPress install, and overriding that breaks core lookups
+// (e.g. wp-phpunit's mock-mailer reaching ABSPATH . wp-includes/PHPMailer/...).
+if ( ! $loading_wp && ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
 // Load the WordPress class stubs only when the real WP suite is not available.
 // In integration runs WP core declares its own WP_Error and friends; double-
 // declaring them here would cause a fatal.
-if ( $wp_tests_dir === false || ! is_dir( $wp_tests_dir ) ) {
+if ( ! $loading_wp ) {
 	require_once __DIR__ . '/stubs.php';
 }
 
-if ( $wp_tests_dir !== false && is_dir( $wp_tests_dir ) ) {
+if ( $loading_wp ) {
 	if ( getenv( 'WP_MULTISITE' ) ) {
 		define( 'WP_TESTS_MULTISITE', true );
 	}
