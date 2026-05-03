@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-05-03
+
+### Security
+
+- Tighter output escaping in the bookmark list-table column headers
+  (`src/Admin/ListColumns.php`) and the contextual help tabs
+  (`src/Admin/HelpTabs.php`). Every translatable string that lands in
+  HTML now goes through `esc_html__()` at the call site, and the two
+  `sprintf`-builds-help-text spots that previously ran `wp_kses` on
+  the translation template *before* interpolation now wrap the
+  interpolated result, so the embedded `<a>` / `<code>` / `<strong>`
+  fragments pass through the same allow-list. None of the values
+  involved are user-supplied today, so no exploitable flaw existed in
+  0.1.1, but the patterns were fragile and `WP_List_Table` writes
+  column headers to the page raw — flagged in code review and fixed
+  here as defense in depth.
+
 ## [0.1.1] - 2026-05-02
 
 ### Added
