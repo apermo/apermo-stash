@@ -35,27 +35,6 @@ class ListColumns {
 	}
 
 	/**
-	 * Renders the tags column.
-	 *
-	 * @param int $post_id Bookmark post ID.
-	 *
-	 * @return void
-	 */
-	private static function render_tags( int $post_id ): void {
-		$terms = get_the_terms( $post_id, TagTaxonomy::TAXONOMY );
-		if ( ! \is_array( $terms ) || $terms === [] ) {
-			echo '—';
-			return;
-		}
-
-		$names = [];
-		foreach ( $terms as $term ) {
-			$names[] = $term->name;
-		}
-		echo esc_html( \implode( ', ', $names ) );
-	}
-
-	/**
 	 * Renders the visibility column.
 	 *
 	 * @param int $post_id Bookmark post ID.
@@ -114,11 +93,19 @@ class ListColumns {
 	 * @return array<string, string>
 	 */
 	public function filter_columns( array $columns ): array {
+		// Reusing the auto-column key WordPress generates from
+		// `register_taxonomy(['show_admin_column' => true])` so core's
+		// renderer takes over and emits clickable filter links instead
+		// of plain text. The plain key 'tags' is reserved by core for
+		// the post_tag taxonomy and would otherwise be claimed by the
+		// built-in renderer, which finds nothing for our CPT.
+		$tags_column = 'taxonomy-' . TagTaxonomy::TAXONOMY;
+
 		return [
 			'cb'         => $columns['cb'] ?? '<input type="checkbox" />',
 			'title'      => __( 'Title', 'linkstash' ),
 			'url'        => __( 'URL', 'linkstash' ),
-			'tags'       => __( 'Tags', 'linkstash' ),
+			$tags_column => __( 'Tags', 'linkstash' ),
 			'visibility' => __( 'Visibility', 'linkstash' ),
 			'flags'      => __( 'Flags', 'linkstash' ),
 			'date'       => $columns['date'] ?? __( 'Date', 'linkstash' ),
@@ -136,7 +123,6 @@ class ListColumns {
 	public function render_column( string $column, int $post_id ): void {
 		match ( $column ) {
 			'url'        => self::render_url( $post_id ),
-			'tags'       => self::render_tags( $post_id ),
 			'visibility' => self::render_visibility( $post_id ),
 			'flags'      => self::render_flags( $post_id ),
 			default      => null,

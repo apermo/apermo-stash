@@ -12,7 +12,6 @@ use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
 use WP_Post;
-use WP_Term;
 
 /**
  * Tests the bookmark list table column hooks and renderers.
@@ -74,7 +73,7 @@ class ListColumnsTest extends TestCase {
 		self::assertArrayHasKey( 'cb', $result );
 		self::assertArrayHasKey( 'title', $result );
 		self::assertArrayHasKey( 'url', $result );
-		self::assertArrayHasKey( 'tags', $result );
+		self::assertArrayHasKey( 'taxonomy-linkstash_tag', $result );
 		self::assertArrayHasKey( 'visibility', $result );
 		self::assertArrayHasKey( 'flags', $result );
 		self::assertArrayHasKey( 'date', $result );
@@ -110,33 +109,16 @@ class ListColumnsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the tags column joins term names.
+	 * Verifies render_column does not handle the taxonomy-linkstash_tag
+	 * column itself — that column is rendered by core's
+	 * `show_admin_column` mechanism, which emits clickable filter links.
 	 *
 	 * @return void
 	 */
-	public function test_render_tags_column_joins_names(): void {
-		$reading       = new WP_Term();
-		$reading->name = 'reading';
-		$archive       = new WP_Term();
-		$archive->name = 'archive';
-		Functions\when( 'get_the_terms' )->justReturn( [ $reading, $archive ] );
+	public function test_render_tags_column_is_core_owned(): void {
+		$output = $this->capture_render( 'taxonomy-linkstash_tag', 7 );
 
-		$output = $this->capture_render( 'tags', 7 );
-
-		self::assertSame( 'reading, archive', $output );
-	}
-
-	/**
-	 * Verifies the tags column renders an em-dash when no terms are attached.
-	 *
-	 * @return void
-	 */
-	public function test_render_tags_column_empty(): void {
-		Functions\when( 'get_the_terms' )->justReturn( [] );
-
-		$output = $this->capture_render( 'tags', 7 );
-
-		self::assertSame( '—', $output );
+		self::assertSame( '', $output );
 	}
 
 	/**

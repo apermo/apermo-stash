@@ -40,6 +40,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bumped the `Version` plugin header, `Main::VERSION`, and `readme.txt`
   Stable tag to 0.1.1.
 
+### Fixed
+
+- Tags column on the bookmark list screen was empty for every row.
+  The custom column key `tags` is reserved by core for the
+  `post_tag` taxonomy; core's built-in handler claimed the cell and
+  found nothing because the bookmark CPT doesn't have `post_tag`
+  attached. Switched to the `taxonomy-linkstash_tag` key core
+  generates from `register_taxonomy(['show_admin_column' => true])`,
+  which also gives clickable tag links that filter the list.
+
 ### Removed
 
 - The redundant quick-add form on the bookmark list screen. The
@@ -47,6 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   surface going forward. `TagAutocomplete` and `UrlAutoScheme` no
   longer enqueue on `edit.php` since their target inputs are gone
   there.
+- ListColumns no longer ships its own tag-column renderer; core's
+  taxonomy column handles it.
 
 ## [0.1.0] - 2026-05-01
 
