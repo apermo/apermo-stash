@@ -55,7 +55,7 @@ class BookmarkMetaTest extends TestCase {
 	 */
 	public function test_register_post_meta_registers_all_keys(): void {
 		Functions\expect( 'register_post_meta' )
-			->times( 5 )
+			->times( 4 )
 			->with( BookmarkPostType::POST_TYPE, Mockery::type( 'string' ), Mockery::type( 'array' ) );
 
 		( new BookmarkMeta() )->register_post_meta();
@@ -69,8 +69,7 @@ class BookmarkMetaTest extends TestCase {
 	public function test_meta_key_constants(): void {
 		self::assertSame( '_linkstash_url', BookmarkMeta::META_URL );
 		self::assertSame( '_linkstash_url_canonical', BookmarkMeta::META_URL_CANONICAL );
-		self::assertSame( '_linkstash_unread', BookmarkMeta::META_UNREAD );
-		self::assertSame( '_linkstash_archived', BookmarkMeta::META_ARCHIVED );
+		self::assertSame( '_linkstash_favorite', BookmarkMeta::META_FAVORITE );
 	}
 
 	/**

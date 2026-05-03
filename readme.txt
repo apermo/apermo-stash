@@ -56,8 +56,8 @@ extensions and your own scripts.
 
 `linkstash/v1` exposes:
 
-* `GET /bookmarks` (list, paged, filterable by tag / unread / archived /
-  public / private)
+* `GET /bookmarks` (list, paged, filterable by tag / favorite / public /
+  private)
 * `POST /bookmarks` (create — idempotent on canonical URL)
 * `GET /bookmarks/{id}` / `PATCH /bookmarks/{id}` / `DELETE /bookmarks/{id}`
 * `GET /tags?q=` (tag listing with counts; respects visibility)
@@ -91,7 +91,7 @@ or edit the current tab from the popup, and offers a right-click
 = Where are my bookmarks stored? =
 
 In your WordPress database, as posts of type `linkstash_bookmark`.
-The URL, canonical URL, unread / archived / unreachable flags live in
+The URL, canonical URL, favorite flag, and unreachable flag live in
 post meta. Tags use a custom non-hierarchical taxonomy
 (`linkstash_tag`), separate from your standard post tags.
 

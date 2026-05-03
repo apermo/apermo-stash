@@ -76,7 +76,7 @@ class ListColumnsTest extends TestCase {
 		self::assertArrayHasKey( 'url', $result );
 		self::assertArrayHasKey( 'linkstash_tag', $result );
 		self::assertArrayHasKey( 'visibility', $result );
-		self::assertArrayHasKey( 'flags', $result );
+		self::assertArrayHasKey( 'favorite', $result );
 		self::assertArrayHasKey( 'date', $result );
 	}
 
@@ -184,31 +184,32 @@ class ListColumnsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the flags column renders Unread / Archived chips when set.
+	 * Verifies the favorite column renders a star when the flag is set.
 	 *
 	 * @return void
 	 */
-	public function test_render_flags_column_with_both_flags(): void {
+	public function test_render_favorite_column_renders_star(): void {
+		Functions\when( 'esc_attr__' )->returnArg();
 		Functions\when( 'get_post_meta' )->alias(
-			static function ( int $id, string $key ): bool {
-				return \in_array( $key, [ BookmarkMeta::META_UNREAD, BookmarkMeta::META_ARCHIVED ], true );
-			},
+			static fn ( int $id, string $key ): bool => $key === BookmarkMeta::META_FAVORITE,
 		);
 
-		$output = $this->capture_render( 'flags', 7 );
+		$output = $this->capture_render( 'favorite', 7 );
 
-		self::assertSame( 'Unread, Archived', $output );
+		self::assertStringContainsString( '&#9733;', $output );
+		self::assertStringContainsString( 'aria-label="Favorite"', $output );
 	}
 
 	/**
-	 * Verifies the flags column renders an em-dash when no flags are set.
+	 * Verifies the favorite column renders an em-dash when not set.
 	 *
 	 * @return void
 	 */
-	public function test_render_flags_column_empty(): void {
+	public function test_render_favorite_column_empty(): void {
+		Functions\when( 'esc_attr__' )->returnArg();
 		Functions\when( 'get_post_meta' )->justReturn( false );
 
-		$output = $this->capture_render( 'flags', 7 );
+		$output = $this->capture_render( 'favorite', 7 );
 
 		self::assertSame( '—', $output );
 	}

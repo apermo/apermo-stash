@@ -46,7 +46,7 @@ class HelpTabs {
 				[ 'strong' => [] ],
 			) . '</li>'
 			. '<li>' . wp_kses(
-				__( '<strong>Flags</strong> — Unread, Archived, and Unreachable badges. Unreachable means the URL did not respond on its last save check (the bookmark itself is still saved; saving again rechecks).', 'linkstash' ),
+				__( '<strong>Favorite</strong> — a star you set yourself. Filter the list to favorites with the URL parameter ?favorite=1, or use it as a manual quality marker.', 'linkstash' ),
 				[ 'strong' => [] ],
 			) . '</li>'
 			. '</ul>';

@@ -16,7 +16,7 @@ use WP_Post;
 /**
  * Replaces the default bookmark edit screen with a small classic-editor form.
  *
- * Registers two meta boxes — a URL panel (URL + unread + archived flags)
+ * Registers two meta boxes — a URL panel (URL + Favorite flag)
  * and a Notes panel (plain textarea bound to post_content) — and disables
  * the block editor for the bookmark CPT so the classic edit screen is
  * used instead. Saving falls back to a simplified URL as the post_title
@@ -221,7 +221,7 @@ class BookmarkMetabox {
 	}
 
 	/**
-	 * Renders the URL meta box with URL, unread, and archived inputs.
+	 * Renders the URL meta box with URL and the Favorite flag input.
 	 *
 	 * @param WP_Post $post Current post.
 	 *
@@ -229,8 +229,7 @@ class BookmarkMetabox {
 	 */
 	public function render_url_meta_box( WP_Post $post ): void {
 		$url         = (string) get_post_meta( $post->ID, BookmarkMeta::META_URL, true );
-		$unread      = (bool) get_post_meta( $post->ID, BookmarkMeta::META_UNREAD, true );
-		$archived    = (bool) get_post_meta( $post->ID, BookmarkMeta::META_ARCHIVED, true );
+		$favorite    = (bool) get_post_meta( $post->ID, BookmarkMeta::META_FAVORITE, true );
 		$unreachable = (bool) get_post_meta( $post->ID, BookmarkMeta::META_UNREACHABLE, true );
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_FIELD );
 		?>
@@ -256,14 +255,8 @@ class BookmarkMetabox {
 		<?php } ?>
 		<p>
 			<label>
-				<input type="checkbox" name="linkstash_unread" value="1" <?php checked( $unread ); ?> />
-				<?php esc_html_e( 'Unread', 'linkstash' ); ?>
-			</label>
-		</p>
-		<p>
-			<label>
-				<input type="checkbox" name="linkstash_archived" value="1" <?php checked( $archived ); ?> />
-				<?php esc_html_e( 'Archived', 'linkstash' ); ?>
+				<input type="checkbox" name="linkstash_favorite" value="1" <?php checked( $favorite ); ?> />
+				<?php esc_html_e( 'Favorite', 'linkstash' ); ?>
 			</label>
 		</p>
 		<p class="description">
@@ -320,8 +313,11 @@ class BookmarkMetabox {
 			update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, BookmarkMeta::bool_to_meta( ! $result['reachable'] ) );
 		}
 
-		update_post_meta( $post_id, BookmarkMeta::META_UNREAD, isset( $_POST['linkstash_unread'] ) );
-		update_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, isset( $_POST['linkstash_archived'] ) );
+		update_post_meta(
+			$post_id,
+			BookmarkMeta::META_FAVORITE,
+			BookmarkMeta::bool_to_meta( isset( $_POST['linkstash_favorite'] ) ),
+		);
 
 		$note_raw = isset( $_POST['linkstash_note'] ) && \is_string( $_POST['linkstash_note'] )
 			? wp_kses_post( wp_unslash( $_POST['linkstash_note'] ) )

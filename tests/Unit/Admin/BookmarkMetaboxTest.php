@@ -154,8 +154,7 @@ class BookmarkMetaboxTest extends TestCase {
 		Functions\when( 'get_post_meta' )->alias(
 			static fn ( int $post_id, string $key ) => match ( $key ) {
 				BookmarkMeta::META_URL      => 'https://example.tld',
-				BookmarkMeta::META_UNREAD   => true,
-				BookmarkMeta::META_ARCHIVED => false,
+				BookmarkMeta::META_FAVORITE => true,
 				default                     => '',
 			},
 		);
@@ -169,8 +168,7 @@ class BookmarkMetaboxTest extends TestCase {
 
 		self::assertStringContainsString( 'name="linkstash_url"', $output );
 		self::assertStringContainsString( 'value="https://example.tld"', $output );
-		self::assertStringContainsString( 'name="linkstash_unread"', $output );
-		self::assertStringContainsString( 'name="linkstash_archived"', $output );
+		self::assertStringContainsString( 'name="linkstash_favorite"', $output );
 	}
 
 	/**
@@ -215,7 +213,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$_POST = [
 			'linkstash_metabox_nonce' => 'nonce',
 			'linkstash_url'           => 'https://www.example.tld/article',
-			'linkstash_unread'        => '1',
+			'linkstash_favorite'      => '1',
 		];
 
 		$post               = new WP_Post();
@@ -228,8 +226,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$keys = \array_column( $this->meta_writes, 1 );
 		self::assertContains( BookmarkMeta::META_URL, $keys );
 		self::assertContains( BookmarkMeta::META_URL_CANONICAL, $keys );
-		self::assertContains( BookmarkMeta::META_UNREAD, $keys );
-		self::assertContains( BookmarkMeta::META_ARCHIVED, $keys );
+		self::assertContains( BookmarkMeta::META_FAVORITE, $keys );
 
 		// Title was non-empty, so we should NOT have rewritten it.
 		$post_title_writes = \array_filter(

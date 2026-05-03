@@ -93,6 +93,9 @@ class MainTest extends TestCase {
 		Functions\expect( 'register_post_type' )->once();
 		Functions\expect( 'register_taxonomy' )->once();
 		Functions\expect( 'flush_rewrite_rules' )->once();
+		Functions\when( 'apply_filters' )->returnArg( 2 );
+		Functions\when( 'term_exists' )->justReturn( null );
+		Functions\expect( 'wp_insert_term' )->times( 4 );
 
 		Main::activate();
 	}

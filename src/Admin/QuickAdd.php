@@ -174,8 +174,7 @@ class QuickAdd {
 
 		update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
 		update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
-		update_post_meta( $post_id, BookmarkMeta::META_UNREAD, BookmarkMeta::bool_to_meta( false ) );
-		update_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, BookmarkMeta::bool_to_meta( false ) );
+		update_post_meta( $post_id, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( false ) );
 		update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, BookmarkMeta::bool_to_meta( ! $meta['reachable'] ) );
 
 		if ( $tags !== [] ) {

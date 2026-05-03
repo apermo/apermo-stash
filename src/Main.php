@@ -76,7 +76,52 @@ class Main {
 	public static function activate(): void {
 		( new BookmarkPostType() )->register_post_type();
 		( new TagTaxonomy() )->register_taxonomy();
+		self::seed_starter_tags();
 		flush_rewrite_rules();
+	}
+
+	/**
+	 * Inserts a small set of starter tags on first activation.
+	 *
+	 * Idempotent: each tag is created via `wp_insert_term` and skipped if
+	 * the term already exists. Filterable via `linkstash_starter_tags`
+	 * for sites that want a different starter set or none at all
+	 * (return an empty array). Users can rename or delete any of these
+	 * after activation; LinkStash never re-creates a tag the user has
+	 * removed.
+	 *
+	 * @return void
+	 */
+	private static function seed_starter_tags(): void {
+		/**
+		 * Filters the starter tags created on activation.
+		 *
+		 * Each entry is a `slug => name` pair. Return an empty array to
+		 * skip seeding entirely.
+		 *
+		 * @param array<string, string> $tags Default tag map.
+		 *
+		 * @return array<string, string>
+		 */
+		$tags = apply_filters(
+			'linkstash_starter_tags',
+			[
+				'read-later'  => __( 'Read later', 'linkstash' ),
+				'reference'   => __( 'Reference', 'linkstash' ),
+				'inspiration' => __( 'Inspiration', 'linkstash' ),
+				'archive'     => __( 'Archive', 'linkstash' ),
+			],
+		);
+
+		foreach ( $tags as $slug => $name ) {
+			if ( $slug === '' || $name === '' ) {
+				continue;
+			}
+			if ( term_exists( $slug, TagTaxonomy::TAXONOMY ) !== null ) {
+				continue;
+			}
+			wp_insert_term( $name, TagTaxonomy::TAXONOMY, [ 'slug' => $slug ] );
+		}
 	}
 
 	/**

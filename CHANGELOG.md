@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Favorite** flag on bookmarks (replaces Unread / Archived).
+  Single boolean meta `_linkstash_favorite`; rendered as a star
+  badge in the new "Favorite" list-table column; filterable via
+  `GET /linkstash/v1/bookmarks?favorite=1`. The Add/Edit screen
+  shows a single "Favorite" checkbox in the URL meta box.
+- Starter tags created on activation: `read-later`, `reference`,
+  `inspiration`, `archive`. Idempotent (re-activation skips
+  existing terms; deleted terms are not re-created). Filterable
+  via `linkstash_starter_tags` to customise or skip. Tags cover
+  the categorisation use cases the dropped flags were trying to.
 - "Are you sure you want to leave?" guard on the bookmark add/edit
   screen. Once any field changes, navigating away (closing the tab,
   hitting back, clicking a link) prompts the browser's native
@@ -58,6 +68,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- **Unread** and **Archived** flags. `_linkstash_unread` and
+  `_linkstash_archived` meta keys are gone, along with the REST
+  `unread` / `archived` query/body fields and the multi-badge
+  Flags column. Tags + the new starter set cover those use cases.
+  v0.1.0 was never shipped to wp.org so there is no migration path
+  — the previous keys are simply dropped.
 - The redundant quick-add form on the bookmark list screen. The
   dashboard widget covers the same flow and is the single quick-add
   surface going forward. `TagAutocomplete` and `UrlAutoScheme` no
