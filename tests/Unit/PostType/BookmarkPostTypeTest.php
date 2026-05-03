@@ -31,7 +31,9 @@ class BookmarkPostTypeTest extends TestCase {
 			&& $args['capability_type'] === 'post'
 			&& $args['supports'] === [ 'title' ]
 			&& $args['has_archive'] === false
-			&& $args['hierarchical'] === false;
+			&& $args['hierarchical'] === false
+			&& \is_string( $args['menu_icon'] )
+			&& \str_ends_with( $args['menu_icon'], '/assets/menu-icon.svg' );
 	}
 
 	/**
@@ -64,6 +66,34 @@ class BookmarkPostTypeTest extends TestCase {
 		$post_type->register();
 
 		self::assertNotFalse( has_action( 'init', [ $post_type, 'register_post_type' ] ) );
+		self::assertNotFalse( has_action( 'admin_enqueue_scripts', [ $post_type, 'enqueue_menu_icon_styles' ] ) );
+	}
+
+	/**
+	 * Verifies enqueue_menu_icon_styles attaches the masking CSS to wp-admin.
+	 *
+	 * @return void
+	 */
+	public function test_enqueue_menu_icon_styles_attaches_to_wp_admin(): void {
+		Functions\when( 'plugins_url' )->alias(
+			static fn ( string $path ): string => '/wp-content/plugins/linkstash/' . $path,
+		);
+		Functions\when( 'esc_url' )->returnArg();
+
+		$captured = null;
+		Functions\when( 'wp_add_inline_style' )->alias(
+			static function ( string $handle, string $rules ) use ( &$captured ): bool {
+				$captured = [ $handle, $rules ];
+				return true;
+			},
+		);
+
+		( new BookmarkPostType() )->enqueue_menu_icon_styles();
+
+		self::assertNotNull( $captured );
+		self::assertSame( 'wp-admin', $captured[0] );
+		self::assertStringContainsString( '#menu-posts-' . BookmarkPostType::POST_TYPE, $captured[1] );
+		self::assertStringContainsString( '/assets/menu-icon.svg', $captured[1] );
 	}
 
 	/**
@@ -77,6 +107,9 @@ class BookmarkPostTypeTest extends TestCase {
 				'__' => null,
 				'_x' => null,
 			],
+		);
+		Functions\when( 'plugins_url' )->alias(
+			static fn ( string $path ): string => '/wp-content/plugins/linkstash/' . $path,
 		);
 
 		Functions\expect( 'register_post_type' )
