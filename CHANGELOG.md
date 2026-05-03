@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-05-03
+
+### Fixed
+
+- Chrome-extension save flow on production hosts. WordPress core's
+  `rest_send_cors_headers` runs `sanitize_url()` on the incoming
+  `Origin` header, and `chrome-extension://...` is not in
+  `wp_allowed_protocols()` — so core writes an empty
+  `Access-Control-Allow-Origin:` value. Browsers reject the empty
+  string, the extension's preflight fails, and the POST silently
+  never runs. (Local dev with DDEV typically didn't reproduce because
+  the LiteSpeed/Apache plugin order on production let core's hook
+  fire after ours and overwrite the value; on a barebones WP it was
+  still a latent bug because core would always overwrite the origin
+  on direct POSTs.) `CorsHandler::send_cors_headers` now removes the
+  core hook for LinkStash routes when the origin matches the
+  allow-list, and emits the complete CORS header set itself
+  (`Access-Control-Allow-Origin`, `-Allow-Methods`, `-Allow-Headers`,
+  `-Allow-Credentials`, `-Expose-Headers`, `Vary`). Other namespaces
+  and disallowed origins still flow through core.
+
 ## [0.1.2] - 2026-05-03
 
 ### Security

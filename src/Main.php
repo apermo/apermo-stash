@@ -33,7 +33,7 @@ use Apermo\LinkStash\Url\MetadataFetcher;
  */
 class Main {
 
-	public const VERSION = '0.1.2';
+	public const VERSION = '0.1.3';
 
 	private const STARTER_TAGS_SEEDED_OPTION = 'linkstash_starter_tags_seeded';
 

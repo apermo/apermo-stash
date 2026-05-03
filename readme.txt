@@ -4,7 +4,7 @@ Tags: bookmarks, links, rest-api, self-hosted, archive
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -165,6 +165,15 @@ defense-in-depth narrowing of the CORS surface.
 5. Companion Chrome extension popup saving the current tab.
 
 == Changelog ==
+
+= 0.1.3 =
+* Fixed: the Chrome extension's save flow now actually reaches the
+  REST API on production hosts. WordPress core's CORS handler strips
+  `chrome-extension://` origins (the scheme is not in
+  `wp_allowed_protocols()`) and emits an empty
+  `Access-Control-Allow-Origin` header, which browsers reject. The
+  plugin now removes the core hook for LinkStash routes and emits a
+  complete CORS header set itself.
 
 = 0.1.2 =
 * Hardening: tighter output escaping in the bookmark list table and
