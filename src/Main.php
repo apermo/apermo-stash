@@ -34,6 +34,8 @@ class Main {
 
 	public const VERSION = '0.1.1';
 
+	private const STARTER_TAGS_SEEDED_OPTION = 'linkstash_starter_tags_seeded';
+
 	/**
 	 * Holds the main plugin file path.
 	 *
@@ -81,47 +83,36 @@ class Main {
 	}
 
 	/**
-	 * Inserts a small set of starter tags on first activation.
+	 * Seeds a small set of starter tags exactly once.
 	 *
-	 * Idempotent: each tag is created via `wp_insert_term` and skipped if
-	 * the term already exists. Filterable via `linkstash_starter_tags`
-	 * for sites that want a different starter set or none at all
-	 * (return an empty array). Users can rename or delete any of these
-	 * after activation; LinkStash never re-creates a tag the user has
-	 * removed.
+	 * Sets `linkstash_starter_tags_seeded` after the first run; subsequent
+	 * (re-)activations short-circuit on that option, so a user who deletes
+	 * a starter tag and later reactivates the plugin will not see it
+	 * resurrected. Existing tags with the same slug are still skipped on
+	 * the very first run so a pre-existing site is never disturbed.
 	 *
 	 * @return void
 	 */
 	private static function seed_starter_tags(): void {
-		/**
-		 * Filters the starter tags created on activation.
-		 *
-		 * Each entry is a `slug => name` pair. Return an empty array to
-		 * skip seeding entirely.
-		 *
-		 * @param array<string, string> $tags Default tag map.
-		 *
-		 * @return array<string, string>
-		 */
-		$tags = apply_filters(
-			'linkstash_starter_tags',
-			[
-				'read-later'  => __( 'Read later', 'linkstash' ),
-				'reference'   => __( 'Reference', 'linkstash' ),
-				'inspiration' => __( 'Inspiration', 'linkstash' ),
-				'archive'     => __( 'Archive', 'linkstash' ),
-			],
-		);
+		if ( (bool) get_option( self::STARTER_TAGS_SEEDED_OPTION, false ) ) {
+			return;
+		}
+
+		$tags = [
+			'read-later'  => __( 'Read later', 'linkstash' ),
+			'reference'   => __( 'Reference', 'linkstash' ),
+			'inspiration' => __( 'Inspiration', 'linkstash' ),
+			'archive'     => __( 'Archive', 'linkstash' ),
+		];
 
 		foreach ( $tags as $slug => $name ) {
-			if ( $slug === '' || $name === '' ) {
-				continue;
-			}
 			if ( term_exists( $slug, TagTaxonomy::TAXONOMY ) !== null ) {
 				continue;
 			}
 			wp_insert_term( $name, TagTaxonomy::TAXONOMY, [ 'slug' => $slug ] );
 		}
+
+		update_option( self::STARTER_TAGS_SEEDED_OPTION, true, false );
 	}
 
 	/**

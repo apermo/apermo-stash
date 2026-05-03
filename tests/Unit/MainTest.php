@@ -83,19 +83,52 @@ class MainTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function test_activate(): void {
+	public function test_activate_seeds_starter_tags_on_first_run(): void {
 		Functions\stubs(
 			[
 				'__' => null,
 				'_x' => null,
 			],
 		);
+		Functions\when( 'plugins_url' )->returnArg();
 		Functions\expect( 'register_post_type' )->once();
 		Functions\expect( 'register_taxonomy' )->once();
 		Functions\expect( 'flush_rewrite_rules' )->once();
-		Functions\when( 'apply_filters' )->returnArg( 2 );
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'linkstash_starter_tags_seeded', false )
+			->andReturn( false );
 		Functions\when( 'term_exists' )->justReturn( null );
 		Functions\expect( 'wp_insert_term' )->times( 4 );
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'linkstash_starter_tags_seeded', true, false );
+
+		Main::activate();
+	}
+
+	/**
+	 * Verifies activate skips seeding entirely when the marker option is set.
+	 *
+	 * @return void
+	 */
+	public function test_activate_skips_seeding_when_already_seeded(): void {
+		Functions\stubs(
+			[
+				'__' => null,
+				'_x' => null,
+			],
+		);
+		Functions\when( 'plugins_url' )->returnArg();
+		Functions\expect( 'register_post_type' )->once();
+		Functions\expect( 'register_taxonomy' )->once();
+		Functions\expect( 'flush_rewrite_rules' )->once();
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'linkstash_starter_tags_seeded', false )
+			->andReturn( true );
+		Functions\expect( 'wp_insert_term' )->never();
+		Functions\expect( 'update_option' )->never();
 
 		Main::activate();
 	}

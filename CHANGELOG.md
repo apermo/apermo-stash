@@ -16,11 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   badge in the new "Favorite" list-table column; filterable via
   `GET /linkstash/v1/bookmarks?favorite=1`. The Add/Edit screen
   shows a single "Favorite" checkbox in the URL meta box.
-- Starter tags created on activation: `read-later`, `reference`,
-  `inspiration`, `archive`. Idempotent (re-activation skips
-  existing terms; deleted terms are not re-created). Filterable
-  via `linkstash_starter_tags` to customise or skip. Tags cover
-  the categorisation use cases the dropped flags were trying to.
+- Starter tags created on first activation: `read-later`,
+  `reference`, `inspiration`, `archive`. A one-shot
+  `linkstash_starter_tags_seeded` option records that the seed has
+  run, so subsequent (re-)activations are no-ops — tags the user
+  deletes are never resurrected. The marker is cleared on uninstall
+  so a fresh reinstall reseeds. Tags cover the categorisation use
+  cases the dropped flags were trying to.
 - "Are you sure you want to leave?" guard on the bookmark add/edit
   screen. Once any field changes, navigating away (closing the tab,
   hitting back, clicking a link) prompts the browser's native
