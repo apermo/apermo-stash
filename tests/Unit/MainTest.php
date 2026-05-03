@@ -90,7 +90,6 @@ class MainTest extends TestCase {
 				'_x' => null,
 			],
 		);
-		Functions\when( 'plugins_url' )->returnArg();
 		Functions\expect( 'register_post_type' )->once();
 		Functions\expect( 'register_taxonomy' )->once();
 		Functions\expect( 'flush_rewrite_rules' )->once();
@@ -119,7 +118,6 @@ class MainTest extends TestCase {
 				'_x' => null,
 			],
 		);
-		Functions\when( 'plugins_url' )->returnArg();
 		Functions\expect( 'register_post_type' )->once();
 		Functions\expect( 'register_taxonomy' )->once();
 		Functions\expect( 'flush_rewrite_rules' )->once();

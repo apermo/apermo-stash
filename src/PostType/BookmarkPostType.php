@@ -16,23 +16,46 @@ class BookmarkPostType {
 	public const POST_TYPE = 'linkstash_bookmark';
 
 	/**
-	 * Returns the public URL of the SVG used as the admin-menu icon.
+	 * Caches the SVG markup so the file is read at most once per request.
+	 *
+	 * @var string|null
+	 */
+	private static ?string $svg_cache = null;
+
+	/**
+	 * Returns the inline SVG markup for the admin-menu icon.
+	 *
+	 * Reads the plugin-shipped `assets/menu-icon.svg` once per request.
+	 * Returns the empty string if the file cannot be read, in which case
+	 * the menu item simply renders without an icon.
 	 *
 	 * @return string
 	 */
-	private static function menu_icon_url(): string {
-		return plugins_url( 'assets/menu-icon.svg', Main::file() );
+	private static function svg_markup(): string {
+		if ( self::$svg_cache !== null ) {
+			return self::$svg_cache;
+		}
+
+		$path = \dirname( Main::file() ) . '/assets/menu-icon.svg';
+		// SVG file is a static plugin-shipped asset; WP_Filesystem is the
+		// recommended-by-sniff alternative but brings request-time setup
+		// overhead for what is a single static read.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		self::$svg_cache = \is_readable( $path ) ? (string) \file_get_contents( $path ) : '';
+
+		return self::$svg_cache;
 	}
 
 	/**
 	 * Registers the WordPress hooks that drive CPT registration plus
-	 * the admin-menu icon styling.
+	 * the admin-menu icon styling and SVG inlining.
 	 *
 	 * @return void
 	 */
 	public function register(): void {
 		add_action( 'init', [ $this, 'register_post_type' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_menu_icon_styles' ] );
+		add_action( 'admin_print_footer_scripts', [ $this, 'inline_menu_icon' ] );
 	}
 
 	/**
@@ -67,7 +90,7 @@ class BookmarkPostType {
 				'show_in_menu'       => true,
 				'show_in_rest'       => true,
 				'rest_base'          => 'bookmarks',
-				'menu_icon'          => self::menu_icon_url(),
+				'menu_icon'          => 'none',
 				'capability_type'    => 'post',
 				'map_meta_cap'       => true,
 				'supports'           => [ 'title' ],
@@ -79,29 +102,55 @@ class BookmarkPostType {
 	}
 
 	/**
-	 * Attaches the menu-icon mask CSS to wp-admin's stylesheet.
+	 * Attaches the menu-icon sizing + colour CSS to wp-admin's stylesheet.
 	 *
-	 * Renders the SVG via `background: currentColor` plus `mask-image`
-	 * so the icon adopts the menu item's text colour — which the WP
-	 * admin colour scheme already paints grey-ish in the idle state and
-	 * the scheme's highlight on hover/active. The default `<img>` from
-	 * `menu_icon` is hidden so we don't have a coloured logo and a
-	 * masked icon stacked on top of each other.
+	 * The SVG ships with `<g fill="currentColor">`, so the icon adopts the
+	 * `color` property of its parent. Idle state explicitly sets the same
+	 * grey WP uses for native dashicons (`#a7aaad`); hover and current
+	 * states swap to `#fff` to match the highlighted text the WP admin
+	 * colour scheme paints alongside it.
 	 *
 	 * @return void
 	 */
 	public function enqueue_menu_icon_styles(): void {
-		$icon = self::menu_icon_url();
-
 		$menu_id = '#menu-posts-' . self::POST_TYPE;
-		$rules   = $menu_id . ' div.wp-menu-image{background-color:currentColor;'
-			. '-webkit-mask-image:url("' . esc_url( $icon ) . '");mask-image:url("' . esc_url( $icon ) . '");'
-			. '-webkit-mask-position:center 7px;mask-position:center 7px;'
-			. '-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;'
-			. '-webkit-mask-size:20px;mask-size:20px;}'
-			. $menu_id . ' div.wp-menu-image::before,'
-			. $menu_id . ' div.wp-menu-image img{display:none;}';
+		$rules   = $menu_id . ' div.wp-menu-image{color:#a7aaad;}'
+			. $menu_id . ' div.wp-menu-image svg{display:block;width:20px;height:20px;margin:7px auto 0;}'
+			. $menu_id . ':hover div.wp-menu-image,'
+			. $menu_id . '.wp-has-current-submenu div.wp-menu-image,'
+			. $menu_id . '.current div.wp-menu-image{color:#fff;}';
 
 		wp_add_inline_style( 'wp-admin', $rules );
+	}
+
+	/**
+	 * Injects the SVG markup directly into the admin menu icon container.
+	 *
+	 * Setting `menu_icon` to `none` makes WP render an empty
+	 * `.wp-menu-image` div (no `<img>` tag); this hook fills that div
+	 * with the actual SVG markup so `currentColor` references inside the
+	 * SVG cascade from the parent CSS, which `<img src=...svg>` would
+	 * not allow.
+	 *
+	 * @return void
+	 */
+	public function inline_menu_icon(): void {
+		$markup = self::svg_markup();
+		if ( $markup === '' ) {
+			return;
+		}
+
+		// $markup is read from a plugin-shipped static SVG file and embedded
+		// inside a JS string literal via wp_json_encode (which produces
+		// JS-safe escaping); the surrounding script tag and selector are
+		// constants composed from a class constant. No user data flows in.
+		$selector = '#menu-posts-' . self::POST_TYPE . ' .wp-menu-image';
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '<script id="linkstash-menu-icon">'
+			. '(function(){'
+			. 'var d=document.querySelector(' . wp_json_encode( $selector ) . ');'
+			. 'if(d){d.innerHTML=' . wp_json_encode( $markup ) . ';}'
+			. '})();'
+			. "</script>\n";
 	}
 }

@@ -9,6 +9,7 @@ use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /**
  * Tests the bookmark CPT registration.
@@ -32,8 +33,7 @@ class BookmarkPostTypeTest extends TestCase {
 			&& $args['supports'] === [ 'title' ]
 			&& $args['has_archive'] === false
 			&& $args['hierarchical'] === false
-			&& \is_string( $args['menu_icon'] )
-			&& \str_ends_with( $args['menu_icon'], '/assets/menu-icon.svg' );
+			&& $args['menu_icon'] === 'none';
 	}
 
 	/**
@@ -67,19 +67,15 @@ class BookmarkPostTypeTest extends TestCase {
 
 		self::assertNotFalse( has_action( 'init', [ $post_type, 'register_post_type' ] ) );
 		self::assertNotFalse( has_action( 'admin_enqueue_scripts', [ $post_type, 'enqueue_menu_icon_styles' ] ) );
+		self::assertNotFalse( has_action( 'admin_print_footer_scripts', [ $post_type, 'inline_menu_icon' ] ) );
 	}
 
 	/**
-	 * Verifies enqueue_menu_icon_styles attaches the masking CSS to wp-admin.
+	 * Verifies enqueue_menu_icon_styles attaches state-based color CSS to wp-admin.
 	 *
 	 * @return void
 	 */
 	public function test_enqueue_menu_icon_styles_attaches_to_wp_admin(): void {
-		Functions\when( 'plugins_url' )->alias(
-			static fn ( string $path ): string => '/wp-content/plugins/linkstash/' . $path,
-		);
-		Functions\when( 'esc_url' )->returnArg();
-
 		$captured = null;
 		Functions\when( 'wp_add_inline_style' )->alias(
 			static function ( string $handle, string $rules ) use ( &$captured ): bool {
@@ -93,7 +89,57 @@ class BookmarkPostTypeTest extends TestCase {
 		self::assertNotNull( $captured );
 		self::assertSame( 'wp-admin', $captured[0] );
 		self::assertStringContainsString( '#menu-posts-' . BookmarkPostType::POST_TYPE, $captured[1] );
-		self::assertStringContainsString( '/assets/menu-icon.svg', $captured[1] );
+		self::assertStringContainsString( '#a7aaad', $captured[1] );
+		self::assertStringContainsString( '#fff', $captured[1] );
+		self::assertStringContainsString( ' svg{', $captured[1] );
+	}
+
+	/**
+	 * Verifies inline_menu_icon outputs a script that injects the SVG markup
+	 * into the menu-image div for our CPT.
+	 *
+	 * @return void
+	 */
+	public function test_inline_menu_icon_outputs_injection_script(): void {
+		Functions\when( 'wp_json_encode' )->alias(
+			static fn ( $data ) => \json_encode( $data ), // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
+		);
+
+		// Reset the static cache via a new class instance is not enough; the
+		// cache is class-level. Use reflection so the test is hermetic.
+		$reflection = new ReflectionClass( BookmarkPostType::class );
+		$cache_prop = $reflection->getProperty( 'svg_cache' );
+		$cache_prop->setValue( null, '<svg viewBox="0 0 10 10"><path d="M0,0"/></svg>' );
+
+		\ob_start();
+		( new BookmarkPostType() )->inline_menu_icon();
+		$output = (string) \ob_get_clean();
+
+		self::assertStringContainsString( '<script id="linkstash-menu-icon">', $output );
+		self::assertStringContainsString( '#menu-posts-' . BookmarkPostType::POST_TYPE . ' .wp-menu-image', $output );
+		self::assertStringContainsString( 'd.innerHTML=', $output );
+		self::assertStringContainsString( '<svg', $output );
+
+		$cache_prop->setValue( null, null );
+	}
+
+	/**
+	 * Verifies inline_menu_icon emits nothing when the SVG cannot be loaded.
+	 *
+	 * @return void
+	 */
+	public function test_inline_menu_icon_silent_when_svg_missing(): void {
+		$reflection = new ReflectionClass( BookmarkPostType::class );
+		$cache_prop = $reflection->getProperty( 'svg_cache' );
+		$cache_prop->setValue( null, '' );
+
+		\ob_start();
+		( new BookmarkPostType() )->inline_menu_icon();
+		$output = (string) \ob_get_clean();
+
+		self::assertSame( '', $output );
+
+		$cache_prop->setValue( null, null );
 	}
 
 	/**
@@ -107,9 +153,6 @@ class BookmarkPostTypeTest extends TestCase {
 				'__' => null,
 				'_x' => null,
 			],
-		);
-		Functions\when( 'plugins_url' )->alias(
-			static fn ( string $path ): string => '/wp-content/plugins/linkstash/' . $path,
 		);
 
 		Functions\expect( 'register_post_type' )
