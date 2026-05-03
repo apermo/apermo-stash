@@ -10,6 +10,7 @@ use Apermo\LinkStash\Admin\BookmarkMetabox;
 use Apermo\LinkStash\Admin\DashboardWidget;
 use Apermo\LinkStash\Admin\HelpTabs;
 use Apermo\LinkStash\Admin\ListColumns;
+use Apermo\LinkStash\Admin\ListFilter;
 use Apermo\LinkStash\Admin\Notices;
 use Apermo\LinkStash\Admin\QuickAdd;
 use Apermo\LinkStash\Admin\SettingsPage;
@@ -85,11 +86,16 @@ class Main {
 	/**
 	 * Seeds a small set of starter tags exactly once.
 	 *
-	 * Sets `linkstash_starter_tags_seeded` after the first run; subsequent
-	 * (re-)activations short-circuit on that option, so a user who deletes
-	 * a starter tag and later reactivates the plugin will not see it
-	 * resurrected. Existing tags with the same slug are still skipped on
-	 * the very first run so a pre-existing site is never disturbed.
+	 * Sets `linkstash_starter_tags_seeded` after the first fully-successful
+	 * run; subsequent (re-)activations short-circuit on that option, so a
+	 * user who deletes a starter tag and later reactivates the plugin
+	 * will not see it resurrected. Existing tags with the same slug are
+	 * still skipped on the very first run so a pre-existing site is
+	 * never disturbed.
+	 *
+	 * If any `wp_insert_term` call returns a `WP_Error` (e.g. a transient
+	 * DB failure during activation) the marker is **not** written, so the
+	 * next activation retries the missing tags.
 	 *
 	 * @return void
 	 */
@@ -105,14 +111,20 @@ class Main {
 			'archive'     => __( 'Archive', 'linkstash' ),
 		];
 
+		$all_ok = true;
 		foreach ( $tags as $slug => $name ) {
 			if ( term_exists( $slug, TagTaxonomy::TAXONOMY ) !== null ) {
 				continue;
 			}
-			wp_insert_term( $name, TagTaxonomy::TAXONOMY, [ 'slug' => $slug ] );
+			$result = wp_insert_term( $name, TagTaxonomy::TAXONOMY, [ 'slug' => $slug ] );
+			if ( is_wp_error( $result ) ) {
+				$all_ok = false;
+			}
 		}
 
-		update_option( self::STARTER_TAGS_SEEDED_OPTION, true, false );
+		if ( $all_ok ) {
+			update_option( self::STARTER_TAGS_SEEDED_OPTION, true, false );
+		}
 	}
 
 	/**
@@ -144,6 +156,7 @@ class Main {
 		if ( is_admin() ) {
 			$store = new TokenStore();
 			( new ListColumns() )->register();
+			( new ListFilter() )->register();
 			( new Notices() )->register();
 			( new QuickAdd( new MetadataFetcher() ) )->register();
 			( new SettingsPage( $store ) )->register();
