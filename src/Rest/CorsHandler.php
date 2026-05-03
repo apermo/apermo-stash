@@ -178,52 +178,27 @@ class CorsHandler {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'rest_api_init', [ $this, 'send_cors_headers' ], 5 );
-		add_filter( 'rest_pre_serve_request', [ $this, 'handle_preflight' ], 10, 4 );
+		// Priority 100 puts us after WP core's rest_send_cors_headers
+		// (priority 10) AND after WP_REST_Server::send_header() emissions
+		// for Access-Control-Allow-Headers / -Expose-Headers (which fire
+		// inside serve_request before this filter runs). We need to be
+		// the last writer or core's empty Allow-Origin (sanitize_url
+		// strips chrome-extension://, which is not in wp_allowed_protocols)
+		// is what the browser sees.
+		add_filter( 'rest_pre_serve_request', [ $this, 'send_cors_response' ], 100, 4 );
 	}
 
 	/**
-	 * Sends CORS headers when the request origin is allow-listed and short-circuits
-	 * WP core's own CORS handler for the LinkStash namespace.
+	 * Emits the LinkStash CORS response headers and, for OPTIONS preflight,
+	 * short-circuits the request with a 204.
 	 *
-	 * WP core's `rest_send_cors_headers` runs `sanitize_url()` on the Origin
-	 * header, which drops `chrome-extension://...` because that scheme is
-	 * not in `wp_allowed_protocols()`. The result is an empty
-	 * `Access-Control-Allow-Origin:` value, which browsers reject — so the
-	 * extension's preflight fails and the actual POST never runs. By
-	 * removing the core hook and emitting our own headers (only on
-	 * LinkStash routes, only when the origin matches the allow-list) we
-	 * stay the sole emitter and the response carries the right value.
-	 *
-	 * @return void
-	 */
-	public function send_cors_headers(): void {
-		if ( ! self::is_linkstash_route() ) {
-			return;
-		}
-
-		$origin = self::request_origin();
-		if ( $origin === '' || ! self::is_allowed_origin( $origin ) ) {
-			return;
-		}
-
-		// Drop WP core's CORS hook so it can't overwrite the headers we're
-		// about to emit. Removed on a per-request basis — we only reach this
-		// line when the request is on a LinkStash route with an allow-listed
-		// origin, so other namespaces / origins still go through core.
-		remove_filter( 'rest_pre_serve_request', 'rest_send_cors_headers' );
-
-		\header( 'Access-Control-Allow-Origin: ' . $origin );
-		\header( 'Access-Control-Allow-Methods: ' . self::ALLOWED_METHODS );
-		\header( 'Access-Control-Allow-Headers: ' . self::ALLOWED_HEADERS );
-		\header( 'Access-Control-Allow-Credentials: true' );
-		\header( 'Access-Control-Expose-Headers: ' . self::EXPOSED_HEADERS );
-		\header( 'Vary: Origin' );
-	}
-
-	/**
-	 * Handles `OPTIONS` preflight for the LinkStash namespace by short-circuiting
-	 * with CORS response headers before authentication runs.
+	 * Runs late on `rest_pre_serve_request` (priority 100) to be the last
+	 * writer for the CORS header set. This means our values overwrite WP
+	 * core's `rest_send_cors_headers` (which would otherwise emit an empty
+	 * `Access-Control-Allow-Origin` for `chrome-extension://...` because
+	 * `sanitize_url()` strips schemes outside `wp_allowed_protocols()`)
+	 * and `WP_REST_Server::send_header()` defaults for Allow-Headers and
+	 * Expose-Headers.
 	 *
 	 * @param bool  $served  Whether the request has already been served.
 	 * @param mixed $result  The REST response (unused).
@@ -232,14 +207,10 @@ class CorsHandler {
 	 *
 	 * @return bool
 	 */
-	public function handle_preflight( bool $served, mixed $result, mixed $request, mixed $server ): bool {
+	public function send_cors_response( bool $served, mixed $result, mixed $request, mixed $server ): bool {
 		unset( $result, $request, $server );
 
-		if ( $served ) {
-			return $served;
-		}
-
-		if ( ! self::is_options_request() || ! self::is_linkstash_route() ) {
+		if ( ! self::is_linkstash_route() ) {
 			return $served;
 		}
 
@@ -251,11 +222,16 @@ class CorsHandler {
 		\header( 'Access-Control-Allow-Origin: ' . $origin );
 		\header( 'Access-Control-Allow-Methods: ' . self::ALLOWED_METHODS );
 		\header( 'Access-Control-Allow-Headers: ' . self::ALLOWED_HEADERS );
+		\header( 'Access-Control-Allow-Credentials: true' );
 		\header( 'Access-Control-Expose-Headers: ' . self::EXPOSED_HEADERS );
-		\header( 'Access-Control-Max-Age: 86400' );
 		\header( 'Vary: Origin' );
-		status_header( 204 );
 
-		return true;
+		if ( self::is_options_request() && ! $served ) {
+			\header( 'Access-Control-Max-Age: 86400' );
+			status_header( 204 );
+			return true;
+		}
+
+		return $served;
 	}
 }

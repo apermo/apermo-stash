@@ -87,104 +87,83 @@ class CorsHandlerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies register hooks send_cors_headers early on rest_api_init.
+	 * Verifies register hooks send_cors_response on rest_pre_serve_request
+	 * at a high priority (so we run after core's CORS handler).
 	 *
 	 * @return void
 	 */
-	public function test_register_hooks_rest_api_init_early(): void {
+	public function test_register_hooks_rest_pre_serve_request_late(): void {
 		$handler = new CorsHandler();
 		$handler->register();
 
-		self::assertNotFalse( has_action( 'rest_api_init', [ $handler, 'send_cors_headers' ] ) );
-		self::assertNotFalse( has_filter( 'rest_pre_serve_request', [ $handler, 'handle_preflight' ] ) );
+		$priority = has_filter( 'rest_pre_serve_request', [ $handler, 'send_cors_response' ] );
+		self::assertNotFalse( $priority );
+		self::assertGreaterThan( 10, $priority, 'Must run after WP core rest_send_cors_headers (priority 10).' );
 	}
 
 	/**
-	 * Verifies send_cors_headers is a no-op when the request is not for
-	 * a LinkStash route, even if the origin would otherwise match.
+	 * Verifies send_cors_response is a no-op when the request is not for
+	 * a LinkStash route, returning the unchanged $served value.
 	 *
 	 * @return void
 	 */
-	public function test_send_cors_headers_skips_other_namespaces(): void {
-		$_SERVER['REQUEST_URI'] = '/wp-json/wp/v2/posts';
-		$_SERVER['HTTP_ORIGIN'] = 'chrome-extension://abc';
-		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-
-		Functions\expect( 'remove_filter' )->never();
-
-		( new CorsHandler() )->send_cors_headers();
-	}
-
-	/**
-	 * Verifies send_cors_headers removes WP core's CORS hook on LinkStash
-	 * routes when the origin is allow-listed — the empty-Origin bug fixed
-	 * in 0.1.3.
-	 *
-	 * @return void
-	 */
-	public function test_send_cors_headers_removes_core_hook_on_linkstash_route(): void {
-		$_SERVER['REQUEST_URI'] = '/wp-json/linkstash/v1/bookmarks';
-		$_SERVER['HTTP_ORIGIN'] = 'chrome-extension://abc';
-		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
-
-		Functions\expect( 'remove_filter' )
-			->once()
-			->with( 'rest_pre_serve_request', 'rest_send_cors_headers' );
-
-		( new CorsHandler() )->send_cors_headers();
-	}
-
-	/**
-	 * Verifies send_cors_headers does not remove the core hook when the
-	 * origin is not allow-listed.
-	 *
-	 * @return void
-	 */
-	public function test_send_cors_headers_keeps_core_hook_for_unknown_origin(): void {
-		$_SERVER['REQUEST_URI'] = '/wp-json/linkstash/v1/bookmarks';
-		$_SERVER['HTTP_ORIGIN'] = 'https://attacker.tld';
-		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
-
-		Functions\expect( 'remove_filter' )->never();
-
-		( new CorsHandler() )->send_cors_headers();
-	}
-
-	/**
-	 * Verifies handle_preflight returns early when the request is not OPTIONS.
-	 *
-	 * @return void
-	 */
-	public function test_preflight_skipped_for_non_options_request(): void {
-		$_SERVER['REQUEST_METHOD'] = 'GET';
-		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+	public function test_send_cors_response_skips_other_namespaces(): void {
+		$_SERVER['REQUEST_METHOD'] = 'POST';
+		$_SERVER['REQUEST_URI']    = '/wp-json/wp/v2/posts';
 		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
-
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
 
-		$handler = new CorsHandler();
-
-		self::assertFalse( $handler->handle_preflight( false, null, null, null ) );
+		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
+		self::assertFalse( $result );
 	}
 
 	/**
-	 * Verifies an unknown origin is rejected during preflight.
+	 * Verifies send_cors_response is a no-op when the origin is not on the allow-list.
 	 *
 	 * @return void
 	 */
-	public function test_preflight_rejects_unknown_origin(): void {
-		$_SERVER['REQUEST_METHOD'] = 'OPTIONS';
+	public function test_send_cors_response_skips_unknown_origin(): void {
+		$_SERVER['REQUEST_METHOD'] = 'POST';
 		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
 		$_SERVER['HTTP_ORIGIN']    = 'https://attacker.tld';
-
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
 		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
 
-		$handler = new CorsHandler();
+		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
+		self::assertFalse( $result );
+	}
 
-		self::assertFalse( $handler->handle_preflight( false, null, null, null ) );
+	/**
+	 * Verifies send_cors_response short-circuits an OPTIONS preflight with 204.
+	 *
+	 * @return void
+	 */
+	public function test_send_cors_response_serves_options_preflight(): void {
+		$_SERVER['REQUEST_METHOD'] = 'OPTIONS';
+		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
+		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
+		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+		Functions\when( 'status_header' )->justReturn( null );
+
+		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
+		self::assertTrue( $result );
+	}
+
+	/**
+	 * Verifies send_cors_response on a non-OPTIONS LinkStash request returns
+	 * $served unchanged (we set headers but don't short-circuit the body).
+	 *
+	 * @return void
+	 */
+	public function test_send_cors_response_passes_through_post(): void {
+		$_SERVER['REQUEST_METHOD'] = 'POST';
+		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
+		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
+		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+
+		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
+		self::assertFalse( $result );
 	}
 }
