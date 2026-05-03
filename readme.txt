@@ -123,10 +123,11 @@ sharing page is on the roadmap.
 
 == Screenshots ==
 
-1. Dashboard widget for one-click capture from anywhere in the admin.
-2. Bookmark list screen with the URL / tags / visibility / flags columns.
-3. Bookmark edit screen with URL meta box and unreachable-URL warning.
+1. Bookmark list screen with the URL / tags / visibility / favorite columns.
+2. Bookmark edit screen with URL meta box and unreachable-URL warning.
+3. Dashboard widget for one-click capture from anywhere in the admin.
 4. Settings → LinkStash token settings page.
+5. Companion Chrome extension popup saving the current tab.
 
 == Changelog ==
 

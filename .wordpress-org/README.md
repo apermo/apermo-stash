@@ -17,6 +17,7 @@ wordpress.org/plugins — it does **not** ship inside the plugin zip.
 | `screenshot-2.png` | any | Caption from `readme.txt`, line 2. |
 | `screenshot-3.png` | any | Caption from `readme.txt`, line 3. |
 | `screenshot-4.png` | any | Caption from `readme.txt`, line 4. |
+| `screenshot-5.png` | any | Caption from `readme.txt`, line 5. |
 
 `.jpg`/`.jpeg` are also accepted in place of `.png` for any of the above.
 
