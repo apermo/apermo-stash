@@ -32,6 +32,7 @@ class ListColumnsTest extends TestCase {
 		Functions\when( 'esc_html__' )->returnArg();
 		Functions\when( 'esc_attr' )->returnArg();
 		Functions\when( 'esc_url' )->returnArg();
+		Functions\when( 'wp_kses_post' )->returnArg();
 	}
 
 	/**

@@ -65,10 +65,7 @@ class ListColumns {
 			);
 		}
 
-		// Each anchor was built from esc_url + esc_html; the join is a
-		// constant separator. No user data flows in raw.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo \implode( ', ', $links );
+		echo wp_kses_post( \implode( ', ', $links ) );
 	}
 
 	/**
