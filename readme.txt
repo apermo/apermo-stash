@@ -4,7 +4,7 @@ Tags: bookmarks, links, rest-api, self-hosted, archive
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -165,6 +165,10 @@ defense-in-depth narrowing of the CORS surface.
 5. Companion Chrome extension popup saving the current tab.
 
 == Changelog ==
+
+= 0.1.2 =
+* Hardening: tighter output escaping in the bookmark list table and
+  contextual help tabs. No functional changes.
 
 = 0.1.1 =
 * New: single Favorite flag (replaces Unread / Archived), with a

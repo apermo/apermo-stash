@@ -122,12 +122,12 @@ class ListColumns {
 	public function filter_columns( array $columns ): array {
 		return [
 			'cb'            => $columns['cb'] ?? '<input type="checkbox" />',
-			'title'         => __( 'Title', 'linkstash' ),
-			'url'           => __( 'URL', 'linkstash' ),
-			'linkstash_tag' => __( 'Tags', 'linkstash' ),
-			'visibility'    => __( 'Visibility', 'linkstash' ),
-			'favorite'      => __( 'Favorite', 'linkstash' ),
-			'date'          => $columns['date'] ?? __( 'Date', 'linkstash' ),
+			'title'         => esc_html__( 'Title', 'linkstash' ),
+			'url'           => esc_html__( 'URL', 'linkstash' ),
+			'linkstash_tag' => esc_html__( 'Tags', 'linkstash' ),
+			'visibility'    => esc_html__( 'Visibility', 'linkstash' ),
+			'favorite'      => esc_html__( 'Favorite', 'linkstash' ),
+			'date'          => $columns['date'] ?? esc_html__( 'Date', 'linkstash' ),
 		];
 	}
 

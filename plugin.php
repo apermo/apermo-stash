@@ -3,7 +3,7 @@
  * Plugin Name: LinkStash
  * Plugin URI:  https://github.com/apermo/linkstash
  * Description: A self-hosted bookmark collection with a token-protected REST API.
- * Version:     0.1.1
+ * Version:     0.1.2
  * Author:      Christoph Daum
  * Author URI:  https://apermo.de
  * License:     GPL-2.0-or-later
