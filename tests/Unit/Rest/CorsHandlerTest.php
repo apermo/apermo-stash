@@ -87,6 +87,72 @@ class CorsHandlerTest extends TestCase {
 	}
 
 	/**
+	 * Verifies register hooks send_cors_headers early on rest_api_init.
+	 *
+	 * @return void
+	 */
+	public function test_register_hooks_rest_api_init_early(): void {
+		$handler = new CorsHandler();
+		$handler->register();
+
+		self::assertNotFalse( has_action( 'rest_api_init', [ $handler, 'send_cors_headers' ] ) );
+		self::assertNotFalse( has_filter( 'rest_pre_serve_request', [ $handler, 'handle_preflight' ] ) );
+	}
+
+	/**
+	 * Verifies send_cors_headers is a no-op when the request is not for
+	 * a LinkStash route, even if the origin would otherwise match.
+	 *
+	 * @return void
+	 */
+	public function test_send_cors_headers_skips_other_namespaces(): void {
+		$_SERVER['REQUEST_URI'] = '/wp-json/wp/v2/posts';
+		$_SERVER['HTTP_ORIGIN'] = 'chrome-extension://abc';
+		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
+
+		Functions\expect( 'remove_filter' )->never();
+
+		( new CorsHandler() )->send_cors_headers();
+	}
+
+	/**
+	 * Verifies send_cors_headers removes WP core's CORS hook on LinkStash
+	 * routes when the origin is allow-listed — the empty-Origin bug fixed
+	 * in 0.1.3.
+	 *
+	 * @return void
+	 */
+	public function test_send_cors_headers_removes_core_hook_on_linkstash_route(): void {
+		$_SERVER['REQUEST_URI'] = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['HTTP_ORIGIN'] = 'chrome-extension://abc';
+		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
+		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+
+		Functions\expect( 'remove_filter' )
+			->once()
+			->with( 'rest_pre_serve_request', 'rest_send_cors_headers' );
+
+		( new CorsHandler() )->send_cors_headers();
+	}
+
+	/**
+	 * Verifies send_cors_headers does not remove the core hook when the
+	 * origin is not allow-listed.
+	 *
+	 * @return void
+	 */
+	public function test_send_cors_headers_keeps_core_hook_for_unknown_origin(): void {
+		$_SERVER['REQUEST_URI'] = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['HTTP_ORIGIN'] = 'https://attacker.tld';
+		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
+		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+
+		Functions\expect( 'remove_filter' )->never();
+
+		( new CorsHandler() )->send_cors_headers();
+	}
+
+	/**
 	 * Verifies handle_preflight returns early when the request is not OPTIONS.
 	 *
 	 * @return void
