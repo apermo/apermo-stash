@@ -61,7 +61,7 @@ class CheckControllerTest extends TestCase {
 					}
 					$permission = $config[0]['permission_callback'] ?? null;
 
-					return $permission === [ Permissions::class, 'require_edit_posts' ];
+					return $permission === [ Permissions::class, 'require_read_bookmarks' ];
 				},
 			);
 

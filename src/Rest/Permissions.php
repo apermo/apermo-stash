@@ -43,6 +43,29 @@ class Permissions {
 	}
 
 	/**
+	 * Allows read-only requests against the bookmark library when the
+	 * resolved user can edit bookmarks.
+	 *
+	 * Same capability check as `require_edit_posts` — bookmark reads via
+	 * `/check` and friends are editor-only by design — but the error
+	 * message is phrased for a read context so callers see the right
+	 * thing on a 403.
+	 *
+	 * @return bool|WP_Error
+	 */
+	public static function require_read_bookmarks(): bool|WP_Error {
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return new WP_Error(
+				'linkstash_forbidden',
+				__( 'You are not allowed to read bookmarks.', 'linkstash' ),
+				[ 'status' => 403 ],
+			);
+		}
+
+		return true;
+	}
+
+	/**
 	 * Allows reads of a single bookmark when the bookmark is public, the
 	 * caller owns it, or the caller can edit other users' posts.
 	 *
