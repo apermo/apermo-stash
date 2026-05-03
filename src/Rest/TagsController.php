@@ -18,15 +18,23 @@ use WP_REST_Server;
 class TagsController {
 
 	private const CACHE_GROUP   = 'linkstash';
-	private const CACHE_VERSION = 1;
+	private const CACHE_VERSION = 2;
 
 	/**
 	 * Runs the per-tag aggregate query and returns the raw rows.
 	 *
-	 * Results are cached per (visibility-spec, taxonomy term changes)
-	 * tuple via the object cache, with the taxonomy's last_changed timestamp
-	 * mixed into the key so any term/relationship mutation invalidates the
-	 * entry naturally.
+	 * Results are cached in the object cache with a key derived from:
+	 * - the taxonomy's `last_changed` timestamp (busts on term and term-
+	 *   relationship mutations);
+	 * - the posts cache's `last_changed` timestamp (busts on post status
+	 *   / author / type mutations, which the visibility WHERE clause
+	 *   reads);
+	 * - the visibility spec; and
+	 * - the current user id, since `perm === 'readable'` joins
+	 *   `get_current_user_id()` into the SQL — without the user id in
+	 *   the key, two authenticated callers with different IDs would
+	 *   collide on the same cache entry and read each other's
+	 *   per-author counts.
 	 *
 	 * @param array{post_status: list<string>, author: list<int>|null, perm: ?string} $visibility Visibility constraints.
 	 *
@@ -35,10 +43,16 @@ class TagsController {
 	private static function fetch_term_counts( array $visibility ): array {
 		global $wpdb;
 
-		$last_changed = wp_cache_get_last_changed( TagTaxonomy::TAXONOMY );
-		$cache_key    = 'tag_counts_v' . self::CACHE_VERSION . ':'
-			. \md5( $last_changed . '|' . wp_json_encode( $visibility ) );
-		$cached       = wp_cache_get( $cache_key, self::CACHE_GROUP );
+		$key_payload = wp_json_encode(
+			[
+				'taxonomy'   => wp_cache_get_last_changed( TagTaxonomy::TAXONOMY ),
+				'posts'      => wp_cache_get_last_changed( 'posts' ),
+				'visibility' => $visibility,
+				'user'       => get_current_user_id(),
+			],
+		);
+		$cache_key = 'tag_counts_v' . self::CACHE_VERSION . ':' . \md5( (string) $key_payload );
+		$cached    = wp_cache_get( $cache_key, self::CACHE_GROUP );
 		if ( \is_array( $cached ) ) {
 			return $cached;
 		}
