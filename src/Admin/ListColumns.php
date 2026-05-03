@@ -35,6 +35,43 @@ class ListColumns {
 	}
 
 	/**
+	 * Renders the tags column with clickable per-tag filter links.
+	 *
+	 * @param int $post_id Bookmark post ID.
+	 *
+	 * @return void
+	 */
+	private static function render_tags( int $post_id ): void {
+		$terms = get_the_terms( $post_id, TagTaxonomy::TAXONOMY );
+		if ( ! \is_array( $terms ) || $terms === [] ) {
+			echo '—';
+			return;
+		}
+
+		$links = [];
+		foreach ( $terms as $term ) {
+			$url = add_query_arg(
+				[
+					'post_type'           => BookmarkPostType::POST_TYPE,
+					TagTaxonomy::TAXONOMY => $term->slug,
+				],
+				admin_url( 'edit.php' ),
+			);
+
+			$links[] = \sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( $url ),
+				esc_html( $term->name ),
+			);
+		}
+
+		// Each anchor was built from esc_url + esc_html; the join is a
+		// constant separator. No user data flows in raw.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo \implode( ', ', $links );
+	}
+
+	/**
 	 * Renders the visibility column.
 	 *
 	 * @param int $post_id Bookmark post ID.
@@ -93,22 +130,14 @@ class ListColumns {
 	 * @return array<string, string>
 	 */
 	public function filter_columns( array $columns ): array {
-		// Reusing the auto-column key WordPress generates from
-		// `register_taxonomy(['show_admin_column' => true])` so core's
-		// renderer takes over and emits clickable filter links instead
-		// of plain text. The plain key 'tags' is reserved by core for
-		// the post_tag taxonomy and would otherwise be claimed by the
-		// built-in renderer, which finds nothing for our CPT.
-		$tags_column = 'taxonomy-' . TagTaxonomy::TAXONOMY;
-
 		return [
-			'cb'         => $columns['cb'] ?? '<input type="checkbox" />',
-			'title'      => __( 'Title', 'linkstash' ),
-			'url'        => __( 'URL', 'linkstash' ),
-			$tags_column => __( 'Tags', 'linkstash' ),
-			'visibility' => __( 'Visibility', 'linkstash' ),
-			'flags'      => __( 'Flags', 'linkstash' ),
-			'date'       => $columns['date'] ?? __( 'Date', 'linkstash' ),
+			'cb'            => $columns['cb'] ?? '<input type="checkbox" />',
+			'title'         => __( 'Title', 'linkstash' ),
+			'url'           => __( 'URL', 'linkstash' ),
+			'linkstash_tag' => __( 'Tags', 'linkstash' ),
+			'visibility'    => __( 'Visibility', 'linkstash' ),
+			'flags'         => __( 'Flags', 'linkstash' ),
+			'date'          => $columns['date'] ?? __( 'Date', 'linkstash' ),
 		];
 	}
 
@@ -122,10 +151,11 @@ class ListColumns {
 	 */
 	public function render_column( string $column, int $post_id ): void {
 		match ( $column ) {
-			'url'        => self::render_url( $post_id ),
-			'visibility' => self::render_visibility( $post_id ),
-			'flags'      => self::render_flags( $post_id ),
-			default      => null,
+			'url'           => self::render_url( $post_id ),
+			'linkstash_tag' => self::render_tags( $post_id ),
+			'visibility'    => self::render_visibility( $post_id ),
+			'flags'         => self::render_flags( $post_id ),
+			default         => null,
 		};
 	}
 }

@@ -12,6 +12,7 @@ use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
 use WP_Post;
+use WP_Term;
 
 /**
  * Tests the bookmark list table column hooks and renderers.
@@ -73,7 +74,7 @@ class ListColumnsTest extends TestCase {
 		self::assertArrayHasKey( 'cb', $result );
 		self::assertArrayHasKey( 'title', $result );
 		self::assertArrayHasKey( 'url', $result );
-		self::assertArrayHasKey( 'taxonomy-linkstash_tag', $result );
+		self::assertArrayHasKey( 'linkstash_tag', $result );
 		self::assertArrayHasKey( 'visibility', $result );
 		self::assertArrayHasKey( 'flags', $result );
 		self::assertArrayHasKey( 'date', $result );
@@ -109,16 +110,45 @@ class ListColumnsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies render_column does not handle the taxonomy-linkstash_tag
-	 * column itself — that column is rendered by core's
-	 * `show_admin_column` mechanism, which emits clickable filter links.
+	 * Verifies the tags column emits an anchor per tag pointing at the
+	 * filter-by-tag URL.
 	 *
 	 * @return void
 	 */
-	public function test_render_tags_column_is_core_owned(): void {
-		$output = $this->capture_render( 'taxonomy-linkstash_tag', 7 );
+	public function test_render_tags_column_renders_filter_links(): void {
+		$reading       = new WP_Term();
+		$reading->name = 'reading';
+		$reading->slug = 'reading';
+		$archive       = new WP_Term();
+		$archive->name = 'archive';
+		$archive->slug = 'archive';
+		Functions\when( 'get_the_terms' )->justReturn( [ $reading, $archive ] );
+		Functions\when( 'add_query_arg' )->alias(
+			static fn ( array $args, string $url ): string => $url . '?' . \http_build_query( $args ),
+		);
+		Functions\when( 'admin_url' )->alias( static fn ( string $path ): string => '/wp-admin/' . $path );
 
-		self::assertSame( '', $output );
+		$output = $this->capture_render( 'linkstash_tag', 7 );
+
+		self::assertStringContainsString( 'post_type=linkstash_bookmark', $output );
+		self::assertStringContainsString( 'linkstash_tag=reading', $output );
+		self::assertStringContainsString( 'linkstash_tag=archive', $output );
+		self::assertStringContainsString( '>reading</a>', $output );
+		self::assertStringContainsString( '>archive</a>', $output );
+		self::assertStringContainsString( ', ', $output );
+	}
+
+	/**
+	 * Verifies the tags column renders an em-dash when no terms are attached.
+	 *
+	 * @return void
+	 */
+	public function test_render_tags_column_empty(): void {
+		Functions\when( 'get_the_terms' )->justReturn( [] );
+
+		$output = $this->capture_render( 'linkstash_tag', 7 );
+
+		self::assertSame( '—', $output );
 	}
 
 	/**
