@@ -17,8 +17,16 @@ use WP_REST_Server;
  */
 class TagsController {
 
+	private const CACHE_GROUP   = 'linkstash';
+	private const CACHE_VERSION = 1;
+
 	/**
 	 * Runs the per-tag aggregate query and returns the raw rows.
+	 *
+	 * Results are cached per (visibility-spec, taxonomy term changes)
+	 * tuple via the object cache, with the taxonomy's last_changed timestamp
+	 * mixed into the key so any term/relationship mutation invalidates the
+	 * entry naturally.
 	 *
 	 * @param array{post_status: list<string>, author: list<int>|null, perm: ?string} $visibility Visibility constraints.
 	 *
@@ -26,6 +34,14 @@ class TagsController {
 	 */
 	private static function fetch_term_counts( array $visibility ): array {
 		global $wpdb;
+
+		$last_changed = wp_cache_get_last_changed( TagTaxonomy::TAXONOMY );
+		$cache_key    = 'tag_counts_v' . self::CACHE_VERSION . ':'
+			. \md5( $last_changed . '|' . wp_json_encode( $visibility ) );
+		$cached       = wp_cache_get( $cache_key, self::CACHE_GROUP );
+		if ( \is_array( $cached ) ) {
+			return $cached;
+		}
 
 		[ $where, $args ] = self::build_where_clause( $visibility );
 
@@ -42,17 +58,19 @@ class TagsController {
 				GROUP BY t.term_id, t.name, t.slug
 				ORDER BY t.name ASC";
 
-		// $sql is built from table-name constants + placeholder fragments
-		// generated from `array_fill( count($args), '%s' )`. Every
-		// user-controlled value flows through wpdb::prepare. The
-		// direct query is the whole point of this rewrite (it replaces
-		// the slow N+1 from the previous get_terms loop). PluginCheck's
-		// own sniff doesn't track that the SQL is composed entirely
-		// from constants and prepared placeholders.
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		// $sql is composed from `$wpdb->`-prefixed table names plus the
+		// `$where` fragment built in build_where_clause(), which contains
+		// only literal placeholders (`%s`/`%d`) and constant SQL — every
+		// user-controlled value flows through `$args` into wpdb::prepare.
+		// The remaining sniff (DirectQuery) is intentional: this single
+		// aggregate replaces an N+1 fan-out and is cached above.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $args ), \ARRAY_A );
+		$rows = \is_array( $rows ) ? \array_values( $rows ) : [];
 
-		return \is_array( $rows ) ? \array_values( $rows ) : [];
+		wp_cache_set( $cache_key, $rows, self::CACHE_GROUP );
+
+		return $rows;
 	}
 
 	/**

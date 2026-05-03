@@ -44,6 +44,10 @@ class TagsControllerTest extends TestCase {
 		Functions\when( 'rest_ensure_response' )->alias( static fn ( $data ) => new WP_REST_Response( $data ) );
 		Functions\when( 'get_current_user_id' )->justReturn( 0 );
 		Functions\when( 'current_user_can' )->justReturn( false );
+		Functions\when( 'wp_cache_get_last_changed' )->justReturn( '0' );
+		Functions\when( 'wp_cache_get' )->justReturn( false );
+		Functions\when( 'wp_cache_set' )->justReturn( true );
+		Functions\when( 'wp_json_encode' )->alias( static fn ( $data ) => \json_encode( $data ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
 
 		$rows       = &$this->next_rows;
 		$this->wpdb = new WpdbMockForTags( $rows );
