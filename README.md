@@ -118,6 +118,30 @@ add_filter( 'linkstash_allowed_origins', static function ( array $origins ): arr
 } );
 ```
 
+To **narrow** the default allow-list once you know your extension's
+specific ID — defense-in-depth on top of the Bearer requirement —
+return only that origin:
+
+```php
+add_filter( 'linkstash_allowed_origins', static function (): array {
+    return [ 'chrome-extension://abcdefghijklmnopqrstuvwxyzabcdef' ];
+} );
+```
+
+### Outbound HTTP
+
+LinkStash makes one outbound HTTP request per saved bookmark — to
+the bookmarked URL itself, via `wp_safe_remote_get` (5 s timeout, up
+to three redirects, all re-validated). The fetched body is parsed
+for `<title>` and `<meta name="description" / og:description>`; on
+failure the bookmark still saves and an "unreachable" warning is
+shown on next edit. `wp_safe_remote_get` blocks loopback and private
+IP ranges, so a hostile URL can't be used to probe internal services.
+
+No third-party services are contacted. No analytics, no telemetry.
+The companion Chrome extension talks only to the host you configure
+on its options page.
+
 ## Development
 
 ```bash

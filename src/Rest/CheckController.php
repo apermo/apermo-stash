@@ -34,7 +34,7 @@ class CheckController {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'check' ],
-					'permission_callback' => [ Permissions::class, 'allow_anyone' ],
+					'permission_callback' => [ Permissions::class, 'require_edit_posts' ],
 					'args'                => [
 						'url' => [
 							'type'     => 'string',

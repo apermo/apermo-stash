@@ -181,11 +181,13 @@ class PermissionsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies can_read_bookmark denies a non-owner without admin caps.
+	 * Verifies can_read_bookmark denies a non-owner without admin caps,
+	 * returning 404 (indistinguishable from "post does not exist") rather
+	 * than 403 to prevent ID-enumeration of private bookmarks.
 	 *
 	 * @return void
 	 */
-	public function test_can_read_bookmark_denies_non_owner(): void {
+	public function test_can_read_bookmark_denies_non_owner_with_404(): void {
 		$post              = new WP_Post();
 		$post->post_type   = BookmarkPostType::POST_TYPE;
 		$post->post_status = 'private';
@@ -199,5 +201,6 @@ class PermissionsTest extends TestCase {
 
 		$result = Permissions::can_read_bookmark( $request );
 		self::assertInstanceOf( WP_Error::class, $result );
+		self::assertSame( 'linkstash_not_found', $result->code );
 	}
 }

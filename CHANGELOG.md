@@ -66,6 +66,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   filter-by-tag URL — clicking a tag now narrows the list to that
   tag.
 
+### Security
+
+- `GET /linkstash/v1/check?url=` now requires the same `edit_posts`
+  capability as the rest of the LinkStash REST surface, instead of
+  allowing anonymous callers to probe whether a public bookmark
+  exists. The companion Chrome extension already sends a Bearer
+  token on every call, so this is transparent for it; ad-hoc
+  unauthenticated callers will get a 403.
+- `Permissions::can_read_bookmark` returns 404 (instead of 403)
+  when the caller is not authorised to read a private bookmark, so
+  the response is indistinguishable from "post does not exist" —
+  preventing ID-enumeration of private bookmarks via the
+  `GET /bookmarks/{id}` endpoint.
+- README + readme.txt now document the single outbound HTTP request
+  the plugin makes (the metadata fetch on save, via
+  `wp_safe_remote_get`, which blocks loopback and private IP
+  ranges) and how to narrow the CORS allow-list to a specific
+  extension ID via the `linkstash_allowed_origins` filter.
+
 ### Removed
 
 - **Unread** and **Archived** flags. `_linkstash_unread` and

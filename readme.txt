@@ -121,6 +121,41 @@ built-in authentication.
 Not currently. Bookmarks live in the admin and the REST API. A public
 sharing page is on the roadmap.
 
+= What data does the plugin send anywhere? =
+
+Outbound HTTP from your server to one place only: the URL you save.
+On every save (admin form, dashboard widget, REST POST), LinkStash
+issues a single `wp_safe_remote_get` against the bookmarked URL with
+a 5-second timeout to fetch its title and meta description. If the
+URL cannot be reached the bookmark is still saved and a "URL didn't
+respond" warning is shown next time you edit it. WordPress's
+`wp_safe_remote_get` blocks loopback and private IP ranges, so a
+malicious URL cannot be used to probe internal services.
+
+The plugin does not call any third-party services, does not send
+analytics or telemetry, and does not load resources from third-party
+CDNs. The companion Chrome extension talks only to the LinkStash
+host you configure on its options page.
+
+= Can I lock down which browser extensions can talk to the API? =
+
+Yes. The plugin defaults to allowing CORS preflight from any
+`chrome-extension://...` origin, which is convenient for installing
+the companion extension before you know its ID, but means any
+installed Chrome extension on your browser could call the API if it
+also has a valid Bearer token.
+
+To restrict the allow-list to a specific extension after install,
+add a snippet to your `mu-plugins/` folder or theme's functions.php:
+
+    add_filter( 'linkstash_allowed_origins', static function () {
+        return [ 'chrome-extension://abcdefghijklmnopqrstuvwxyzabcdef' ];
+    } );
+
+Replace the example ID with the actual ID shown on your `chrome://extensions`
+page. The Bearer token is still required regardless; this is a
+defense-in-depth narrowing of the CORS surface.
+
 == Screenshots ==
 
 1. Bookmark list screen with the URL / tags / visibility / favorite columns.

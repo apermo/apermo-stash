@@ -43,12 +43,14 @@ class TagsController {
 				ORDER BY t.name ASC";
 
 		// $sql is built from table-name constants + placeholder fragments
-		// — every user-controlled value flows through wpdb::prepare. The
+		// generated from `array_fill( count($args), '%s' )`. Every
+		// user-controlled value flows through wpdb::prepare. The
 		// direct query is the whole point of this rewrite (it replaces
-		// the slow N+1 from the previous get_terms loop).
-		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		// the slow N+1 from the previous get_terms loop). PluginCheck's
+		// own sniff doesn't track that the SQL is composed entirely
+		// from constants and prepared placeholders.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $args ), \ARRAY_A );
-		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		return \is_array( $rows ) ? \array_values( $rows ) : [];
 	}
