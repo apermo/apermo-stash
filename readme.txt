@@ -14,7 +14,7 @@ companion Chrome extension.
 == Description ==
 
 LinkStash turns your WordPress site into a personal bookmark archive,
-inspired by [linkding](https://linkding.link/). Save URLs with a title,
+inspired by linkding and Delicious. Save URLs with a title,
 notes, and tags from the WordPress admin or from your browser via a
 [Chrome extension](https://github.com/apermo/linkstash-extension); read
 them back through the same admin UI or over a REST API designed for
@@ -167,8 +167,23 @@ defense-in-depth narrowing of the CORS surface.
 == Changelog ==
 
 = 0.1.1 =
-* WordPress.org listing assets (banner, icon, screenshots) and an
-  expanded readme. No functional changes.
+* New: single Favorite flag (replaces Unread / Archived), with a
+  list-table column, an admin URL filter (?favorite=1), and a REST
+  query/body field.
+* New: starter tags created on first activation (read-later /
+  reference / inspiration / archive); seeded once and never recreated
+  if you delete them.
+* New: unsaved-changes guard on the bookmark add/edit screen.
+* New: contextual help tabs on the bookmark list screen.
+* Changed: settings moved from Tools to Settings → LinkStash.
+* Security: /check now requires authentication (was anonymous);
+  unauthorized reads of private bookmarks return 404 instead of 403
+  to prevent ID enumeration.
+* Fixed: the Tags column on the bookmark list screen showed nothing
+  because the column key collided with WordPress core's reserved
+  `tags` slot for the `post_tag` taxonomy.
+* Listing: WordPress.org assets (banner, icon, screenshots) and an
+  expanded readme.
 
 = 0.1.0 =
 * Initial release. Custom post type, custom tag taxonomy, REST API
