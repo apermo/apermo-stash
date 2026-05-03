@@ -107,8 +107,9 @@ class BookmarkPostType {
 	 * The SVG ships with `<g fill="currentColor">`, so the icon adopts the
 	 * `color` property of its parent. Idle state explicitly sets the same
 	 * grey WP uses for native dashicons (`#a7aaad`); hover and current
-	 * states swap to `#fff` to match the highlighted text the WP admin
-	 * colour scheme paints alongside it.
+	 * states swap to the WP admin colour scheme's accent (the
+	 * `--wp-admin-theme-color` custom property defined per scheme since
+	 * WP 5.7) so the icon picks up the user's chosen scheme highlight.
 	 *
 	 * @return void
 	 */
@@ -118,7 +119,7 @@ class BookmarkPostType {
 			. $menu_id . ' div.wp-menu-image svg{display:block;width:20px;height:20px;margin:7px auto 0;}'
 			. $menu_id . ':hover div.wp-menu-image,'
 			. $menu_id . '.wp-has-current-submenu div.wp-menu-image,'
-			. $menu_id . '.current div.wp-menu-image{color:#fff;}';
+			. $menu_id . '.current div.wp-menu-image{color:var(--wp-admin-theme-color,#2271b1);}';
 
 		wp_add_inline_style( 'wp-admin', $rules );
 	}

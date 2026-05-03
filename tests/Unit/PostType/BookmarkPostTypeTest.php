@@ -90,7 +90,7 @@ class BookmarkPostTypeTest extends TestCase {
 		self::assertSame( 'wp-admin', $captured[0] );
 		self::assertStringContainsString( '#menu-posts-' . BookmarkPostType::POST_TYPE, $captured[1] );
 		self::assertStringContainsString( '#a7aaad', $captured[1] );
-		self::assertStringContainsString( '#fff', $captured[1] );
+		self::assertStringContainsString( '--wp-admin-theme-color', $captured[1] );
 		self::assertStringContainsString( ' svg{', $captured[1] );
 	}
 
