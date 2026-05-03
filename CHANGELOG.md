@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- "Are you sure you want to leave?" guard on the bookmark add/edit
+  screen. Once any field changes, navigating away (closing the tab,
+  hitting back, clicking a link) prompts the browser's native
+  unsaved-changes dialog. Submitting the form clears the flag, so
+  legitimate saves don't prompt.
 - WordPress.org listing assets directory (`.wordpress-org/`) with
   documentation of the required image dimensions (icon-128 / icon-256,
   banner-772 / banner-1544, screenshot-N).
