@@ -72,14 +72,17 @@ class HelpTabs {
 				__( '<strong>Browser extension</strong> — see the next tab.', 'linkstash' ),
 				[ 'strong' => [] ],
 			) . '</li>'
-			. '<li>' . \sprintf(
-				wp_kses(
+			. '<li>' . wp_kses(
+				\sprintf(
 					/* translators: 1: REST endpoint, 2: Settings page label. */
 					__( '<strong>REST API</strong> — POST to %1$s with an Authorization Bearer token generated under %2$s.', 'linkstash' ),
-					[ 'strong' => [] ],
+					'<code>/wp-json/linkstash/v1/bookmarks</code>',
+					'<strong>' . esc_html__( 'Settings → LinkStash', 'linkstash' ) . '</strong>',
 				),
-				'<code>/wp-json/linkstash/v1/bookmarks</code>',
-				'<strong>' . esc_html__( 'Settings → LinkStash', 'linkstash' ) . '</strong>',
+				[
+					'strong' => [],
+					'code'   => [],
+				],
 			) . '</li>'
 			. '</ul>'
 			. '<p>' . esc_html__( 'LinkStash dedupes by canonical URL: saving the same page twice updates the existing record instead of creating a duplicate. The X-LinkStash-Existing response header on a re-save tells API clients which path was taken.', 'linkstash' ) . '</p>';
@@ -93,10 +96,19 @@ class HelpTabs {
 	private static function extension_html(): string {
 		$repo_url = 'https://github.com/apermo/linkstash-extension';
 
-		return '<p>' . \sprintf(
-			/* translators: %s: linked repo URL. */
-			esc_html__( 'A companion Chrome extension is currently under review at the Chrome Web Store. Once it is approved you will be able to install it directly from the store; until then you can install it from source by following the instructions in the repository at %s.', 'linkstash' ),
-			'<a href="' . esc_url( $repo_url ) . '" target="_blank" rel="noopener">' . esc_html( $repo_url ) . '</a>',
+		return '<p>' . wp_kses(
+			\sprintf(
+				/* translators: %s: linked repo URL. */
+				esc_html__( 'A companion Chrome extension is currently under review at the Chrome Web Store. Once it is approved you will be able to install it directly from the store; until then you can install it from source by following the instructions in the repository at %s.', 'linkstash' ),
+				'<a href="' . esc_url( $repo_url ) . '" target="_blank" rel="noopener">' . esc_html( $repo_url ) . '</a>',
+			),
+			[
+				'a' => [
+					'href'   => [],
+					'target' => [],
+					'rel'    => [],
+				],
+			],
 		) . '</p>'
 			. '<p>' . esc_html__( 'Once installed, the extension adds:', 'linkstash' ) . '</p>'
 			. '<ul>'
@@ -105,10 +117,13 @@ class HelpTabs {
 			. '<li>' . esc_html__( 'An edit-from-popup flow with title, description, tags, and a public/private toggle.', 'linkstash' ) . '</li>'
 			. '<li>' . esc_html__( 'A right-click "Save link to LinkStash" context-menu entry, so you can save a link without visiting it.', 'linkstash' ) . '</li>'
 			. '</ul>'
-			. '<p>' . \sprintf(
-				/* translators: %s: Settings page label. */
-				esc_html__( 'After installing, open the extension\'s options page, enter your site URL and a Bearer token generated under %s, and pick your default visibility.', 'linkstash' ),
-				'<strong>' . esc_html__( 'Settings → LinkStash', 'linkstash' ) . '</strong>',
+			. '<p>' . wp_kses(
+				\sprintf(
+					/* translators: %s: Settings page label. */
+					esc_html__( 'After installing, open the extension\'s options page, enter your site URL and a Bearer token generated under %s, and pick your default visibility.', 'linkstash' ),
+					'<strong>' . esc_html__( 'Settings → LinkStash', 'linkstash' ) . '</strong>',
+				),
+				[ 'strong' => [] ],
 			) . '</p>';
 	}
 
@@ -158,7 +173,7 @@ class HelpTabs {
 		$screen->add_help_tab(
 			[
 				'id'      => 'linkstash-overview',
-				'title'   => __( 'Overview', 'linkstash' ),
+				'title'   => esc_html__( 'Overview', 'linkstash' ),
 				'content' => self::overview_html(),
 			],
 		);
@@ -166,7 +181,7 @@ class HelpTabs {
 		$screen->add_help_tab(
 			[
 				'id'      => 'linkstash-add-bookmarks',
-				'title'   => __( 'Adding bookmarks', 'linkstash' ),
+				'title'   => esc_html__( 'Adding bookmarks', 'linkstash' ),
 				'content' => self::add_bookmarks_html(),
 			],
 		);
@@ -174,7 +189,7 @@ class HelpTabs {
 		$screen->add_help_tab(
 			[
 				'id'      => 'linkstash-extension',
-				'title'   => __( 'Browser extension', 'linkstash' ),
+				'title'   => esc_html__( 'Browser extension', 'linkstash' ),
 				'content' => self::extension_html(),
 			],
 		);
