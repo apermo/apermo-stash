@@ -118,7 +118,7 @@ class BookmarkMetaboxTest extends TestCase {
 		self::assertNotFalse( has_action( "add_meta_boxes_{$post_type}", [ $metabox, 'register_meta_boxes' ] ) );
 		self::assertNotFalse( has_action( "save_post_{$post_type}", [ $metabox, 'save_post' ] ) );
 		self::assertNotFalse( has_filter( 'use_block_editor_for_post_type', [ $metabox, 'disable_block_editor' ] ) );
-		self::assertNotFalse( has_action( 'admin_print_footer_scripts', [ $metabox, 'maybe_print_unsaved_changes_script' ] ) );
+		self::assertNotFalse( has_action( 'admin_enqueue_scripts', [ $metabox, 'enqueue_unsaved_changes_script' ] ) );
 	}
 
 	/**

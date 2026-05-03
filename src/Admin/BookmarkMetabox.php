@@ -6,6 +6,7 @@ namespace Apermo\LinkStash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
+use Apermo\LinkStash\Main;
 use Apermo\LinkStash\PostType\BookmarkMeta;
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\Url\Canonicalizer;
@@ -91,34 +92,6 @@ class BookmarkMetabox {
 	}
 
 	/**
-	 * Returns the dirty-tracking + beforeunload script body.
-	 *
-	 * @return string
-	 */
-	private static function unsaved_changes_script(): string {
-		return "( function () {\n"
-			. "\tfunction init() {\n"
-			. "\t\tvar form = document.getElementById( 'post' );\n"
-			. "\t\tif ( ! form ) { return; }\n"
-			. "\t\tvar dirty = false;\n"
-			. "\t\tform.addEventListener( 'input', function () { dirty = true; } );\n"
-			. "\t\tform.addEventListener( 'change', function () { dirty = true; } );\n"
-			. "\t\tform.addEventListener( 'submit', function () { dirty = false; } );\n"
-			. "\t\twindow.addEventListener( 'beforeunload', function ( event ) {\n"
-			. "\t\t\tif ( ! dirty ) { return; }\n"
-			. "\t\t\tevent.preventDefault();\n"
-			. "\t\t\tevent.returnValue = '';\n"
-			. "\t\t} );\n"
-			. "\t}\n"
-			. "\tif ( document.readyState === 'loading' ) {\n"
-			. "\t\tdocument.addEventListener( 'DOMContentLoaded', init );\n"
-			. "\t} else {\n"
-			. "\t\tinit();\n"
-			. "\t}\n"
-			. "} )();\n";
-	}
-
-	/**
 	 * Updates the given post fields without re-triggering save_post handlers.
 	 *
 	 * Detaches our own save_post hook for the duration of the update so the
@@ -146,11 +119,11 @@ class BookmarkMetabox {
 		add_action( 'add_meta_boxes_' . BookmarkPostType::POST_TYPE, [ $this, 'register_meta_boxes' ] );
 		add_action( 'save_post_' . BookmarkPostType::POST_TYPE, [ $this, 'save_post' ], 10, 2 );
 		add_filter( 'use_block_editor_for_post_type', [ $this, 'disable_block_editor' ], 10, 2 );
-		add_action( 'admin_print_footer_scripts', [ $this, 'maybe_print_unsaved_changes_script' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_unsaved_changes_script' ] );
 	}
 
 	/**
-	 * Prints the inline beforeunload guard on the bookmark add/edit screen.
+	 * Enqueues the beforeunload guard script on the bookmark add/edit screen.
 	 *
 	 * Wires a small DOM-level dirty-tracking script to `#post` (the
 	 * standard classic-editor `<form>` id WordPress emits on
@@ -162,7 +135,7 @@ class BookmarkMetabox {
 	 *
 	 * @return void
 	 */
-	public function maybe_print_unsaved_changes_script(): void {
+	public function enqueue_unsaved_changes_script(): void {
 		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 		if ( $screen === null
 			|| $screen->base !== 'post'
@@ -171,9 +144,13 @@ class BookmarkMetabox {
 			return;
 		}
 
-		// Constant string, no user data.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo "<script>\n" . self::unsaved_changes_script() . "</script>\n";
+		wp_enqueue_script(
+			'linkstash-unsaved-changes',
+			plugins_url( 'assets/js/unsaved-changes.js', Main::file() ),
+			[],
+			Main::VERSION,
+			true,
+		);
 	}
 
 	/**
