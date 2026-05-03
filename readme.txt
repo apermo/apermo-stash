@@ -16,7 +16,7 @@ companion Chrome extension.
 LinkStash turns your WordPress site into a personal bookmark archive,
 inspired by linkding and Delicious. Save URLs with a title,
 notes, and tags from the WordPress admin or from your browser via a
-[Chrome extension](https://github.com/apermo/linkstash-extension); read
+[Chrome extension](https://chromewebstore.google.com/detail/linkstash/midebpgblmgkcgljcgojjbehnonljnmk); read
 them back through the same admin UI or over a REST API designed for
 extensions and your own scripts.
 
@@ -69,8 +69,11 @@ recoverable.
 
 = Companion Chrome extension =
 
-A Chrome MV3 extension is in development at
-[apermo/linkstash-extension](https://github.com/apermo/linkstash-extension).
+A Chrome MV3 extension is published on the Chrome Web Store:
+https://chromewebstore.google.com/detail/linkstash/midebpgblmgkcgljcgojjbehnonljnmk
+
+Source: [apermo/linkstash-extension](https://github.com/apermo/linkstash-extension).
+
 It surfaces the saved/unsaved state on the action badge, lets you save
 or edit the current tab from the popup, and offers a right-click
 "Save link" context menu.
