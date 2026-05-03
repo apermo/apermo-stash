@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Apermo\LinkStash\Tests\Unit\Rest;
 
 use Apermo\LinkStash\Rest\CheckController;
+use Apermo\LinkStash\Rest\Permissions;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
@@ -54,7 +55,14 @@ class CheckControllerTest extends TestCase {
 		Functions\expect( 'register_rest_route' )
 			->once()
 			->withArgs(
-				static fn ( string $rest_namespace, string $route ): bool => $rest_namespace === 'linkstash/v1' && $route === '/check',
+				static function ( string $rest_namespace, string $route, array $config ): bool {
+					if ( $rest_namespace !== 'linkstash/v1' || $route !== '/check' ) {
+						return false;
+					}
+					$permission = $config[0]['permission_callback'] ?? null;
+
+					return $permission === [ Permissions::class, 'require_read_bookmarks' ];
+				},
 			);
 
 		( new CheckController() )->register_routes( 'linkstash/v1' );

@@ -142,8 +142,7 @@ class BookmarksController {
 			],
 			'tag'      => [ 'type' => 'string' ],
 			'q'        => [ 'type' => 'string' ],
-			'unread'   => [ 'type' => 'boolean' ],
-			'archived' => [ 'type' => 'boolean' ],
+			'favorite' => [ 'type' => 'boolean' ],
 			'public'   => [ 'type' => 'boolean' ],
 			'private'  => [ 'type' => 'boolean' ],
 		];
@@ -167,8 +166,7 @@ class BookmarksController {
 				'type' => 'array',
 				'items' => [ 'type' => 'string' ],
 			],
-			'unread'      => [ 'type' => 'boolean' ],
-			'archived'    => [ 'type' => 'boolean' ],
+			'favorite'    => [ 'type' => 'boolean' ],
 			'public'      => [ 'type' => 'boolean' ],
 		];
 	}
@@ -190,14 +188,13 @@ class BookmarksController {
 				'type' => 'array',
 				'items' => [ 'type' => 'string' ],
 			],
-			'unread'      => [ 'type' => 'boolean' ],
-			'archived'    => [ 'type' => 'boolean' ],
+			'favorite'    => [ 'type' => 'boolean' ],
 			'public'      => [ 'type' => 'boolean' ],
 		];
 	}
 
 	/**
-	 * Builds the meta_query fragment from unread/archived params.
+	 * Builds the meta_query fragment from the favorite param.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -206,19 +203,11 @@ class BookmarksController {
 	private static function build_meta_query( WP_REST_Request $request ): array {
 		$meta_query = [];
 
-		$unread = $request->get_param( 'unread' );
-		if ( $unread !== null ) {
+		$favorite = $request->get_param( 'favorite' );
+		if ( $favorite !== null ) {
 			$meta_query[] = [
-				'key'   => BookmarkMeta::META_UNREAD,
-				'value' => BookmarkMeta::sanitize_bool_meta( $unread ),
-			];
-		}
-
-		$archived = $request->get_param( 'archived' );
-		if ( $archived !== null ) {
-			$meta_query[] = [
-				'key'   => BookmarkMeta::META_ARCHIVED,
-				'value' => BookmarkMeta::sanitize_bool_meta( $archived ),
+				'key'   => BookmarkMeta::META_FAVORITE,
+				'value' => BookmarkMeta::sanitize_bool_meta( $favorite ),
 			];
 		}
 
@@ -408,8 +397,7 @@ class BookmarksController {
 
 		update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
 		update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
-		update_post_meta( $post_id, BookmarkMeta::META_UNREAD, BookmarkMeta::bool_to_meta( self::optional_bool( $request, 'unread' ) ?? false ) );
-		update_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, BookmarkMeta::bool_to_meta( self::optional_bool( $request, 'archived' ) ?? false ) );
+		update_post_meta( $post_id, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( self::optional_bool( $request, 'favorite' ) ?? false ) );
 
 		if ( $tags !== [] ) {
 			wp_set_object_terms( $post_id, $tags, TagTaxonomy::TAXONOMY, false );
@@ -495,13 +483,9 @@ class BookmarksController {
 			update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
 		}
 
-		$unread = self::optional_bool( $request, 'unread' );
-		if ( $unread !== null ) {
-			update_post_meta( $post_id, BookmarkMeta::META_UNREAD, BookmarkMeta::bool_to_meta( $unread ) );
-		}
-		$archived = self::optional_bool( $request, 'archived' );
-		if ( $archived !== null ) {
-			update_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, BookmarkMeta::bool_to_meta( $archived ) );
+		$favorite = self::optional_bool( $request, 'favorite' );
+		if ( $favorite !== null ) {
+			update_post_meta( $post_id, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( $favorite ) );
 		}
 
 		if ( $request->has_param( 'tags' ) ) {
@@ -587,13 +571,9 @@ class BookmarksController {
 			}
 		}
 
-		$unread = self::optional_bool( $request, 'unread' );
-		if ( $unread !== null ) {
-			update_post_meta( $existing->ID, BookmarkMeta::META_UNREAD, BookmarkMeta::bool_to_meta( $unread ) );
-		}
-		$archived = self::optional_bool( $request, 'archived' );
-		if ( $archived !== null ) {
-			update_post_meta( $existing->ID, BookmarkMeta::META_ARCHIVED, BookmarkMeta::bool_to_meta( $archived ) );
+		$favorite = self::optional_bool( $request, 'favorite' );
+		if ( $favorite !== null ) {
+			update_post_meta( $existing->ID, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( $favorite ) );
 		}
 
 		// Re-fetch by ID so prepare_response sees the post_status that
@@ -729,8 +709,7 @@ class BookmarksController {
 			'title'       => $post->post_title,
 			'description' => $post->post_content,
 			'tags'        => $tags,
-			'unread'      => (bool) get_post_meta( $post->ID, BookmarkMeta::META_UNREAD, true ),
-			'archived'    => (bool) get_post_meta( $post->ID, BookmarkMeta::META_ARCHIVED, true ),
+			'favorite'    => (bool) get_post_meta( $post->ID, BookmarkMeta::META_FAVORITE, true ),
 			'public'      => $post->post_status === 'publish',
 			'created'     => mysql2date( 'c', $post->post_date_gmt, false ),
 			'modified'    => mysql2date( 'c', $post->post_modified_gmt, false ),

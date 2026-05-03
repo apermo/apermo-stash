@@ -35,7 +35,7 @@ class ListColumns {
 	}
 
 	/**
-	 * Renders the tags column.
+	 * Renders the tags column with clickable per-tag filter links.
 	 *
 	 * @param int $post_id Bookmark post ID.
 	 *
@@ -48,11 +48,24 @@ class ListColumns {
 			return;
 		}
 
-		$names = [];
+		$links = [];
 		foreach ( $terms as $term ) {
-			$names[] = $term->name;
+			$url = add_query_arg(
+				[
+					'post_type'           => BookmarkPostType::POST_TYPE,
+					TagTaxonomy::TAXONOMY => $term->slug,
+				],
+				admin_url( 'edit.php' ),
+			);
+
+			$links[] = \sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( $url ),
+				esc_html( $term->name ),
+			);
 		}
-		echo esc_html( \implode( ', ', $names ) );
+
+		echo wp_kses_post( \implode( ', ', $links ) );
 	}
 
 	/**
@@ -73,25 +86,18 @@ class ListColumns {
 	}
 
 	/**
-	 * Renders the flags (unread / archived) column.
+	 * Renders the favorite column — a star when set, em-dash otherwise.
 	 *
 	 * @param int $post_id Bookmark post ID.
 	 *
 	 * @return void
 	 */
-	private static function render_flags( int $post_id ): void {
-		$badges = [];
-		if ( (bool) get_post_meta( $post_id, BookmarkMeta::META_UNREAD, true ) ) {
-			$badges[] = __( 'Unread', 'linkstash' );
-		}
-		if ( (bool) get_post_meta( $post_id, BookmarkMeta::META_ARCHIVED, true ) ) {
-			$badges[] = __( 'Archived', 'linkstash' );
-		}
-		if ( $badges === [] ) {
-			echo '—';
-			return;
-		}
-		echo esc_html( \implode( ', ', $badges ) );
+	private static function render_favorite( int $post_id ): void {
+		$favorite = (bool) get_post_meta( $post_id, BookmarkMeta::META_FAVORITE, true );
+
+		echo $favorite
+			? '<span aria-label="' . esc_attr__( 'Favorite', 'linkstash' ) . '">&#9733;</span>'
+			: '—';
 	}
 
 	/**
@@ -115,13 +121,13 @@ class ListColumns {
 	 */
 	public function filter_columns( array $columns ): array {
 		return [
-			'cb'         => $columns['cb'] ?? '<input type="checkbox" />',
-			'title'      => __( 'Title', 'linkstash' ),
-			'url'        => __( 'URL', 'linkstash' ),
-			'tags'       => __( 'Tags', 'linkstash' ),
-			'visibility' => __( 'Visibility', 'linkstash' ),
-			'flags'      => __( 'Flags', 'linkstash' ),
-			'date'       => $columns['date'] ?? __( 'Date', 'linkstash' ),
+			'cb'            => $columns['cb'] ?? '<input type="checkbox" />',
+			'title'         => __( 'Title', 'linkstash' ),
+			'url'           => __( 'URL', 'linkstash' ),
+			'linkstash_tag' => __( 'Tags', 'linkstash' ),
+			'visibility'    => __( 'Visibility', 'linkstash' ),
+			'favorite'      => __( 'Favorite', 'linkstash' ),
+			'date'          => $columns['date'] ?? __( 'Date', 'linkstash' ),
 		];
 	}
 
@@ -135,11 +141,11 @@ class ListColumns {
 	 */
 	public function render_column( string $column, int $post_id ): void {
 		match ( $column ) {
-			'url'        => self::render_url( $post_id ),
-			'tags'       => self::render_tags( $post_id ),
-			'visibility' => self::render_visibility( $post_id ),
-			'flags'      => self::render_flags( $post_id ),
-			default      => null,
+			'url'           => self::render_url( $post_id ),
+			'linkstash_tag' => self::render_tags( $post_id ),
+			'visibility'    => self::render_visibility( $post_id ),
+			'favorite'      => self::render_favorite( $post_id ),
+			default         => null,
 		};
 	}
 }

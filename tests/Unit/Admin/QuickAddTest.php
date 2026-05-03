@@ -12,31 +12,15 @@ use Brain\Monkey\Functions;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use WP_Screen;
 
 /**
- * Tests the bookmark list-screen quick-add form.
+ * Tests the QuickAdd class — the shared form HTML used by the dashboard
+ * widget plus the admin-post.php submission handler.
  *
  * Branches that call `wp_safe_redirect` followed by `exit()` are not
  * exercised here.
  */
 class QuickAddTest extends TestCase {
-
-	/**
-	 * Builds a WP_Screen-shaped stub for the get_current_screen mock.
-	 *
-	 * @param string $base      Screen base.
-	 * @param string $post_type Screen post type.
-	 *
-	 * @return WP_Screen
-	 */
-	private static function screen( string $base, string $post_type ): WP_Screen {
-		$screen            = new WP_Screen();
-		$screen->base      = $base;
-		$screen->post_type = $post_type;
-
-		return $screen;
-	}
 
 	/**
 	 * Sets up Brain Monkey.
@@ -74,7 +58,7 @@ class QuickAddTest extends TestCase {
 	}
 
 	/**
-	 * Verifies register hooks the form renderer and submission handler.
+	 * Verifies register hooks the submission handler.
 	 *
 	 * @return void
 	 */
@@ -82,38 +66,21 @@ class QuickAddTest extends TestCase {
 		$quick = $this->quick_add();
 		$quick->register();
 
-		self::assertNotFalse( has_action( 'all_admin_notices', [ $quick, 'maybe_render_form' ] ) );
 		self::assertNotFalse( has_action( 'admin_post_linkstash_quick_add', [ $quick, 'handle_submission' ] ) );
+		self::assertFalse( has_action( 'all_admin_notices' ) );
 	}
 
 	/**
-	 * Verifies maybe_render_form is a no-op outside the bookmark list screen.
+	 * Verifies render_form_html outputs the shared markup the dashboard widget consumes.
 	 *
 	 * @return void
 	 */
-	public function test_render_form_skips_other_screens(): void {
-		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', 'post' ) );
-
+	public function test_render_form_html_outputs_form(): void {
 		\ob_start();
-		$this->quick_add()->maybe_render_form();
+		QuickAdd::render_form_html( 'linkstash-dashboard-widget' );
 		$output = (string) \ob_get_clean();
 
-		self::assertSame( '', $output );
-	}
-
-	/**
-	 * Verifies maybe_render_form outputs the form on the bookmark list screen.
-	 *
-	 * @return void
-	 */
-	public function test_render_form_outputs_form(): void {
-		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
-
-		\ob_start();
-		$this->quick_add()->maybe_render_form();
-		$output = (string) \ob_get_clean();
-
-		self::assertStringContainsString( 'linkstash-quick-add', $output );
+		self::assertStringContainsString( 'linkstash-dashboard-widget', $output );
 		self::assertStringContainsString( 'name="url"', $output );
 		self::assertStringContainsString( 'name="tags"', $output );
 		self::assertStringContainsString( 'name="public"', $output );

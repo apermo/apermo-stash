@@ -24,7 +24,7 @@ and CORS configured for `chrome-extension://*` origins out of the box.
 1. Clone or download this repository into `wp-content/plugins/linkstash/`.
 2. Run `composer install --no-dev` to generate the autoloader.
 3. Activate the plugin through the WordPress "Plugins" screen.
-4. Visit **Tools → LinkStash** to generate an API token (see Authentication
+4. Visit **Settings → LinkStash** to generate an API token (see Authentication
    below).
 
 ## Authentication
@@ -44,7 +44,7 @@ curl -u "your-username:xxxx xxxx xxxx xxxx xxxx xxxx" \
 
 ### LinkStash Bearer Tokens
 
-Better suited for browser extensions: generate at **Tools → LinkStash → API
+Better suited for browser extensions: generate at **Settings → LinkStash → API
 Tokens**. The plain token is shown **once** at creation time — copy it
 immediately. Send it as:
 
@@ -117,6 +117,30 @@ add_filter( 'linkstash_allowed_origins', static function ( array $origins ): arr
     return $origins;
 } );
 ```
+
+To **narrow** the default allow-list once you know your extension's
+specific ID — defense-in-depth on top of the Bearer requirement —
+return only that origin:
+
+```php
+add_filter( 'linkstash_allowed_origins', static function (): array {
+    return [ 'chrome-extension://abcdefghijklmnopqrstuvwxyzabcdef' ];
+} );
+```
+
+### Outbound HTTP
+
+LinkStash makes one outbound HTTP request per saved bookmark — to
+the bookmarked URL itself, via `wp_safe_remote_get` (5 s timeout, up
+to three redirects, all re-validated). The fetched body is parsed
+for `<title>` and `<meta name="description" / og:description>`; on
+failure the bookmark still saves and an "unreachable" warning is
+shown on next edit. `wp_safe_remote_get` blocks loopback and private
+IP ranges, so a hostile URL can't be used to probe internal services.
+
+No third-party services are contacted. No analytics, no telemetry.
+The companion Chrome extension talks only to the host you configure
+on its options page.
 
 ## Development
 

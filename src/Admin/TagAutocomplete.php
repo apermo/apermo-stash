@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Apermo\LinkStash\Admin;
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\PostType\TagTaxonomy;
 
 \defined( 'ABSPATH' ) || exit();
@@ -25,24 +24,14 @@ use Apermo\LinkStash\PostType\TagTaxonomy;
 class TagAutocomplete {
 
 	/**
-	 * Returns true when the current screen renders one of the quick-add forms.
+	 * Returns true when the current screen renders the dashboard quick-add form.
 	 *
 	 * @param string $hook Hook suffix passed to admin_enqueue_scripts.
 	 *
 	 * @return bool
 	 */
 	private static function is_target_screen( string $hook ): bool {
-		if ( $hook === 'index.php' ) {
-			return true;
-		}
-
-		if ( $hook !== 'edit.php' ) {
-			return false;
-		}
-
-		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-
-		return $screen !== null && $screen->post_type === BookmarkPostType::POST_TYPE;
+		return $hook === 'index.php';
 	}
 
 	/**

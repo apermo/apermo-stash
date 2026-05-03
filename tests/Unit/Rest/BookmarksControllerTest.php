@@ -322,8 +322,7 @@ class BookmarksControllerTest extends TestCase {
 			'title'       => 'Updated',
 			'description' => 'New notes',
 			'tags'        => [ 'a', 'b' ],
-			'unread'      => true,
-			'archived'    => true,
+			'favorite'    => true,
 			'public'      => true,
 		];
 

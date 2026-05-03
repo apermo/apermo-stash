@@ -8,7 +8,9 @@ namespace Apermo\LinkStash;
 
 use Apermo\LinkStash\Admin\BookmarkMetabox;
 use Apermo\LinkStash\Admin\DashboardWidget;
+use Apermo\LinkStash\Admin\HelpTabs;
 use Apermo\LinkStash\Admin\ListColumns;
+use Apermo\LinkStash\Admin\ListFilter;
 use Apermo\LinkStash\Admin\Notices;
 use Apermo\LinkStash\Admin\QuickAdd;
 use Apermo\LinkStash\Admin\SettingsPage;
@@ -31,7 +33,9 @@ use Apermo\LinkStash\Url\MetadataFetcher;
  */
 class Main {
 
-	public const VERSION = '0.1.0';
+	public const VERSION = '0.1.1';
+
+	private const STARTER_TAGS_SEEDED_OPTION = 'linkstash_starter_tags_seeded';
 
 	/**
 	 * Holds the main plugin file path.
@@ -75,7 +79,52 @@ class Main {
 	public static function activate(): void {
 		( new BookmarkPostType() )->register_post_type();
 		( new TagTaxonomy() )->register_taxonomy();
+		self::seed_starter_tags();
 		flush_rewrite_rules();
+	}
+
+	/**
+	 * Seeds a small set of starter tags exactly once.
+	 *
+	 * Sets `linkstash_starter_tags_seeded` after the first fully-successful
+	 * run; subsequent (re-)activations short-circuit on that option, so a
+	 * user who deletes a starter tag and later reactivates the plugin
+	 * will not see it resurrected. Existing tags with the same slug are
+	 * still skipped on the very first run so a pre-existing site is
+	 * never disturbed.
+	 *
+	 * If any `wp_insert_term` call returns a `WP_Error` (e.g. a transient
+	 * DB failure during activation) the marker is **not** written, so the
+	 * next activation retries the missing tags.
+	 *
+	 * @return void
+	 */
+	private static function seed_starter_tags(): void {
+		if ( (bool) get_option( self::STARTER_TAGS_SEEDED_OPTION, false ) ) {
+			return;
+		}
+
+		$tags = [
+			'read-later'  => __( 'Read later', 'linkstash' ),
+			'reference'   => __( 'Reference', 'linkstash' ),
+			'inspiration' => __( 'Inspiration', 'linkstash' ),
+			'archive'     => __( 'Archive', 'linkstash' ),
+		];
+
+		$all_ok = true;
+		foreach ( $tags as $slug => $name ) {
+			if ( term_exists( $slug, TagTaxonomy::TAXONOMY ) !== null ) {
+				continue;
+			}
+			$result = wp_insert_term( $name, TagTaxonomy::TAXONOMY, [ 'slug' => $slug ] );
+			if ( is_wp_error( $result ) ) {
+				$all_ok = false;
+			}
+		}
+
+		if ( $all_ok ) {
+			update_option( self::STARTER_TAGS_SEEDED_OPTION, true, false );
+		}
 	}
 
 	/**
@@ -107,6 +156,7 @@ class Main {
 		if ( is_admin() ) {
 			$store = new TokenStore();
 			( new ListColumns() )->register();
+			( new ListFilter() )->register();
 			( new Notices() )->register();
 			( new QuickAdd( new MetadataFetcher() ) )->register();
 			( new SettingsPage( $store ) )->register();
@@ -114,6 +164,7 @@ class Main {
 			( new DashboardWidget() )->register();
 			( new TagAutocomplete() )->register();
 			( new UrlAutoScheme() )->register();
+			( new HelpTabs() )->register();
 		}
 	}
 }

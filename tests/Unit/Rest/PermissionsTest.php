@@ -74,6 +74,31 @@ class PermissionsTest extends TestCase {
 	}
 
 	/**
+	 * Verifies require_read_bookmarks denies and uses a read-oriented message.
+	 *
+	 * @return void
+	 */
+	public function test_require_read_bookmarks_denies_with_read_message(): void {
+		Functions\when( 'current_user_can' )->justReturn( false );
+
+		$result = Permissions::require_read_bookmarks();
+
+		self::assertInstanceOf( WP_Error::class, $result );
+		self::assertStringContainsString( 'read', $result->message );
+	}
+
+	/**
+	 * Verifies require_read_bookmarks allows users with edit_posts.
+	 *
+	 * @return void
+	 */
+	public function test_require_read_bookmarks_allows_when_cap_present(): void {
+		Functions\when( 'current_user_can' )->justReturn( true );
+
+		self::assertTrue( Permissions::require_read_bookmarks() );
+	}
+
+	/**
 	 * Verifies can_edit_bookmark delegates to current_user_can( 'edit_post', id ).
 	 *
 	 * @return void
@@ -181,11 +206,13 @@ class PermissionsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies can_read_bookmark denies a non-owner without admin caps.
+	 * Verifies can_read_bookmark denies a non-owner without admin caps,
+	 * returning 404 (indistinguishable from "post does not exist") rather
+	 * than 403 to prevent ID-enumeration of private bookmarks.
 	 *
 	 * @return void
 	 */
-	public function test_can_read_bookmark_denies_non_owner(): void {
+	public function test_can_read_bookmark_denies_non_owner_with_404(): void {
 		$post              = new WP_Post();
 		$post->post_type   = BookmarkPostType::POST_TYPE;
 		$post->post_status = 'private';
@@ -199,5 +226,6 @@ class PermissionsTest extends TestCase {
 
 		$result = Permissions::can_read_bookmark( $request );
 		self::assertInstanceOf( WP_Error::class, $result );
+		self::assertSame( 'linkstash_not_found', $result->code );
 	}
 }

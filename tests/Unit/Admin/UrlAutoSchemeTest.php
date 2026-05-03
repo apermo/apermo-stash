@@ -91,6 +91,18 @@ class UrlAutoSchemeTest extends TestCase {
 	}
 
 	/**
+	 * Verifies the bookmark list screen is skipped — the quick-add
+	 * form is no longer rendered there, so no URL inputs to bind.
+	 *
+	 * @return void
+	 */
+	public function test_skips_bookmark_list_screen(): void {
+		Functions\expect( 'wp_enqueue_script' )->never();
+
+		( new UrlAutoScheme() )->maybe_enqueue( 'edit.php' );
+	}
+
+	/**
 	 * Verifies post.php for an unrelated CPT is skipped.
 	 *
 	 * @return void

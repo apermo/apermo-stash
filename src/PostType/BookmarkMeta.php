@@ -13,8 +13,7 @@ class BookmarkMeta {
 
 	public const META_URL           = '_linkstash_url';
 	public const META_URL_CANONICAL = '_linkstash_url_canonical';
-	public const META_UNREAD        = '_linkstash_unread';
-	public const META_ARCHIVED      = '_linkstash_archived';
+	public const META_FAVORITE      = '_linkstash_favorite';
 	public const META_UNREACHABLE   = '_linkstash_unreachable';
 
 	/**
@@ -110,8 +109,7 @@ class BookmarkMeta {
 
 		self::register_string_meta( self::META_URL, $auth_callback );
 		self::register_string_meta( self::META_URL_CANONICAL, $auth_callback );
-		self::register_bool_meta( self::META_UNREAD, $auth_callback );
-		self::register_bool_meta( self::META_ARCHIVED, $auth_callback );
+		self::register_bool_meta( self::META_FAVORITE, $auth_callback );
 		self::register_bool_meta( self::META_UNREACHABLE, $auth_callback );
 	}
 }

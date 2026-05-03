@@ -8,6 +8,7 @@ use Apermo\LinkStash\Main;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
+use WP_Error;
 
 /**
  * Tests for the Main class.
@@ -83,7 +84,7 @@ class MainTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function test_activate(): void {
+	public function test_activate_seeds_starter_tags_on_first_run(): void {
 		Functions\stubs(
 			[
 				'__' => null,
@@ -93,6 +94,76 @@ class MainTest extends TestCase {
 		Functions\expect( 'register_post_type' )->once();
 		Functions\expect( 'register_taxonomy' )->once();
 		Functions\expect( 'flush_rewrite_rules' )->once();
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'linkstash_starter_tags_seeded', false )
+			->andReturn( false );
+		Functions\when( 'term_exists' )->justReturn( null );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\expect( 'wp_insert_term' )->times( 4 )->andReturn( [ 'term_id' => 1 ] );
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'linkstash_starter_tags_seeded', true, false );
+
+		Main::activate();
+	}
+
+	/**
+	 * Verifies activate does not write the seeded marker if any wp_insert_term fails,
+	 * so the next activation can retry.
+	 *
+	 * @return void
+	 */
+	public function test_activate_skips_marker_when_insert_fails(): void {
+		Functions\stubs(
+			[
+				'__' => null,
+				'_x' => null,
+			],
+		);
+		Functions\expect( 'register_post_type' )->once();
+		Functions\expect( 'register_taxonomy' )->once();
+		Functions\expect( 'flush_rewrite_rules' )->once();
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'linkstash_starter_tags_seeded', false )
+			->andReturn( false );
+		Functions\when( 'term_exists' )->justReturn( null );
+		Functions\when( 'is_wp_error' )->alias( static fn ( $value ): bool => $value instanceof WP_Error );
+
+		$call = 0;
+		Functions\when( 'wp_insert_term' )->alias(
+			static function () use ( &$call ) {
+				$call++;
+				return $call === 2 ? new WP_Error( 'db_fail', 'transient' ) : [ 'term_id' => $call ];
+			},
+		);
+		Functions\expect( 'update_option' )->never();
+
+		Main::activate();
+	}
+
+	/**
+	 * Verifies activate skips seeding entirely when the marker option is set.
+	 *
+	 * @return void
+	 */
+	public function test_activate_skips_seeding_when_already_seeded(): void {
+		Functions\stubs(
+			[
+				'__' => null,
+				'_x' => null,
+			],
+		);
+		Functions\expect( 'register_post_type' )->once();
+		Functions\expect( 'register_taxonomy' )->once();
+		Functions\expect( 'flush_rewrite_rules' )->once();
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'linkstash_starter_tags_seeded', false )
+			->andReturn( true );
+		Functions\expect( 'wp_insert_term' )->never();
+		Functions\expect( 'update_option' )->never();
 
 		Main::activate();
 	}

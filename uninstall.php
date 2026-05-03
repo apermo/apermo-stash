@@ -21,6 +21,9 @@ delete_metadata( 'user', 0, '_linkstash_tokens', '', true );
 // Drop the global hash → user index that backs O(1) token lookups.
 delete_option( 'linkstash_token_index' );
 
+// Drop the one-shot starter-tags marker so a fresh reinstall reseeds.
+delete_option( 'linkstash_starter_tags_seeded' );
+
 // Drop the one-shot transients used to surface freshly-issued tokens. A
 // direct query is used here because user IDs are not enumerated and
 // per-user delete_transient() calls would require iterating every user.

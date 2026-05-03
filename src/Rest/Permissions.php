@@ -43,8 +43,36 @@ class Permissions {
 	}
 
 	/**
+	 * Allows read-only requests against the bookmark library when the
+	 * resolved user can edit bookmarks.
+	 *
+	 * Same capability check as `require_edit_posts` — bookmark reads via
+	 * `/check` and friends are editor-only by design — but the error
+	 * message is phrased for a read context so callers see the right
+	 * thing on a 403.
+	 *
+	 * @return bool|WP_Error
+	 */
+	public static function require_read_bookmarks(): bool|WP_Error {
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return new WP_Error(
+				'linkstash_forbidden',
+				__( 'You are not allowed to read bookmarks.', 'linkstash' ),
+				[ 'status' => 403 ],
+			);
+		}
+
+		return true;
+	}
+
+	/**
 	 * Allows reads of a single bookmark when the bookmark is public, the
 	 * caller owns it, or the caller can edit other users' posts.
+	 *
+	 * Returns 404 (not 403) when the caller is not authorised to read,
+	 * so the response is indistinguishable from "post does not exist" —
+	 * preventing ID-enumeration that would otherwise reveal the
+	 * existence of private bookmarks.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -54,31 +82,25 @@ class Permissions {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
 
-		if ( $post === null || $post->post_type !== BookmarkPostType::POST_TYPE ) {
-			return new WP_Error(
-				'linkstash_not_found',
-				__( 'Bookmark not found.', 'linkstash' ),
-				[ 'status' => 404 ],
-			);
-		}
+		if ( $post !== null && $post->post_type === BookmarkPostType::POST_TYPE ) {
+			if ( $post->post_status === 'publish' ) {
+				return true;
+			}
 
-		if ( $post->post_status === 'publish' ) {
-			return true;
-		}
+			$current_user = get_current_user_id();
+			if ( $current_user > 0 && (int) $post->post_author === $current_user ) {
+				return true;
+			}
 
-		$current_user = get_current_user_id();
-		if ( $current_user > 0 && (int) $post->post_author === $current_user ) {
-			return true;
-		}
-
-		if ( current_user_can( 'edit_others_posts' ) ) {
-			return true;
+			if ( current_user_can( 'edit_others_posts' ) ) {
+				return true;
+			}
 		}
 
 		return new WP_Error(
-			'linkstash_forbidden',
-			__( 'You are not allowed to view this bookmark.', 'linkstash' ),
-			[ 'status' => 403 ],
+			'linkstash_not_found',
+			__( 'Bookmark not found.', 'linkstash' ),
+			[ 'status' => 404 ],
 		);
 	}
 

@@ -32,7 +32,8 @@ class UrlAutoScheme {
 			return true;
 		}
 
-		if ( ! \in_array( $hook, [ 'edit.php', 'post.php', 'post-new.php' ], true ) ) {
+		// Bookmark add/edit screens carry the URL meta box.
+		if ( ! \in_array( $hook, [ 'post.php', 'post-new.php' ], true ) ) {
 			return false;
 		}
 

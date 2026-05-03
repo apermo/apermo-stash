@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Apermo\LinkStash\Tests\Unit\Admin;
 
 use Apermo\LinkStash\Admin\BookmarkMetabox;
+use Apermo\LinkStash\Main;
 use Apermo\LinkStash\PostType\BookmarkMeta;
 use Apermo\LinkStash\PostType\BookmarkPostType;
 use Apermo\LinkStash\Url\MetadataFetcher;
@@ -12,7 +13,9 @@ use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use WP_Post;
+use WP_Screen;
 
 /**
  * Tests the bookmark edit-screen metabox class.
@@ -118,6 +121,7 @@ class BookmarkMetaboxTest extends TestCase {
 		self::assertNotFalse( has_action( "add_meta_boxes_{$post_type}", [ $metabox, 'register_meta_boxes' ] ) );
 		self::assertNotFalse( has_action( "save_post_{$post_type}", [ $metabox, 'save_post' ] ) );
 		self::assertNotFalse( has_filter( 'use_block_editor_for_post_type', [ $metabox, 'disable_block_editor' ] ) );
+		self::assertNotFalse( has_action( 'admin_enqueue_scripts', [ $metabox, 'enqueue_unsaved_changes_script' ] ) );
 	}
 
 	/**
@@ -145,6 +149,63 @@ class BookmarkMetaboxTest extends TestCase {
 	}
 
 	/**
+	 * Verifies enqueue_unsaved_changes_script enqueues on the bookmark add/edit screen.
+	 *
+	 * @return void
+	 */
+	public function test_enqueue_unsaved_changes_script_on_bookmark_post_screen(): void {
+		$screen            = Mockery::mock( WP_Screen::class );
+		$screen->base      = 'post';
+		$screen->post_type = BookmarkPostType::POST_TYPE;
+		Functions\when( 'get_current_screen' )->justReturn( $screen );
+		Functions\when( 'plugins_url' )->alias(
+			static fn ( string $path ): string => '/wp-content/plugins/linkstash/' . $path,
+		);
+
+		$enqueued = null;
+		Functions\when( 'wp_enqueue_script' )->alias(
+			static function ( string $handle ) use ( &$enqueued ): void {
+				$enqueued = $handle;
+			},
+		);
+		Functions\stubs( [ 'register_activation_hook', 'register_deactivation_hook', 'add_action' ] );
+		( new ReflectionClass( Main::class ) )->getProperty( 'file' )->setValue( null, '/tmp/plugin.php' );
+
+		$this->metabox()->enqueue_unsaved_changes_script();
+
+		self::assertSame( 'linkstash-unsaved-changes', $enqueued );
+	}
+
+	/**
+	 * Verifies enqueue_unsaved_changes_script bails on unrelated screens.
+	 *
+	 * @return void
+	 */
+	public function test_enqueue_unsaved_changes_script_skips_other_screens(): void {
+		$screen            = Mockery::mock( WP_Screen::class );
+		$screen->base      = 'post';
+		$screen->post_type = 'post';
+		Functions\when( 'get_current_screen' )->justReturn( $screen );
+
+		Functions\expect( 'wp_enqueue_script' )->never();
+
+		$this->metabox()->enqueue_unsaved_changes_script();
+	}
+
+	/**
+	 * Verifies enqueue_unsaved_changes_script bails when get_current_screen returns null.
+	 *
+	 * @return void
+	 */
+	public function test_enqueue_unsaved_changes_script_skips_when_no_screen(): void {
+		Functions\when( 'get_current_screen' )->justReturn( null );
+
+		Functions\expect( 'wp_enqueue_script' )->never();
+
+		$this->metabox()->enqueue_unsaved_changes_script();
+	}
+
+	/**
 	 * Verifies the URL meta box renders the URL, unread, and archived inputs.
 	 *
 	 * @return void
@@ -153,8 +214,7 @@ class BookmarkMetaboxTest extends TestCase {
 		Functions\when( 'get_post_meta' )->alias(
 			static fn ( int $post_id, string $key ) => match ( $key ) {
 				BookmarkMeta::META_URL      => 'https://example.tld',
-				BookmarkMeta::META_UNREAD   => true,
-				BookmarkMeta::META_ARCHIVED => false,
+				BookmarkMeta::META_FAVORITE => true,
 				default                     => '',
 			},
 		);
@@ -168,8 +228,32 @@ class BookmarkMetaboxTest extends TestCase {
 
 		self::assertStringContainsString( 'name="linkstash_url"', $output );
 		self::assertStringContainsString( 'value="https://example.tld"', $output );
-		self::assertStringContainsString( 'name="linkstash_unread"', $output );
-		self::assertStringContainsString( 'name="linkstash_archived"', $output );
+		self::assertStringContainsString( 'name="linkstash_favorite"', $output );
+	}
+
+	/**
+	 * Verifies the URL meta box renders the unreachable-warning notice when set.
+	 *
+	 * @return void
+	 */
+	public function test_render_url_meta_box_unreachable_notice(): void {
+		Functions\when( 'get_post_meta' )->alias(
+			static fn ( int $post_id, string $key ) => match ( $key ) {
+				BookmarkMeta::META_URL         => 'https://example.tld/down',
+				BookmarkMeta::META_UNREACHABLE => true,
+				default                        => '',
+			},
+		);
+
+		$post     = new WP_Post();
+		$post->ID = 7;
+
+		\ob_start();
+		$this->metabox()->render_url_meta_box( $post );
+		$output = (string) \ob_get_clean();
+
+		self::assertStringContainsString( 'notice-warning', $output );
+		self::assertStringContainsString( 'URL didn', $output );
 	}
 
 	/**
@@ -214,7 +298,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$_POST = [
 			'linkstash_metabox_nonce' => 'nonce',
 			'linkstash_url'           => 'https://www.example.tld/article',
-			'linkstash_unread'        => '1',
+			'linkstash_favorite'      => '1',
 		];
 
 		$post               = new WP_Post();
@@ -227,8 +311,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$keys = \array_column( $this->meta_writes, 1 );
 		self::assertContains( BookmarkMeta::META_URL, $keys );
 		self::assertContains( BookmarkMeta::META_URL_CANONICAL, $keys );
-		self::assertContains( BookmarkMeta::META_UNREAD, $keys );
-		self::assertContains( BookmarkMeta::META_ARCHIVED, $keys );
+		self::assertContains( BookmarkMeta::META_FAVORITE, $keys );
 
 		// Title was non-empty, so we should NOT have rewritten it.
 		$post_title_writes = \array_filter(

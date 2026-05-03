@@ -32,6 +32,7 @@ class ListColumnsTest extends TestCase {
 		Functions\when( 'esc_html__' )->returnArg();
 		Functions\when( 'esc_attr' )->returnArg();
 		Functions\when( 'esc_url' )->returnArg();
+		Functions\when( 'wp_kses_post' )->returnArg();
 	}
 
 	/**
@@ -74,9 +75,9 @@ class ListColumnsTest extends TestCase {
 		self::assertArrayHasKey( 'cb', $result );
 		self::assertArrayHasKey( 'title', $result );
 		self::assertArrayHasKey( 'url', $result );
-		self::assertArrayHasKey( 'tags', $result );
+		self::assertArrayHasKey( 'linkstash_tag', $result );
 		self::assertArrayHasKey( 'visibility', $result );
-		self::assertArrayHasKey( 'flags', $result );
+		self::assertArrayHasKey( 'favorite', $result );
 		self::assertArrayHasKey( 'date', $result );
 	}
 
@@ -110,20 +111,32 @@ class ListColumnsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the tags column joins term names.
+	 * Verifies the tags column emits an anchor per tag pointing at the
+	 * filter-by-tag URL.
 	 *
 	 * @return void
 	 */
-	public function test_render_tags_column_joins_names(): void {
+	public function test_render_tags_column_renders_filter_links(): void {
 		$reading       = new WP_Term();
 		$reading->name = 'reading';
+		$reading->slug = 'reading';
 		$archive       = new WP_Term();
 		$archive->name = 'archive';
+		$archive->slug = 'archive';
 		Functions\when( 'get_the_terms' )->justReturn( [ $reading, $archive ] );
+		Functions\when( 'add_query_arg' )->alias(
+			static fn ( array $args, string $url ): string => $url . '?' . \http_build_query( $args ),
+		);
+		Functions\when( 'admin_url' )->alias( static fn ( string $path ): string => '/wp-admin/' . $path );
 
-		$output = $this->capture_render( 'tags', 7 );
+		$output = $this->capture_render( 'linkstash_tag', 7 );
 
-		self::assertSame( 'reading, archive', $output );
+		self::assertStringContainsString( 'post_type=linkstash_bookmark', $output );
+		self::assertStringContainsString( 'linkstash_tag=reading', $output );
+		self::assertStringContainsString( 'linkstash_tag=archive', $output );
+		self::assertStringContainsString( '>reading</a>', $output );
+		self::assertStringContainsString( '>archive</a>', $output );
+		self::assertStringContainsString( ', ', $output );
 	}
 
 	/**
@@ -134,7 +147,7 @@ class ListColumnsTest extends TestCase {
 	public function test_render_tags_column_empty(): void {
 		Functions\when( 'get_the_terms' )->justReturn( [] );
 
-		$output = $this->capture_render( 'tags', 7 );
+		$output = $this->capture_render( 'linkstash_tag', 7 );
 
 		self::assertSame( '—', $output );
 	}
@@ -172,31 +185,32 @@ class ListColumnsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the flags column renders Unread / Archived chips when set.
+	 * Verifies the favorite column renders a star when the flag is set.
 	 *
 	 * @return void
 	 */
-	public function test_render_flags_column_with_both_flags(): void {
+	public function test_render_favorite_column_renders_star(): void {
+		Functions\when( 'esc_attr__' )->returnArg();
 		Functions\when( 'get_post_meta' )->alias(
-			static function ( int $id, string $key ): bool {
-				return \in_array( $key, [ BookmarkMeta::META_UNREAD, BookmarkMeta::META_ARCHIVED ], true );
-			},
+			static fn ( int $id, string $key ): bool => $key === BookmarkMeta::META_FAVORITE,
 		);
 
-		$output = $this->capture_render( 'flags', 7 );
+		$output = $this->capture_render( 'favorite', 7 );
 
-		self::assertSame( 'Unread, Archived', $output );
+		self::assertStringContainsString( '&#9733;', $output );
+		self::assertStringContainsString( 'aria-label="Favorite"', $output );
 	}
 
 	/**
-	 * Verifies the flags column renders an em-dash when no flags are set.
+	 * Verifies the favorite column renders an em-dash when not set.
 	 *
 	 * @return void
 	 */
-	public function test_render_flags_column_empty(): void {
+	public function test_render_favorite_column_empty(): void {
+		Functions\when( 'esc_attr__' )->returnArg();
 		Functions\when( 'get_post_meta' )->justReturn( false );
 
-		$output = $this->capture_render( 'flags', 7 );
+		$output = $this->capture_render( 'favorite', 7 );
 
 		self::assertSame( '—', $output );
 	}
