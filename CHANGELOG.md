@@ -27,6 +27,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`Access-Control-Allow-Origin`, `-Allow-Methods`, `-Allow-Headers`,
   `-Allow-Credentials`, `-Expose-Headers`, `Vary`). Other namespaces
   and disallowed origins still flow through core.
+- Plugin Check `PluginCheck.Security.DirectDB.UnescapedDBParameter`
+  warning on the `/tags` aggregate query in `TagsController`. The
+  query was already correctly prepared (every interpolated value is
+  a `$wpdb->`-prefixed table name or a constant `%s`/`%d` placeholder
+  built in `build_where_clause`) and the WordPress.DB sniff variants
+  were already suppressed; Plugin Check ships its own scanner under
+  the `PluginCheck.*` namespace that doesn't inherit the existing
+  ignore list, so the same false positive is now suppressed
+  alongside the WordPress.DB ones.
 
 ## [0.1.2] - 2026-05-03
 

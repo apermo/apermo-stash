@@ -72,13 +72,18 @@ class TagsController {
 				GROUP BY t.term_id, t.name, t.slug
 				ORDER BY t.name ASC";
 
-		// $sql is composed from `$wpdb->`-prefixed table names plus the
-		// `$where` fragment built in build_where_clause(), which contains
-		// only literal placeholders (`%s`/`%d`) and constant SQL — every
-		// user-controlled value flows through `$args` into wpdb::prepare.
-		// The remaining sniff (DirectQuery) is intentional: this single
-		// aggregate replaces an N+1 fan-out and is cached above.
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery
+		/*
+		 * $sql is composed from `$wpdb->`-prefixed table names plus the
+		 * `$where` fragment built in build_where_clause(), which contains
+		 * only literal placeholders (`%s`/`%d`) and constant SQL — every
+		 * user-controlled value flows through `$args` into wpdb::prepare.
+		 * The remaining sniff (DirectQuery) is intentional: this single
+		 * aggregate replaces an N+1 fan-out and is cached above. The
+		 * PluginCheck.Security.DirectDB.UnescapedDBParameter sniff fires
+		 * on the same false-positive (it doesn't follow the prepare()
+		 * call) and is suppressed alongside the WordPress.DB ones.
+		 */
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $args ), \ARRAY_A );
 		$rows = \is_array( $rows ) ? \array_values( $rows ) : [];
 
