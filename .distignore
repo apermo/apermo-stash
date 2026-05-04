@@ -1,0 +1,54 @@
+# wp.org plugin-directory bundle exclusions.
+#
+# Used by 10up/action-wordpress-plugin-deploy (called from
+# .github/workflows/wporg-deploy.yml) to decide what stays out of the
+# released ZIP and the SVN trunk. Mirrors the export-ignore entries in
+# .gitattributes so a local `git archive` produces the same shape.
+#
+# What ships:
+#   plugin.php uninstall.php LICENSE readme.txt
+#   composer.json (so the runtime vendor/ has provenance)
+#   src/ assets/ vendor/
+
+# Local + CI tooling
+/.ddev
+/.editorconfig
+/.gemini
+/.github
+/.husky
+/.gitattributes
+/.gitignore
+/.lintstagedrc.js
+/.lighthouserc.js
+/.phpunit.cache
+/.wp-env.json
+/.distignore
+
+# Source bundles + dev artifacts
+/branding
+/.wordpress-org
+/setup.sh
+
+# Tests + analyser configs
+/e2e
+/tests
+/phpcs.xml.dist
+/phpstan.neon.dist
+/phpunit.xml.dist
+/playwright.config.js
+/wp-tests-config.php.dist
+
+# Node + JS toolchain (we ship vanilla JS, no build step)
+/package.json
+/package-lock.json
+
+# Misc dev-facing docs + CI metadata
+/codecov.yml
+/CHANGELOG.md
+/CLAUDE.md
+/README.md
+
+# Composer dev metadata: composer.json stays (Plugin Check requires
+# the file when /vendor is present), composer.lock is large and only
+# useful at install/regen time.
+/composer.lock

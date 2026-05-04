@@ -87,38 +87,83 @@ class CorsHandlerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies handle_preflight returns early when the request is not OPTIONS.
+	 * Verifies register hooks send_cors_response on rest_pre_serve_request
+	 * at a high priority (so we run after core's CORS handler).
 	 *
 	 * @return void
 	 */
-	public function test_preflight_skipped_for_non_options_request(): void {
-		$_SERVER['REQUEST_METHOD'] = 'GET';
-		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
-		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
-
-		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
-
+	public function test_register_hooks_rest_pre_serve_request_late(): void {
 		$handler = new CorsHandler();
+		$handler->register();
 
-		self::assertFalse( $handler->handle_preflight( false, null, null, null ) );
+		$priority = has_filter( 'rest_pre_serve_request', [ $handler, 'send_cors_response' ] );
+		self::assertNotFalse( $priority );
+		self::assertGreaterThan( 10, $priority, 'Must run after WP core rest_send_cors_headers (priority 10).' );
 	}
 
 	/**
-	 * Verifies an unknown origin is rejected during preflight.
+	 * Verifies send_cors_response is a no-op when the request is not for
+	 * a LinkStash route, returning the unchanged $served value.
 	 *
 	 * @return void
 	 */
-	public function test_preflight_rejects_unknown_origin(): void {
-		$_SERVER['REQUEST_METHOD'] = 'OPTIONS';
+	public function test_send_cors_response_skips_other_namespaces(): void {
+		$_SERVER['REQUEST_METHOD'] = 'POST';
+		$_SERVER['REQUEST_URI']    = '/wp-json/wp/v2/posts';
+		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
+		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
+
+		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
+		self::assertFalse( $result );
+	}
+
+	/**
+	 * Verifies send_cors_response is a no-op when the origin is not on the allow-list.
+	 *
+	 * @return void
+	 */
+	public function test_send_cors_response_skips_unknown_origin(): void {
+		$_SERVER['REQUEST_METHOD'] = 'POST';
 		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
 		$_SERVER['HTTP_ORIGIN']    = 'https://attacker.tld';
-
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
 		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
 
-		$handler = new CorsHandler();
+		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
+		self::assertFalse( $result );
+	}
 
-		self::assertFalse( $handler->handle_preflight( false, null, null, null ) );
+	/**
+	 * Verifies send_cors_response short-circuits an OPTIONS preflight with 204.
+	 *
+	 * @return void
+	 */
+	public function test_send_cors_response_serves_options_preflight(): void {
+		$_SERVER['REQUEST_METHOD'] = 'OPTIONS';
+		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
+		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
+		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+		Functions\when( 'status_header' )->justReturn( null );
+
+		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
+		self::assertTrue( $result );
+	}
+
+	/**
+	 * Verifies send_cors_response on a non-OPTIONS LinkStash request returns
+	 * $served unchanged (we set headers but don't short-circuit the body).
+	 *
+	 * @return void
+	 */
+	public function test_send_cors_response_passes_through_post(): void {
+		$_SERVER['REQUEST_METHOD'] = 'POST';
+		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
+		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
+		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+
+		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
+		self::assertFalse( $result );
 	}
 }

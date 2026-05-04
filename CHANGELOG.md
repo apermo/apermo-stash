@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-05-03
+
+### Fixed
+
+- Chrome-extension save flow on production hosts. WordPress core's
+  `rest_send_cors_headers` runs `sanitize_url()` on the incoming
+  `Origin` header, and `chrome-extension://...` is not in
+  `wp_allowed_protocols()` — so core writes an empty
+  `Access-Control-Allow-Origin:` value. Browsers reject the empty
+  string, the extension's preflight fails, and the POST silently
+  never runs. (Local dev with DDEV typically didn't reproduce because
+  the LiteSpeed/Apache plugin order on production let core's hook
+  fire after ours and overwrite the value; on a barebones WP it was
+  still a latent bug because core would always overwrite the origin
+  on direct POSTs.) `CorsHandler::send_cors_headers` now removes the
+  core hook for LinkStash routes when the origin matches the
+  allow-list, and emits the complete CORS header set itself
+  (`Access-Control-Allow-Origin`, `-Allow-Methods`, `-Allow-Headers`,
+  `-Allow-Credentials`, `-Expose-Headers`, `Vary`). Other namespaces
+  and disallowed origins still flow through core.
+- Plugin Check `PluginCheck.Security.DirectDB.UnescapedDBParameter`
+  warning on the `/tags` aggregate query in `TagsController`. The
+  query was already correctly prepared (every interpolated value is
+  a `$wpdb->`-prefixed table name or a constant `%s`/`%d` placeholder
+  built in `build_where_clause`) and the WordPress.DB sniff variants
+  were already suppressed; Plugin Check ships its own scanner under
+  the `PluginCheck.*` namespace that doesn't inherit the existing
+  ignore list, so the same false positive is now suppressed
+  alongside the WordPress.DB ones.
+
 ## [0.1.2] - 2026-05-03
 
 ### Security

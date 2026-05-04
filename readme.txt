@@ -4,7 +4,7 @@ Tags: bookmarks, links, rest-api, self-hosted, archive
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ companion Chrome extension.
 LinkStash turns your WordPress site into a personal bookmark archive,
 inspired by linkding and Delicious. Save URLs with a title,
 notes, and tags from the WordPress admin or from your browser via a
-[Chrome extension](https://github.com/apermo/linkstash-extension); read
+[Chrome extension](https://chromewebstore.google.com/detail/linkstash/midebpgblmgkcgljcgojjbehnonljnmk); read
 them back through the same admin UI or over a REST API designed for
 extensions and your own scripts.
 
@@ -69,8 +69,11 @@ recoverable.
 
 = Companion Chrome extension =
 
-A Chrome MV3 extension is in development at
-[apermo/linkstash-extension](https://github.com/apermo/linkstash-extension).
+A Chrome MV3 extension is published on the Chrome Web Store:
+https://chromewebstore.google.com/detail/linkstash/midebpgblmgkcgljcgojjbehnonljnmk
+
+Source: [apermo/linkstash-extension](https://github.com/apermo/linkstash-extension).
+
 It surfaces the saved/unsaved state on the action badge, lets you save
 or edit the current tab from the popup, and offers a right-click
 "Save link" context menu.
@@ -165,6 +168,15 @@ defense-in-depth narrowing of the CORS surface.
 5. Companion Chrome extension popup saving the current tab.
 
 == Changelog ==
+
+= 0.1.3 =
+* Fixed: the Chrome extension's save flow now actually reaches the
+  REST API on production hosts. WordPress core's CORS handler strips
+  `chrome-extension://` origins (the scheme is not in
+  `wp_allowed_protocols()`) and emits an empty
+  `Access-Control-Allow-Origin` header, which browsers reject. The
+  plugin now removes the core hook for LinkStash routes and emits a
+  complete CORS header set itself.
 
 = 0.1.2 =
 * Hardening: tighter output escaping in the bookmark list table and

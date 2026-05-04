@@ -19,7 +19,10 @@ use WP_Screen;
  */
 class HelpTabs {
 
-	private const SCREEN_ID = 'edit-' . BookmarkPostType::POST_TYPE;
+	private const SCREEN_ID           = 'edit-' . BookmarkPostType::POST_TYPE;
+	private const PLUGIN_REPO_URL     = 'https://github.com/apermo/linkstash';
+	private const EXTENSION_STORE_URL = 'https://chromewebstore.google.com/detail/linkstash/midebpgblmgkcgljcgojjbehnonljnmk';
+	private const EXTENSION_REPO_URL  = 'https://github.com/apermo/linkstash-extension';
 
 	/**
 	 * Returns the Overview tab markup.
@@ -94,21 +97,27 @@ class HelpTabs {
 	 * @return string
 	 */
 	private static function extension_html(): string {
-		$repo_url = 'https://github.com/apermo/linkstash-extension';
+		$store_link = '<a href="' . esc_url( self::EXTENSION_STORE_URL ) . '" target="_blank" rel="noopener">'
+			. esc_html__( 'Chrome Web Store', 'linkstash' ) . '</a>';
+		$repo_link  = '<a href="' . esc_url( self::EXTENSION_REPO_URL ) . '" target="_blank" rel="noopener">'
+			. esc_html( self::EXTENSION_REPO_URL ) . '</a>';
+
+		$kses_a = [
+			'a' => [
+				'href'   => [],
+				'target' => [],
+				'rel'    => [],
+			],
+		];
 
 		return '<p>' . wp_kses(
 			\sprintf(
-				/* translators: %s: linked repo URL. */
-				esc_html__( 'A companion Chrome extension is currently under review at the Chrome Web Store. Once it is approved you will be able to install it directly from the store; until then you can install it from source by following the instructions in the repository at %s.', 'linkstash' ),
-				'<a href="' . esc_url( $repo_url ) . '" target="_blank" rel="noopener">' . esc_html( $repo_url ) . '</a>',
+				/* translators: 1: Chrome Web Store link, 2: GitHub source link. */
+				esc_html__( 'A companion Chrome extension is available on the %1$s. The source is at %2$s if you prefer to review it or install from source.', 'linkstash' ),
+				$store_link,
+				$repo_link,
 			),
-			[
-				'a' => [
-					'href'   => [],
-					'target' => [],
-					'rel'    => [],
-				],
-			],
+			$kses_a,
 		) . '</p>'
 			. '<p>' . esc_html__( 'Once installed, the extension adds:', 'linkstash' ) . '</p>'
 			. '<ul>'
@@ -136,10 +145,10 @@ class HelpTabs {
 		$settings_url = admin_url( 'options-general.php?page=linkstash' );
 
 		return '<p><strong>' . esc_html__( 'For more information:', 'linkstash' ) . '</strong></p>'
-			. '<p><a href="https://github.com/apermo/linkstash" target="_blank" rel="noopener">'
+			. '<p><a href="' . esc_url( self::PLUGIN_REPO_URL ) . '" target="_blank" rel="noopener">'
 			. esc_html__( 'Plugin source &amp; README', 'linkstash' )
 			. '</a></p>'
-			. '<p><a href="https://github.com/apermo/linkstash-extension" target="_blank" rel="noopener">'
+			. '<p><a href="' . esc_url( self::EXTENSION_STORE_URL ) . '" target="_blank" rel="noopener">'
 			. esc_html__( 'Chrome extension', 'linkstash' )
 			. '</a></p>'
 			. '<p><a href="' . esc_url( $settings_url ) . '">'

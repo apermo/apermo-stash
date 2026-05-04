@@ -1,26 +1,37 @@
+# Exclusions for `git archive` — kept in sync with .distignore so a
+# local archive produces the same shape as 10up's wporg-deploy action.
+
 /.ddev/             export-ignore
 /.editorconfig      export-ignore
 /.gemini/           export-ignore
 /.github/           export-ignore
-/.wordpress-org/    export-ignore
-/branding/          export-ignore
 /.husky/            export-ignore
+/.wordpress-org/    export-ignore
 /.gitattributes     export-ignore
 /.gitignore         export-ignore
 /.lintstagedrc.js   export-ignore
+/.lighthouserc.js   export-ignore
 /.phpunit.cache/    export-ignore
+/.wp-env.json       export-ignore
+/.distignore        export-ignore
+
+/branding/          export-ignore
 /setup.sh           export-ignore
+
+/e2e/               export-ignore
 /tests/             export-ignore
 /phpcs.xml.dist     export-ignore
 /phpstan.neon.dist  export-ignore
 /phpunit.xml.dist   export-ignore
+/playwright.config.js     export-ignore
 /wp-tests-config.php.dist export-ignore
-/e2e/               export-ignore
-/playwright.config.js export-ignore
+
 /package.json       export-ignore
-/.lighthouserc.js   export-ignore
-/.wp-env.json       export-ignore
 /package-lock.json  export-ignore
+
 /codecov.yml        export-ignore
 CHANGELOG.md        export-ignore
 CLAUDE.md           export-ignore
+README.md           export-ignore
+
+/composer.lock      export-ignore
