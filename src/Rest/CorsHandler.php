@@ -178,13 +178,15 @@ class CorsHandler {
 	 * @return void
 	 */
 	public function register(): void {
-		// Priority 100 puts us after WP core's rest_send_cors_headers
-		// (priority 10) AND after WP_REST_Server::send_header() emissions
-		// for Access-Control-Allow-Headers / -Expose-Headers (which fire
-		// inside serve_request before this filter runs). We need to be
-		// the last writer or core's empty Allow-Origin (sanitize_url
-		// strips chrome-extension://, which is not in wp_allowed_protocols)
-		// is what the browser sees.
+		/*
+		 * Priority 100 puts us after WP core's rest_send_cors_headers
+		 * (priority 10) AND after WP_REST_Server::send_header() emissions
+		 * for Access-Control-Allow-Headers / -Expose-Headers (which fire
+		 * inside serve_request before this filter runs). We need to be
+		 * the last writer or core's empty Allow-Origin (sanitize_url
+		 * strips chrome-extension://, which is not in wp_allowed_protocols)
+		 * is what the browser sees.
+		 */
 		add_filter( 'rest_pre_serve_request', [ $this, 'send_cors_response' ], 100, 4 );
 	}
 
