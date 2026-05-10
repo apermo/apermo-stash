@@ -79,7 +79,7 @@ class HelpTabs {
 				\sprintf(
 					/* translators: 1: REST endpoint, 2: Settings page label. */
 					__( '<strong>REST API</strong> — POST to %1$s with an Authorization Bearer token generated under %2$s.', 'apermo-stash' ),
-					'<code>/wp-json/apermo-stash/v1/bookmarks</code>',
+					'<code>/wp-json/apermo-stash/v1/links</code>',
 					'<strong>' . esc_html__( 'Settings → Apermo Stash', 'apermo-stash' ) . '</strong>',
 				),
 				[

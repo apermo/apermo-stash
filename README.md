@@ -39,7 +39,7 @@ Passwords** and pass it as Basic Auth:
 
 ```bash
 curl -u "your-username:xxxx xxxx xxxx xxxx xxxx xxxx" \
-     https://example.tld/wp-json/apermo-stash/v1/bookmarks
+     https://example.tld/wp-json/apermo-stash/v1/links
 ```
 
 ### Apermo Stash Bearer Tokens
@@ -50,7 +50,7 @@ immediately. Send it as:
 
 ```bash
 curl -H "Authorization: Bearer <token>" \
-     https://example.tld/wp-json/apermo-stash/v1/bookmarks
+     https://example.tld/wp-json/apermo-stash/v1/links
 ```
 
 Each token is bound to a WordPress user; permission checks run against that
@@ -62,11 +62,11 @@ Base path: `/wp-json/apermo-stash/v1`.
 
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/bookmarks` | List bookmarks (filters: `tag`, `q`, `unread`, `archived`, `public`/`private`, `page`, `per_page`) |
-| `POST` | `/bookmarks` | Create a bookmark (idempotent — same URL returns existing record with `X-Apermo-Stash-Existing: 1`) |
-| `GET` | `/bookmarks/{id}` | Fetch a single bookmark |
-| `PATCH` | `/bookmarks/{id}` | Update fields |
-| `DELETE` | `/bookmarks/{id}` | Delete a bookmark |
+| `GET` | `/links` | List bookmarks (filters: `tag`, `q`, `unread`, `archived`, `public`/`private`, `page`, `per_page`) |
+| `POST` | `/links` | Create a bookmark (idempotent — same URL returns existing record with `X-Apermo-Stash-Existing: 1`) |
+| `GET` | `/links/{id}` | Fetch a single bookmark |
+| `PATCH` | `/links/{id}` | Update fields |
+| `DELETE` | `/links/{id}` | Delete a bookmark |
 | `GET` | `/tags` | List tags with bookmark counts |
 | `GET` | `/check?url=...` | Returns `{exists: bool, id?: int}` for a given URL |
 
@@ -75,7 +75,7 @@ Base path: `/wp-json/apermo-stash/v1`.
 Save a bookmark; let the server fetch the title and description:
 
 ```bash
-curl -X POST https://example.tld/wp-json/apermo-stash/v1/bookmarks \
+curl -X POST https://example.tld/wp-json/apermo-stash/v1/links \
      -H "Authorization: Bearer <token>" \
      -H "Content-Type: application/json" \
      -d '{"url":"https://example.tld/article","tags":["reading"],"public":true}'
@@ -92,7 +92,7 @@ Search and filter:
 
 ```bash
 curl -H "Authorization: Bearer <token>" \
-     "https://example.tld/wp-json/apermo-stash/v1/bookmarks?tag=reading&unread=1"
+     "https://example.tld/wp-json/apermo-stash/v1/links?tag=reading&unread=1"
 ```
 
 ### Public versus private bookmarks
@@ -102,7 +102,7 @@ Bookmarks use WordPress's native `post_status`:
 - `publish` (public) — readable without authentication via the REST API.
 - `private` — only the owner (and users with `edit_others_posts`) can read.
 
-Anonymous `GET /bookmarks` returns only public bookmarks. Authenticated users
+Anonymous `GET /links` returns only public bookmarks. Authenticated users
 see their own bookmarks plus any public bookmarks owned by other users. POST,
 PATCH, DELETE always require authentication.
 

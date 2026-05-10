@@ -45,7 +45,7 @@ extensions and your own scripts.
   plugin-issued Bearer tokens. CORS is preconfigured for
   `chrome-extension://*` so the companion extension works without
   additional setup.
-* **Idempotent save.** `POST /bookmarks` dedupes by canonical URL —
+* **Idempotent save.** `POST /links` dedupes by canonical URL —
   re-saving the same page from the extension merges into the existing
   record (and updates fields you change) rather than creating a
   duplicate.
@@ -56,10 +56,10 @@ extensions and your own scripts.
 
 `apermo-stash/v1` exposes:
 
-* `GET /bookmarks` (list, paged, filterable by tag / favorite / public /
+* `GET /links` (list, paged, filterable by tag / favorite / public /
   private)
-* `POST /bookmarks` (create — idempotent on canonical URL)
-* `GET /bookmarks/{id}` / `PATCH /bookmarks/{id}` / `DELETE /bookmarks/{id}`
+* `POST /links` (create — idempotent on canonical URL)
+* `GET /links/{id}` / `PATCH /links/{id}` / `DELETE /links/{id}`
 * `GET /tags?q=` (tag listing with counts; respects visibility)
 * `GET /check?url=` (browser-extension "is this saved?" check)
 

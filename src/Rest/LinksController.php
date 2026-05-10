@@ -224,7 +224,7 @@ class LinksController {
 	public function register_routes( string $rest_namespace ): void {
 		register_rest_route(
 			$rest_namespace,
-			'/bookmarks',
+			'/links',
 			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
@@ -243,7 +243,7 @@ class LinksController {
 
 		register_rest_route(
 			$rest_namespace,
-			'/bookmarks/(?P<id>\d+)',
+			'/links/(?P<id>\d+)',
 			[
 				[
 					'methods'             => WP_REST_Server::READABLE,

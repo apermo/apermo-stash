@@ -79,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Favorite** flag on bookmarks (replaces Unread / Archived).
   Single boolean meta `_linkstash_favorite`; rendered as a star
   badge in the new "Favorite" list-table column; filterable via
-  `GET /apermo-stash/v1/bookmarks?favorite=1`. The Add/Edit screen
+  `GET /apermo-stash/v1/links?favorite=1`. The Add/Edit screen
   shows a single "Favorite" checkbox in the URL meta box.
 - Starter tags created on first activation: `read-later`,
   `reference`, `inspiration`, `archive`. A one-shot
@@ -145,7 +145,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   when the caller is not authorised to read a private bookmark, so
   the response is indistinguishable from "post does not exist" —
   preventing ID-enumeration of private bookmarks via the
-  `GET /bookmarks/{id}` endpoint.
+  `GET /links/{id}` endpoint.
 - README + readme.txt now document the single outbound HTTP request
   the plugin makes (the metadata fetch on save, via
   `wp_safe_remote_get`, which blocks loopback and private IP
