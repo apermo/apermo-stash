@@ -180,7 +180,7 @@ class BookmarkMetabox {
 		// above the Notes panel.
 		add_meta_box(
 			'linkstash_bookmark_url',
-			__( 'Bookmark URL', 'linkstash' ),
+			__( 'Bookmark URL', 'apermo-stash' ),
 			[ $this, 'render_url_meta_box' ],
 			BookmarkPostType::POST_TYPE,
 			'normal',
@@ -189,7 +189,7 @@ class BookmarkMetabox {
 
 		add_meta_box(
 			'linkstash_bookmark_note',
-			__( 'Notes', 'linkstash' ),
+			__( 'Notes', 'apermo-stash' ),
 			[ $this, 'render_note_meta_box' ],
 			BookmarkPostType::POST_TYPE,
 			'normal',
@@ -211,7 +211,7 @@ class BookmarkMetabox {
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_FIELD );
 		?>
 		<p>
-			<label for="linkstash-url"><strong><?php esc_html_e( 'URL', 'linkstash' ); ?></strong></label><br />
+			<label for="linkstash-url"><strong><?php esc_html_e( 'URL', 'apermo-stash' ); ?></strong></label><br />
 			<input type="url"
 					id="linkstash-url"
 					name="linkstash_url"
@@ -224,20 +224,20 @@ class BookmarkMetabox {
 		<?php if ( $unreachable && $url !== '' ) { ?>
 			<div class="notice notice-warning inline" style="margin: 0.5rem 0; padding: 0.5rem 0.75rem;">
 				<p style="margin: 0;">
-					<strong><?php esc_html_e( 'URL didn\'t respond on last save.', 'linkstash' ); ?></strong>
+					<strong><?php esc_html_e( 'URL didn\'t respond on last save.', 'apermo-stash' ); ?></strong>
 					<br />
-					<?php esc_html_e( 'It may be private, behind a VPN or login wall, or temporarily down. The bookmark is saved either way; re-saving will re-check.', 'linkstash' ); ?>
+					<?php esc_html_e( 'It may be private, behind a VPN or login wall, or temporarily down. The bookmark is saved either way; re-saving will re-check.', 'apermo-stash' ); ?>
 				</p>
 			</div>
 		<?php } ?>
 		<p>
 			<label>
 				<input type="checkbox" name="linkstash_favorite" value="1" <?php checked( $favorite ); ?> />
-				<?php esc_html_e( 'Favorite', 'linkstash' ); ?>
+				<?php esc_html_e( 'Favorite', 'apermo-stash' ); ?>
 			</label>
 		</p>
 		<p class="description">
-			<?php esc_html_e( 'Leave the title field empty to use the URL as the title.', 'linkstash' ); ?>
+			<?php esc_html_e( 'Leave the title field empty to use the URL as the title.', 'apermo-stash' ); ?>
 		</p>
 		<?php
 	}
@@ -255,7 +255,7 @@ class BookmarkMetabox {
 					id="linkstash-note"
 					class="widefat"
 					rows="8"
-					placeholder="<?php esc_attr_e( 'Optional note&hellip;', 'linkstash' ); ?>"><?php echo esc_textarea( $post->post_content ); ?></textarea>
+					placeholder="<?php esc_attr_e( 'Optional note&hellip;', 'apermo-stash' ); ?>"><?php echo esc_textarea( $post->post_content ); ?></textarea>
 		<?php
 	}
 

@@ -94,17 +94,17 @@ class QuickAdd {
 			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
 			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
 			<p>
-				<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required class="widefat" data-linkstash-url-input />
+				<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'apermo-stash' ); ?>" required class="widefat" data-linkstash-url-input />
 			</p>
 			<p>
-				<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'linkstash' ); ?>" class="widefat" data-linkstash-tag-autocomplete="<?php echo esc_attr( TagTaxonomy::TAXONOMY ); ?>" autocomplete="off" />
+				<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'apermo-stash' ); ?>" class="widefat" data-linkstash-tag-autocomplete="<?php echo esc_attr( TagTaxonomy::TAXONOMY ); ?>" autocomplete="off" />
 			</p>
 			<p>
 				<label>
 					<input type="checkbox" name="public" value="1" />
-					<?php esc_html_e( 'Public', 'linkstash' ); ?>
+					<?php esc_html_e( 'Public', 'apermo-stash' ); ?>
 				</label>
-				<button type="submit" class="button button-primary alignright"><?php esc_html_e( 'Save bookmark', 'linkstash' ); ?></button>
+				<button type="submit" class="button button-primary alignright"><?php esc_html_e( 'Save bookmark', 'apermo-stash' ); ?></button>
 			</p>
 		</form>
 		<?php
@@ -132,7 +132,7 @@ class QuickAdd {
 	 */
 	public function handle_submission(): void {
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'You are not allowed to add bookmarks.', 'linkstash' ), '', [ 'response' => 403 ] );
+			wp_die( esc_html__( 'You are not allowed to add bookmarks.', 'apermo-stash' ), '', [ 'response' => 403 ] );
 		}
 
 		check_admin_referer( self::ACTION );

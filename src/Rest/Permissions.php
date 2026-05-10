@@ -34,7 +34,7 @@ class Permissions {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error(
 				'linkstash_forbidden',
-				__( 'You are not allowed to create or modify bookmarks.', 'linkstash' ),
+				__( 'You are not allowed to create or modify bookmarks.', 'apermo-stash' ),
 				[ 'status' => 403 ],
 			);
 		}
@@ -57,7 +57,7 @@ class Permissions {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error(
 				'linkstash_forbidden',
-				__( 'You are not allowed to read bookmarks.', 'linkstash' ),
+				__( 'You are not allowed to read bookmarks.', 'apermo-stash' ),
 				[ 'status' => 403 ],
 			);
 		}
@@ -99,7 +99,7 @@ class Permissions {
 
 		return new WP_Error(
 			'linkstash_not_found',
-			__( 'Bookmark not found.', 'linkstash' ),
+			__( 'Bookmark not found.', 'apermo-stash' ),
 			[ 'status' => 404 ],
 		);
 	}
@@ -116,7 +116,7 @@ class Permissions {
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new WP_Error(
 				'linkstash_forbidden',
-				__( 'You are not allowed to edit this bookmark.', 'linkstash' ),
+				__( 'You are not allowed to edit this bookmark.', 'apermo-stash' ),
 				[ 'status' => 403 ],
 			);
 		}
@@ -136,7 +136,7 @@ class Permissions {
 		if ( ! current_user_can( 'delete_post', $post_id ) ) {
 			return new WP_Error(
 				'linkstash_forbidden',
-				__( 'You are not allowed to delete this bookmark.', 'linkstash' ),
+				__( 'You are not allowed to delete this bookmark.', 'apermo-stash' ),
 				[ 'status' => 403 ],
 			);
 		}

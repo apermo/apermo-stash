@@ -33,19 +33,19 @@ class Notices {
 	private static function message_for( string $slug ): array {
 		switch ( $slug ) {
 			case 'saved':
-				return [ 'success', __( 'Bookmark saved.', 'linkstash' ) ];
+				return [ 'success', __( 'Bookmark saved.', 'apermo-stash' ) ];
 			case 'saved-unreachable':
 				return [
 					'warning',
 					__(
 						'Bookmark saved, but the URL didn\'t respond — it may be private, behind a VPN or login wall, or temporarily down. Title and notes were left blank for you to fill in.',
-						'linkstash',
+						'apermo-stash',
 					),
 				];
 			case 'invalid':
-				return [ 'error', __( 'That URL was empty or unparseable.', 'linkstash' ) ];
+				return [ 'error', __( 'That URL was empty or unparseable.', 'apermo-stash' ) ];
 			case 'failed':
-				return [ 'error', __( 'Could not save the bookmark.', 'linkstash' ) ];
+				return [ 'error', __( 'Could not save the bookmark.', 'apermo-stash' ) ];
 		}
 
 		return [ '', '' ];

@@ -39,7 +39,7 @@ class DashboardWidget {
 
 		wp_add_dashboard_widget(
 			self::WIDGET_ID,
-			__( 'Quick Bookmark', 'linkstash' ),
+			__( 'Quick Bookmark', 'apermo-stash' ),
 			[ $this, 'render' ],
 		);
 	}
@@ -50,7 +50,7 @@ class DashboardWidget {
 	 * @return void
 	 */
 	public function render(): void {
-		echo '<p>' . esc_html__( 'Save a URL to your bookmark library.', 'linkstash' ) . '</p>';
+		echo '<p>' . esc_html__( 'Save a URL to your bookmark library.', 'apermo-stash' ) . '</p>';
 		QuickAdd::render_form_html( 'linkstash-dashboard-widget' );
 	}
 }

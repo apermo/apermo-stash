@@ -105,10 +105,10 @@ class Main {
 		}
 
 		$tags = [
-			'read-later'  => __( 'Read later', 'linkstash' ),
-			'reference'   => __( 'Reference', 'linkstash' ),
-			'inspiration' => __( 'Inspiration', 'linkstash' ),
-			'archive'     => __( 'Archive', 'linkstash' ),
+			'read-later'  => __( 'Read later', 'apermo-stash' ),
+			'reference'   => __( 'Reference', 'apermo-stash' ),
+			'inspiration' => __( 'Inspiration', 'apermo-stash' ),
+			'archive'     => __( 'Archive', 'apermo-stash' ),
 		];
 
 		$all_ok = true;

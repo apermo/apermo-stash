@@ -81,7 +81,7 @@ class ListColumns {
 		\printf(
 			'<span class="linkstash-badge linkstash-badge--%1$s">%2$s</span>',
 			esc_attr( $is_public ? 'public' : 'private' ),
-			esc_html( $is_public ? __( 'Public', 'linkstash' ) : __( 'Private', 'linkstash' ) ),
+			esc_html( $is_public ? __( 'Public', 'apermo-stash' ) : __( 'Private', 'apermo-stash' ) ),
 		);
 	}
 
@@ -96,7 +96,7 @@ class ListColumns {
 		$favorite = (bool) get_post_meta( $post_id, BookmarkMeta::META_FAVORITE, true );
 
 		echo $favorite
-			? '<span aria-label="' . esc_attr__( 'Favorite', 'linkstash' ) . '">&#9733;</span>'
+			? '<span aria-label="' . esc_attr__( 'Favorite', 'apermo-stash' ) . '">&#9733;</span>'
 			: '—';
 	}
 
@@ -122,12 +122,12 @@ class ListColumns {
 	public function filter_columns( array $columns ): array {
 		return [
 			'cb'            => $columns['cb'] ?? '<input type="checkbox" />',
-			'title'         => esc_html__( 'Title', 'linkstash' ),
-			'url'           => esc_html__( 'URL', 'linkstash' ),
-			'linkstash_tag' => esc_html__( 'Tags', 'linkstash' ),
-			'visibility'    => esc_html__( 'Visibility', 'linkstash' ),
-			'favorite'      => esc_html__( 'Favorite', 'linkstash' ),
-			'date'          => $columns['date'] ?? esc_html__( 'Date', 'linkstash' ),
+			'title'         => esc_html__( 'Title', 'apermo-stash' ),
+			'url'           => esc_html__( 'URL', 'apermo-stash' ),
+			'linkstash_tag' => esc_html__( 'Tags', 'apermo-stash' ),
+			'visibility'    => esc_html__( 'Visibility', 'apermo-stash' ),
+			'favorite'      => esc_html__( 'Favorite', 'apermo-stash' ),
+			'date'          => $columns['date'] ?? esc_html__( 'Date', 'apermo-stash' ),
 		];
 	}
 
