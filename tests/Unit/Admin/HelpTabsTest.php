@@ -89,7 +89,7 @@ class HelpTabsTest extends TestCase {
 			$ids,
 		);
 		self::assertStringContainsString( 'github.com/apermo/linkstash-extension', $registered[2]['content'] );
-		self::assertStringContainsString( 'options-general.php?page=linkstash', $sidebar );
+		self::assertStringContainsString( 'options-general.php?page=apermo-stash', $sidebar );
 	}
 
 	/**

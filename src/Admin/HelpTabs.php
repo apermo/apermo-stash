@@ -142,7 +142,7 @@ class HelpTabs {
 	 * @return string
 	 */
 	private static function sidebar_html(): string {
-		$settings_url = admin_url( 'options-general.php?page=linkstash' );
+		$settings_url = admin_url( 'options-general.php?page=apermo-stash' );
 
 		return '<p><strong>' . esc_html__( 'For more information:', 'apermo-stash' ) . '</strong></p>'
 			. '<p><a href="' . esc_url( self::PLUGIN_REPO_URL ) . '" target="_blank" rel="noopener">'
