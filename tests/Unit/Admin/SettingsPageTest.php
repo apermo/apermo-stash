@@ -103,6 +103,30 @@ class SettingsPageTest extends TestCase {
 	}
 
 	/**
+	 * Verifies register_menu calls add_options_page with the expected
+	 * slug, capability, and render callback.
+	 *
+	 * @return void
+	 */
+	public function test_register_menu_adds_options_page(): void {
+		$page     = $this->page();
+		$captured = null;
+		Functions\when( 'add_options_page' )->alias(
+			static function ( ...$args ) use ( &$captured ): string {
+				$captured = $args;
+				return '';
+			},
+		);
+
+		$page->register_menu();
+
+		self::assertSame(
+			[ 'Apermo Stash', 'Apermo Stash', 'manage_options', 'apermo-stash', [ $page, 'render' ] ],
+			$captured,
+		);
+	}
+
+	/**
 	 * Verifies render outputs the expected page skeleton when there are no tokens.
 	 *
 	 * @return void

@@ -228,4 +228,64 @@ class PermissionsTest extends TestCase {
 		self::assertInstanceOf( WP_Error::class, $result );
 		self::assertSame( 'apermo_stash_not_found', $result->code );
 	}
+
+	/**
+	 * Verifies can_edit_link denies callers without edit_post and returns 403.
+	 *
+	 * @return void
+	 */
+	public function test_can_edit_link_denies_when_cap_missing(): void {
+		Functions\when( 'current_user_can' )->justReturn( false );
+
+		$request         = new WP_REST_Request();
+		$request->params = [ 'id' => 7 ];
+
+		$result = Permissions::can_edit_link( $request );
+		self::assertInstanceOf( WP_Error::class, $result );
+		self::assertSame( 'apermo_stash_forbidden', $result->code );
+	}
+
+	/**
+	 * Verifies can_edit_link allows callers with edit_post.
+	 *
+	 * @return void
+	 */
+	public function test_can_edit_link_allows_when_cap_present(): void {
+		Functions\when( 'current_user_can' )->justReturn( true );
+
+		$request         = new WP_REST_Request();
+		$request->params = [ 'id' => 7 ];
+
+		self::assertTrue( Permissions::can_edit_link( $request ) );
+	}
+
+	/**
+	 * Verifies can_delete_link denies callers without delete_post and returns 403.
+	 *
+	 * @return void
+	 */
+	public function test_can_delete_link_denies_when_cap_missing(): void {
+		Functions\when( 'current_user_can' )->justReturn( false );
+
+		$request         = new WP_REST_Request();
+		$request->params = [ 'id' => 7 ];
+
+		$result = Permissions::can_delete_link( $request );
+		self::assertInstanceOf( WP_Error::class, $result );
+		self::assertSame( 'apermo_stash_forbidden', $result->code );
+	}
+
+	/**
+	 * Verifies can_delete_link allows callers with delete_post.
+	 *
+	 * @return void
+	 */
+	public function test_can_delete_link_allows_when_cap_present(): void {
+		Functions\when( 'current_user_can' )->justReturn( true );
+
+		$request         = new WP_REST_Request();
+		$request->params = [ 'id' => 7 ];
+
+		self::assertTrue( Permissions::can_delete_link( $request ) );
+	}
 }

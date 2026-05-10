@@ -137,6 +137,40 @@ class NoticesTest extends TestCase {
 	}
 
 	/**
+	 * Verifies the invalid-URL notice renders as an error.
+	 *
+	 * @return void
+	 */
+	public function test_renders_invalid_error(): void {
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
+		$_GET['apermo_stash_notice'] = 'invalid';
+
+		\ob_start();
+		( new Notices() )->maybe_render();
+		$output = (string) \ob_get_clean();
+
+		self::assertStringContainsString( 'notice-error', $output );
+		self::assertStringContainsString( 'unparseable', $output );
+	}
+
+	/**
+	 * Verifies the save-failed notice renders as an error.
+	 *
+	 * @return void
+	 */
+	public function test_renders_failed_error(): void {
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
+		$_GET['apermo_stash_notice'] = 'failed';
+
+		\ob_start();
+		( new Notices() )->maybe_render();
+		$output = (string) \ob_get_clean();
+
+		self::assertStringContainsString( 'notice-error', $output );
+		self::assertStringContainsString( 'Could not save', $output );
+	}
+
+	/**
 	 * Verifies an unrecognised slug renders nothing.
 	 *
 	 * @return void

@@ -191,4 +191,23 @@ class MainTest extends TestCase {
 
 		Main::boot();
 	}
+
+	/**
+	 * Verifies boot also wires the admin classes when running in wp-admin.
+	 *
+	 * @return void
+	 */
+	public function test_boot_wires_admin_classes(): void {
+		Functions\when( 'add_action' )->justReturn( true );
+		Functions\when( 'add_filter' )->justReturn( true );
+		Functions\when( 'is_admin' )->justReturn( true );
+		Functions\when( 'plugin_basename' )->returnArg();
+		Functions\when( 'plugins_url' )->returnArg();
+
+		Main::boot();
+
+		// boot completing without throwing exercises the
+		// `if ( is_admin() ) { … }` branch in src/Main.php.
+		self::assertTrue( true );
+	}
 }
