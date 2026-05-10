@@ -1,6 +1,6 @@
 # Apermo Stash
 
-[![PHP CI](https://github.com/apermo/linkstash/actions/workflows/ci.yml/badge.svg)](https://github.com/apermo/linkstash/actions/workflows/ci.yml)
+[![PHP CI](https://github.com/apermo/apermo-stash/actions/workflows/ci.yml/badge.svg)](https://github.com/apermo/apermo-stash/actions/workflows/ci.yml)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPLv2+-blue.svg)](LICENSE)
 
 A self-hosted WordPress plugin for collecting bookmarks. Inspired by

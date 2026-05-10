@@ -20,7 +20,7 @@ use WP_Screen;
 class HelpTabs {
 
 	private const SCREEN_ID           = 'edit-' . BookmarkPostType::POST_TYPE;
-	private const PLUGIN_REPO_URL     = 'https://github.com/apermo/linkstash';
+	private const PLUGIN_REPO_URL     = 'https://github.com/apermo/apermo-stash';
 	private const EXTENSION_STORE_URL = 'https://chromewebstore.google.com/detail/linkstash/midebpgblmgkcgljcgojjbehnonljnmk';
 	private const EXTENSION_REPO_URL  = 'https://github.com/apermo/linkstash-extension';
 

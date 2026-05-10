@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: Apermo Stash
- * Plugin URI:  https://github.com/apermo/linkstash
+ * Plugin URI:  https://github.com/apermo/apermo-stash
  * Description: A self-hosted bookmark collection with a token-protected REST API.
  * Version:     0.1.3
  * Author:      Christoph Daum
