@@ -113,7 +113,7 @@ class ListColumns {
 	}
 
 	/**
-	 * Replaces the default columns with LinkStash-specific ones.
+	 * Replaces the default columns with Apermo Stash-specific ones.
 	 *
 	 * @param array<string, string> $columns Existing columns.
 	 *

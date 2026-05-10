@@ -116,7 +116,7 @@ class MetadataFetcher {
 			[
 				'timeout'     => self::TIMEOUT_SECONDS,
 				'redirection' => 3,
-				'user-agent'  => 'LinkStash/0.1 (+https://github.com/apermo/linkstash)',
+				'user-agent'  => 'Apermo Stash/0.1 (+https://github.com/apermo/linkstash)',
 			],
 		);
 

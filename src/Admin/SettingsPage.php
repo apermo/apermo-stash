@@ -10,7 +10,7 @@ use Apermo\Stash\Auth\TokenStore;
 use Apermo\Stash\Main;
 
 /**
- * Renders the Settings → LinkStash page that manages API tokens.
+ * Renders the Settings → Apermo Stash page that manages API tokens.
  */
 class SettingsPage {
 
@@ -218,14 +218,14 @@ class SettingsPage {
 	}
 
 	/**
-	 * Registers the Settings → LinkStash menu entry.
+	 * Registers the Settings → Apermo Stash menu entry.
 	 *
 	 * @return void
 	 */
 	public function register_menu(): void {
 		add_options_page(
-			__( 'LinkStash', 'apermo-stash' ),
-			__( 'LinkStash', 'apermo-stash' ),
+			__( 'Apermo Stash', 'apermo-stash' ),
+			__( 'Apermo Stash', 'apermo-stash' ),
 			'manage_options',
 			self::PAGE_SLUG,
 			[ $this, 'render' ],
@@ -266,7 +266,7 @@ class SettingsPage {
 		$new_token = self::pop_new_token( $user_id );
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'LinkStash API Tokens', 'apermo-stash' ); ?></h1>
+			<h1><?php esc_html_e( 'Apermo Stash API Tokens', 'apermo-stash' ); ?></h1>
 			<?php
 			self::render_new_token_notice( $new_token );
 			self::render_create_form();

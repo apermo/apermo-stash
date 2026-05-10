@@ -13,7 +13,7 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests the Tools → LinkStash settings page.
+ * Tests the Tools → Apermo Stash settings page.
  *
  * Branches that call `wp_safe_redirect` followed by `exit()` are not
  * exercised here — `exit()` in PHP cannot be intercepted in-process — but
@@ -115,7 +115,7 @@ class SettingsPageTest extends TestCase {
 		( new SettingsPage( $store ) )->render();
 		$output = (string) \ob_get_clean();
 
-		self::assertStringContainsString( 'LinkStash API Tokens', $output );
+		self::assertStringContainsString( 'Apermo Stash API Tokens', $output );
 		self::assertStringContainsString( 'Generate a new token', $output );
 		self::assertStringContainsString( 'No tokens yet', $output );
 	}

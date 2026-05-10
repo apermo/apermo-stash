@@ -1,6 +1,6 @@
 <?php
 /**
- * Uninstall handler for LinkStash.
+ * Uninstall handler for Apermo Stash.
  *
  * Removes plugin-owned data (API tokens, transients) but intentionally
  * preserves user-created bookmarks so an accidental delete + reinstall

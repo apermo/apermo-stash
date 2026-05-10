@@ -73,7 +73,7 @@ class BookmarkPostType {
 				'labels'             => [
 					'name'               => __( 'Bookmarks', 'apermo-stash' ),
 					'singular_name'      => __( 'Bookmark', 'apermo-stash' ),
-					'menu_name'          => __( 'LinkStash', 'apermo-stash' ),
+					'menu_name'          => __( 'Apermo Stash', 'apermo-stash' ),
 					'add_new'            => __( 'Add New', 'apermo-stash' ),
 					'add_new_item'       => __( 'Add New Bookmark', 'apermo-stash' ),
 					'edit_item'          => __( 'Edit Bookmark', 'apermo-stash' ),

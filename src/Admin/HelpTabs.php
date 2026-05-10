@@ -10,7 +10,7 @@ use Apermo\Stash\PostType\BookmarkPostType;
 use WP_Screen;
 
 /**
- * Adds contextual help tabs to LinkStash admin screens.
+ * Adds contextual help tabs to Apermo Stash admin screens.
  *
  * Hooks `current_screen` and decides per-screen what tabs to register
  * via `WP_Screen::add_help_tab()` plus a sidebar via
@@ -31,7 +31,7 @@ class HelpTabs {
 	 */
 	private static function overview_html(): string {
 		return '<p>' . esc_html__(
-			'LinkStash turns your WordPress site into a personal bookmark archive. Every URL you save is a real WordPress post (custom post type apermo_stash_bookmark), so it is searchable, taggable, and exportable like any other content on the site.',
+			'Apermo Stash turns your WordPress site into a personal bookmark archive. Every URL you save is a real WordPress post (custom post type apermo_stash_bookmark), so it is searchable, taggable, and exportable like any other content on the site.',
 			'apermo-stash',
 		) . '</p>'
 			. '<p>' . esc_html__( 'Use this screen to browse and edit your saved bookmarks. The columns show:', 'apermo-stash' ) . '</p>'
@@ -61,7 +61,7 @@ class HelpTabs {
 	 * @return string
 	 */
 	private static function add_bookmarks_html(): string {
-		return '<p>' . esc_html__( 'There are several ways to save a URL to LinkStash:', 'apermo-stash' ) . '</p>'
+		return '<p>' . esc_html__( 'There are several ways to save a URL to Apermo Stash:', 'apermo-stash' ) . '</p>'
 			. '<ul>'
 			. '<li>' . wp_kses(
 				__( '<strong>Add New Bookmark</strong> — the button at the top of this screen opens the bookmark editor. Paste a URL, optionally set a title, notes, tags, and visibility.', 'apermo-stash' ),
@@ -80,7 +80,7 @@ class HelpTabs {
 					/* translators: 1: REST endpoint, 2: Settings page label. */
 					__( '<strong>REST API</strong> — POST to %1$s with an Authorization Bearer token generated under %2$s.', 'apermo-stash' ),
 					'<code>/wp-json/apermo-stash/v1/bookmarks</code>',
-					'<strong>' . esc_html__( 'Settings → LinkStash', 'apermo-stash' ) . '</strong>',
+					'<strong>' . esc_html__( 'Settings → Apermo Stash', 'apermo-stash' ) . '</strong>',
 				),
 				[
 					'strong' => [],
@@ -88,7 +88,7 @@ class HelpTabs {
 				],
 			) . '</li>'
 			. '</ul>'
-			. '<p>' . esc_html__( 'LinkStash dedupes by canonical URL: saving the same page twice updates the existing record instead of creating a duplicate. The X-Apermo-Stash-Existing response header on a re-save tells API clients which path was taken.', 'apermo-stash' ) . '</p>';
+			. '<p>' . esc_html__( 'Apermo Stash dedupes by canonical URL: saving the same page twice updates the existing record instead of creating a duplicate. The X-Apermo-Stash-Existing response header on a re-save tells API clients which path was taken.', 'apermo-stash' ) . '</p>';
 	}
 
 	/**
@@ -124,13 +124,13 @@ class HelpTabs {
 			. '<li>' . esc_html__( 'A toolbar action that saves the current tab in one click.', 'apermo-stash' ) . '</li>'
 			. '<li>' . esc_html__( 'A green checkmark on the toolbar icon when the open page is already saved.', 'apermo-stash' ) . '</li>'
 			. '<li>' . esc_html__( 'An edit-from-popup flow with title, description, tags, and a public/private toggle.', 'apermo-stash' ) . '</li>'
-			. '<li>' . esc_html__( 'A right-click "Save link to LinkStash" context-menu entry, so you can save a link without visiting it.', 'apermo-stash' ) . '</li>'
+			. '<li>' . esc_html__( 'A right-click "Save link to Apermo Stash" context-menu entry, so you can save a link without visiting it.', 'apermo-stash' ) . '</li>'
 			. '</ul>'
 			. '<p>' . wp_kses(
 				\sprintf(
 					/* translators: %s: Settings page label. */
 					esc_html__( 'After installing, open the extension\'s options page, enter your site URL and a Bearer token generated under %s, and pick your default visibility.', 'apermo-stash' ),
-					'<strong>' . esc_html__( 'Settings → LinkStash', 'apermo-stash' ) . '</strong>',
+					'<strong>' . esc_html__( 'Settings → Apermo Stash', 'apermo-stash' ) . '</strong>',
 				),
 				[ 'strong' => [] ],
 			) . '</p>';
@@ -152,7 +152,7 @@ class HelpTabs {
 			. esc_html__( 'Chrome extension', 'apermo-stash' )
 			. '</a></p>'
 			. '<p><a href="' . esc_url( $settings_url ) . '">'
-			. esc_html__( 'Settings → LinkStash', 'apermo-stash' )
+			. esc_html__( 'Settings → Apermo Stash', 'apermo-stash' )
 			. '</a></p>';
 	}
 
@@ -167,7 +167,7 @@ class HelpTabs {
 	}
 
 	/**
-	 * Attaches the LinkStash help tabs when the current screen is the
+	 * Attaches the Apermo Stash help tabs when the current screen is the
 	 * bookmark list table.
 	 *
 	 * @param WP_Screen $screen Current admin screen.

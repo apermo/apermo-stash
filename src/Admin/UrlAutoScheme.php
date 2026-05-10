@@ -20,7 +20,7 @@ use Apermo\Stash\PostType\BookmarkPostType;
 class UrlAutoScheme {
 
 	/**
-	 * Returns true on screens that render a LinkStash URL input.
+	 * Returns true on screens that render a Apermo Stash URL input.
 	 *
 	 * @param string $hook Hook suffix passed to admin_enqueue_scripts.
 	 *
@@ -80,7 +80,7 @@ class UrlAutoScheme {
 
 	/**
 	 * Enqueues the blur-handler script on every screen that renders a
-	 * LinkStash URL input.
+	 * Apermo Stash URL input.
 	 *
 	 * @param string $hook Current admin screen hook suffix.
 	 *

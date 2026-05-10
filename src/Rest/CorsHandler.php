@@ -7,14 +7,14 @@ namespace Apermo\Stash\Rest;
 \defined( 'ABSPATH' ) || exit();
 
 /**
- * Sends CORS headers for the LinkStash REST namespace and short-circuits
+ * Sends CORS headers for the Apermo Stash REST namespace and short-circuits
  * `OPTIONS` preflight requests.
  *
  * Browser extensions (Chrome MV3) send `Origin: chrome-extension://<id>` and
  * issue a preflight `OPTIONS` request before any non-simple call. WordPress
  * core only echoes `Access-Control-Allow-Origin: *` for cookie-authenticated
  * requests by default, which doesn't help an extension that wants to send
- * `Authorization: Bearer ...`. This handler responds for the LinkStash
+ * `Authorization: Bearer ...`. This handler responds for the Apermo Stash
  * routes only.
  */
 class CorsHandler {
@@ -48,7 +48,7 @@ class CorsHandler {
 	 */
 	private static function is_allowed_origin( string $origin ): bool {
 		/**
-		 * Filters the list of allowed CORS origins for the LinkStash REST namespace.
+		 * Filters the list of allowed CORS origins for the Apermo Stash REST namespace.
 		 *
 		 * @param list<string> $origins Origins; entries may end in `*` to match any suffix.
 		 *
@@ -127,7 +127,7 @@ class CorsHandler {
 	}
 
 	/**
-	 * Returns true when the current REST route is under the LinkStash namespace.
+	 * Returns true when the current REST route is under the Apermo Stash namespace.
 	 *
 	 * @return bool
 	 */
@@ -191,7 +191,7 @@ class CorsHandler {
 	}
 
 	/**
-	 * Emits the LinkStash CORS response headers and, for OPTIONS preflight,
+	 * Emits the Apermo Stash CORS response headers and, for OPTIONS preflight,
 	 * short-circuits the request with a 204.
 	 *
 	 * Runs late on `rest_pre_serve_request` (priority 100) to be the last

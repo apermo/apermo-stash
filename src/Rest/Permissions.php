@@ -11,7 +11,7 @@ use WP_Error;
 use WP_REST_Request;
 
 /**
- * Holds permission callbacks shared by the LinkStash REST controllers.
+ * Holds permission callbacks shared by the Apermo Stash REST controllers.
  */
 class Permissions {
 

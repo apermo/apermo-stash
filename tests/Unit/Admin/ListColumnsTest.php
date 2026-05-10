@@ -60,7 +60,7 @@ class ListColumnsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies filter_columns adds the LinkStash columns.
+	 * Verifies filter_columns adds the Apermo Stash columns.
 	 *
 	 * @return void
 	 */
