@@ -1,4 +1,4 @@
-name: linkstash
+name: apermo-stash
 type: php
 docroot: .ddev/wordpress
 php_version: "8.4"

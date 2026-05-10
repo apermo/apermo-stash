@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Rename: LinkStash → Apermo Stash.** Slug `linkstash` →
+  `apermo-stash`, namespace `Apermo\LinkStash` → `Apermo\Stash`,
+  text domain `linkstash` → `apermo-stash`, REST namespace
+  `linkstash/v1` → `apermo-stash/v1`, Composer package
+  `apermo/linkstash` → `apermo/apermo-stash`. The taxonomy
+  (`apermo_stash_tag`), options, user/post meta keys, transient
+  keys, query parameters, filter hooks, HTTP headers
+  (`X-Apermo-Stash-Existing`, `X-Apermo-Stash-Meta-Fetched`), HTML
+  data attributes, and CSS class names were all updated to match.
+  No migration shim is provided — the plugin had no published WP.org
+  installs at the time of the rename.
+- **Content type renamed: "Bookmark" → "Link" everywhere.** The post
+  type slug changed from `apermo_stash_bookmark` (which exceeded
+  WordPress's 20-character `register_post_type` limit) to
+  `apermo_stash_link`. The REST endpoint moved from `/bookmarks` to
+  `/links`. Admin labels ("Add New Bookmark", "Search Bookmarks",
+  "All Bookmarks", etc.) now read "Link"/"Links". The
+  Bookmark\* PHP classes (`BookmarkPostType`, `BookmarkMeta`,
+  `BookmarkMetabox`, `BookmarksController`) were renamed to Link\*
+  with matching file moves. Sets up a coherent family for the
+  upcoming `apermo_stash_note` and `apermo_stash_image` types.
+- Author URI on the plugin header is now
+  `https://christoph-daum.com` (was `https://apermo.de`); the author
+  is the person Christoph Daum, not the Apermo brand.
+
 ## [0.1.3] - 2026-05-03
 
 ### Fixed

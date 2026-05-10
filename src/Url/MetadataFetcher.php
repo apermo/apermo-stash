@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Url;
+namespace Apermo\Stash\Url;
+
+use Apermo\Stash\Main;
 
 \defined( 'ABSPATH' ) || exit();
 
@@ -83,7 +85,7 @@ class MetadataFetcher {
 	 * Returns the unreachable result shape.
 	 *
 	 * Used when the host wouldn't talk to us (DNS failure, timeout, non-200,
-	 * empty body). The bookmark is still saved by the caller; the
+	 * empty body). The link is still saved by the caller; the
 	 * `reachable: false` flag lets the UI raise a "URL saved, but the
 	 * content didn't load" warning while still allowing private/VPN/
 	 * OAuth-only links through.
@@ -116,7 +118,7 @@ class MetadataFetcher {
 			[
 				'timeout'     => self::TIMEOUT_SECONDS,
 				'redirection' => 3,
-				'user-agent'  => 'LinkStash/0.1 (+https://github.com/apermo/linkstash)',
+				'user-agent'  => 'Apermo Stash/' . Main::VERSION . ' (+https://github.com/apermo/apermo-stash)',
 			],
 		);
 

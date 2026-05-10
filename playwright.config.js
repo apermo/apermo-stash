@@ -5,7 +5,7 @@ module.exports = defineConfig({
     workers: 1,
     retries: process.env.CI ? 1 : 0,
     use: {
-        baseURL: process.env.WP_BASE_URL || 'https://linkstash.ddev.site',
+        baseURL: process.env.WP_BASE_URL || 'https://apermo-stash.ddev.site',
         ignoreHTTPSErrors: true,
         screenshot: 'only-on-failure',
         trace: 'retain-on-failure',

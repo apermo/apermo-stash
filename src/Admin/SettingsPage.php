@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\Auth\TokenStore;
-use Apermo\LinkStash\Main;
+use Apermo\Stash\Auth\TokenStore;
+use Apermo\Stash\Main;
 
 /**
- * Renders the Settings → LinkStash page that manages API tokens.
+ * Renders the Settings → Apermo Stash page that manages API tokens.
  */
 class SettingsPage {
 
-	private const PAGE_SLUG = 'linkstash';
-	private const ACTION_CREATE = 'linkstash_token_create';
-	private const ACTION_REVOKE = 'linkstash_token_revoke';
-	private const TRANSIENT_PREFIX = 'linkstash_new_token_';
+	private const PAGE_SLUG = 'apermo-stash';
+	private const ACTION_CREATE = 'apermo_stash_token_create';
+	private const ACTION_REVOKE = 'apermo_stash_token_revoke';
+	private const TRANSIENT_PREFIX = 'apermo_stash_new_token_';
 
 	/**
 	 * Holds the token store.
@@ -83,12 +83,12 @@ class SettingsPage {
 
 		if ( $time_diff >= 0 && $time_diff < \DAY_IN_SECONDS ) {
 			/* translators: %s: Human-readable time difference. */
-			return \sprintf( __( '%s ago', 'linkstash' ), human_time_diff( $timestamp ) );
+			return \sprintf( __( '%s ago', 'apermo-stash' ), human_time_diff( $timestamp ) );
 		}
 
 		return \sprintf(
 			/* translators: 1: token date, 2: token time. */
-			__( '%1$s at %2$s', 'linkstash' ),
+			__( '%1$s at %2$s', 'apermo-stash' ),
 			wp_date( (string) get_option( 'date_format' ), $timestamp ),
 			wp_date( (string) get_option( 'time_format' ), $timestamp ),
 		);
@@ -107,7 +107,7 @@ class SettingsPage {
 		}
 		?>
 		<div class="notice notice-success">
-			<p><strong><?php esc_html_e( 'New token created. Copy it now — it will not be shown again.', 'linkstash' ); ?></strong></p>
+			<p><strong><?php esc_html_e( 'New token created. Copy it now — it will not be shown again.', 'apermo-stash' ); ?></strong></p>
 			<p><code style="display:inline-block;padding:.5rem 1rem;background:#f0f0f1;"><?php echo esc_html( $token ); ?></code></p>
 		</div>
 		<?php
@@ -120,14 +120,14 @@ class SettingsPage {
 	 */
 	private static function render_create_form(): void {
 		?>
-		<h2><?php esc_html_e( 'Generate a new token', 'linkstash' ); ?></h2>
+		<h2><?php esc_html_e( 'Generate a new token', 'apermo-stash' ); ?></h2>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION_CREATE ); ?>" />
 			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( wp_create_nonce( self::ACTION_CREATE ) ); ?>" />
 			<p>
-				<label for="linkstash-token-name"><?php esc_html_e( 'Name', 'linkstash' ); ?></label>
-				<input id="linkstash-token-name" type="text" name="token_name" required class="regular-text" placeholder="<?php esc_attr_e( 'Chrome extension on laptop', 'linkstash' ); ?>" />
-				<button type="submit" class="button button-primary"><?php esc_html_e( 'Generate', 'linkstash' ); ?></button>
+				<label for="apermo-stash-token-name"><?php esc_html_e( 'Name', 'apermo-stash' ); ?></label>
+				<input id="apermo-stash-token-name" type="text" name="token_name" required class="regular-text" placeholder="<?php esc_attr_e( 'Chrome extension on laptop', 'apermo-stash' ); ?>" />
+				<button type="submit" class="button button-primary"><?php esc_html_e( 'Generate', 'apermo-stash' ); ?></button>
 			</p>
 		</form>
 		<?php
@@ -142,19 +142,19 @@ class SettingsPage {
 	 */
 	private static function render_tokens_table( array $tokens ): void {
 		?>
-		<h2><?php esc_html_e( 'Existing tokens', 'linkstash' ); ?></h2>
+		<h2><?php esc_html_e( 'Existing tokens', 'apermo-stash' ); ?></h2>
 		<?php
 		if ( $tokens === [] ) {
-			echo '<p>' . esc_html__( 'No tokens yet.', 'linkstash' ) . '</p>';
+			echo '<p>' . esc_html__( 'No tokens yet.', 'apermo-stash' ) . '</p>';
 			return;
 		}
 		?>
 		<table class="widefat striped">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Name', 'linkstash' ); ?></th>
-					<th><?php esc_html_e( 'Created', 'linkstash' ); ?></th>
-					<th><?php esc_html_e( 'Last used', 'linkstash' ); ?></th>
+					<th><?php esc_html_e( 'Name', 'apermo-stash' ); ?></th>
+					<th><?php esc_html_e( 'Created', 'apermo-stash' ); ?></th>
+					<th><?php esc_html_e( 'Last used', 'apermo-stash' ); ?></th>
 					<th></th>
 				</tr>
 			</thead>
@@ -184,7 +184,7 @@ class SettingsPage {
 			<td>
 				<?php
 				if ( $entry['last_used'] === null ) {
-					esc_html_e( 'never', 'linkstash' );
+					esc_html_e( 'never', 'apermo-stash' );
 				} else {
 					echo esc_html( self::formatted_date( $entry['last_used'] ) );
 				}
@@ -195,7 +195,7 @@ class SettingsPage {
 					<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION_REVOKE ); ?>" />
 					<input type="hidden" name="token_id" value="<?php echo esc_attr( $entry['id'] ); ?>" />
 					<?php wp_nonce_field( self::ACTION_REVOKE . ':' . $entry['id'] ); ?>
-					<button type="submit" class="button-link-delete" onclick="return confirm('<?php echo esc_js( __( 'Revoke this token?', 'linkstash' ) ); ?>');"><?php esc_html_e( 'Revoke', 'linkstash' ); ?></button>
+					<button type="submit" class="button-link-delete" onclick="return confirm('<?php echo esc_js( __( 'Revoke this token?', 'apermo-stash' ) ); ?>');"><?php esc_html_e( 'Revoke', 'apermo-stash' ); ?></button>
 				</form>
 			</td>
 		</tr>
@@ -218,14 +218,14 @@ class SettingsPage {
 	}
 
 	/**
-	 * Registers the Settings → LinkStash menu entry.
+	 * Registers the Settings → Apermo Stash menu entry.
 	 *
 	 * @return void
 	 */
 	public function register_menu(): void {
 		add_options_page(
-			__( 'LinkStash', 'linkstash' ),
-			__( 'LinkStash', 'linkstash' ),
+			__( 'Apermo Stash', 'apermo-stash' ),
+			__( 'Apermo Stash', 'apermo-stash' ),
 			'manage_options',
 			self::PAGE_SLUG,
 			[ $this, 'render' ],
@@ -243,7 +243,7 @@ class SettingsPage {
 		$settings = \sprintf(
 			'<a href="%1$s">%2$s</a>',
 			esc_url( self::settings_url() ),
-			esc_html__( 'Settings', 'linkstash' ),
+			esc_html__( 'Settings', 'apermo-stash' ),
 		);
 
 		\array_unshift( $links, $settings );
@@ -258,7 +258,7 @@ class SettingsPage {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Access denied.', 'linkstash' ), '', [ 'response' => 403 ] );
+			wp_die( esc_html__( 'Access denied.', 'apermo-stash' ), '', [ 'response' => 403 ] );
 		}
 
 		$user_id   = get_current_user_id();
@@ -266,7 +266,7 @@ class SettingsPage {
 		$new_token = self::pop_new_token( $user_id );
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'LinkStash API Tokens', 'linkstash' ); ?></h1>
+			<h1><?php esc_html_e( 'Apermo Stash API Tokens', 'apermo-stash' ); ?></h1>
 			<?php
 			self::render_new_token_notice( $new_token );
 			self::render_create_form();
@@ -283,7 +283,7 @@ class SettingsPage {
 	 */
 	public function handle_create(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Access denied.', 'linkstash' ), '', [ 'response' => 403 ] );
+			wp_die( esc_html__( 'Access denied.', 'apermo-stash' ), '', [ 'response' => 403 ] );
 		}
 
 		check_admin_referer( self::ACTION_CREATE );
@@ -313,7 +313,7 @@ class SettingsPage {
 	 */
 	public function handle_revoke(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Access denied.', 'linkstash' ), '', [ 'response' => 403 ] );
+			wp_die( esc_html__( 'Access denied.', 'apermo-stash' ), '', [ 'response' => 403 ] );
 		}
 
 		$token_id = isset( $_POST['token_id'] ) && \is_string( $_POST['token_id'] )

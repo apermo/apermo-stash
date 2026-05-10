@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Rest;
+namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
 /**
- * Sends CORS headers for the LinkStash REST namespace and short-circuits
+ * Sends CORS headers for the Apermo Stash REST namespace and short-circuits
  * `OPTIONS` preflight requests.
  *
  * Browser extensions (Chrome MV3) send `Origin: chrome-extension://<id>` and
  * issue a preflight `OPTIONS` request before any non-simple call. WordPress
  * core only echoes `Access-Control-Allow-Origin: *` for cookie-authenticated
  * requests by default, which doesn't help an extension that wants to send
- * `Authorization: Bearer ...`. This handler responds for the LinkStash
+ * `Authorization: Bearer ...`. This handler responds for the Apermo Stash
  * routes only.
  */
 class CorsHandler {
 
 	private const ALLOWED_HEADERS = 'Authorization, Content-Type, X-WP-Nonce, X-Requested-With';
 	private const ALLOWED_METHODS = 'GET, POST, PATCH, PUT, DELETE, OPTIONS';
-	private const EXPOSED_HEADERS = 'X-LinkStash-Existing, X-LinkStash-Meta-Fetched, X-WP-Total, X-WP-TotalPages, Link';
+	private const EXPOSED_HEADERS = 'X-Apermo-Stash-Existing, X-Apermo-Stash-Meta-Fetched, X-WP-Total, X-WP-TotalPages, Link';
 
 	/**
 	 * Returns the origin from the current request, or an empty string.
@@ -39,7 +39,7 @@ class CorsHandler {
 	/**
 	 * Returns true when the origin matches the allow-list.
 	 *
-	 * Extensions can extend the list via the `linkstash_allowed_origins` filter.
+	 * Extensions can extend the list via the `apermo_stash_allowed_origins` filter.
 	 * The default list contains the literal `chrome-extension://*` wildcard.
 	 *
 	 * @param string $origin Origin header value.
@@ -48,13 +48,13 @@ class CorsHandler {
 	 */
 	private static function is_allowed_origin( string $origin ): bool {
 		/**
-		 * Filters the list of allowed CORS origins for the LinkStash REST namespace.
+		 * Filters the list of allowed CORS origins for the Apermo Stash REST namespace.
 		 *
 		 * @param list<string> $origins Origins; entries may end in `*` to match any suffix.
 		 *
 		 * @return mixed Filter consumers may return anything; non-array values fall back to deny.
 		 */
-		$allowed = apply_filters( 'linkstash_allowed_origins', [ 'chrome-extension://*' ] );
+		$allowed = apply_filters( 'apermo_stash_allowed_origins', [ 'chrome-extension://*' ] );
 		// @phpstan-ignore function.alreadyNarrowedType
 		if ( ! \is_array( $allowed ) ) {
 			return false;
@@ -127,11 +127,11 @@ class CorsHandler {
 	}
 
 	/**
-	 * Returns true when the current REST route is under the LinkStash namespace.
+	 * Returns true when the current REST route is under the Apermo Stash namespace.
 	 *
 	 * @return bool
 	 */
-	private static function is_linkstash_route(): bool {
+	private static function is_apermo_stash_route(): bool {
 		$route = self::current_route();
 
 		return $route !== '' && \str_starts_with( $route, '/' . RestController::NAMESPACE );
@@ -191,7 +191,7 @@ class CorsHandler {
 	}
 
 	/**
-	 * Emits the LinkStash CORS response headers and, for OPTIONS preflight,
+	 * Emits the Apermo Stash CORS response headers and, for OPTIONS preflight,
 	 * short-circuits the request with a 204.
 	 *
 	 * Runs late on `rest_pre_serve_request` (priority 100) to be the last
@@ -212,7 +212,7 @@ class CorsHandler {
 	public function send_cors_response( bool $served, mixed $result, mixed $request, mixed $server ): bool {
 		unset( $result, $request, $server );
 
-		if ( ! self::is_linkstash_route() ) {
+		if ( ! self::is_apermo_stash_route() ) {
 			return $served;
 		}
 

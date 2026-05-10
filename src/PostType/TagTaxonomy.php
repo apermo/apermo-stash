@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\PostType;
+namespace Apermo\Stash\PostType;
 
 \defined( 'ABSPATH' ) || exit();
 
 /**
- * Registers the linkstash_tag taxonomy attached to the bookmark CPT.
+ * Registers the apermo_stash_tag taxonomy attached to the link CPT.
  */
 class TagTaxonomy {
 
-	public const TAXONOMY = 'linkstash_tag';
+	public const TAXONOMY = 'apermo_stash_tag';
 
 	/**
 	 * Registers the WordPress hook that triggers taxonomy registration.
@@ -30,18 +30,18 @@ class TagTaxonomy {
 	public function register_taxonomy(): void {
 		register_taxonomy(
 			self::TAXONOMY,
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			[
 				'labels'            => [
-					'name'          => __( 'Tags', 'linkstash' ),
-					'singular_name' => __( 'Tag', 'linkstash' ),
-					'search_items'  => __( 'Search Tags', 'linkstash' ),
-					'all_items'     => __( 'All Tags', 'linkstash' ),
-					'edit_item'     => __( 'Edit Tag', 'linkstash' ),
-					'update_item'   => __( 'Update Tag', 'linkstash' ),
-					'add_new_item'  => __( 'Add New Tag', 'linkstash' ),
-					'new_item_name' => __( 'New Tag Name', 'linkstash' ),
-					'menu_name'     => __( 'Tags', 'linkstash' ),
+					'name'          => __( 'Tags', 'apermo-stash' ),
+					'singular_name' => __( 'Tag', 'apermo-stash' ),
+					'search_items'  => __( 'Search Tags', 'apermo-stash' ),
+					'all_items'     => __( 'All Tags', 'apermo-stash' ),
+					'edit_item'     => __( 'Edit Tag', 'apermo-stash' ),
+					'update_item'   => __( 'Update Tag', 'apermo-stash' ),
+					'add_new_item'  => __( 'Add New Tag', 'apermo-stash' ),
+					'new_item_name' => __( 'New Tag Name', 'apermo-stash' ),
+					'menu_name'     => __( 'Tags', 'apermo-stash' ),
 				],
 				'hierarchical'      => false,
 				'public'            => false,

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\PostType;
+namespace Apermo\Stash\Tests\Unit\PostType;
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests the bookmark tag taxonomy registration.
+ * Tests the link tag taxonomy registration.
  */
 class TagTaxonomyTest extends TestCase {
 
@@ -81,7 +81,7 @@ class TagTaxonomyTest extends TestCase {
 			->once()
 			->with(
 				TagTaxonomy::TAXONOMY,
-				BookmarkPostType::POST_TYPE,
+				LinkPostType::POST_TYPE,
 				Mockery::on( [ self::class, 'matchExpectedArgs' ] ),
 			);
 
@@ -94,6 +94,6 @@ class TagTaxonomyTest extends TestCase {
 	 * @return void
 	 */
 	public function test_taxonomy_constant(): void {
-		self::assertSame( 'linkstash_tag', TagTaxonomy::TAXONOMY );
+		self::assertSame( 'apermo_stash_tag', TagTaxonomy::TAXONOMY );
 	}
 }

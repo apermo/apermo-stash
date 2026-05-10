@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\HelpTabs;
-use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\Stash\Admin\HelpTabs;
+use Apermo\Stash\PostType\LinkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 use WP_Screen;
 
 /**
- * Tests the contextual help tabs added to the bookmark list screen.
+ * Tests the contextual help tabs added to the link list screen.
  */
 class HelpTabsTest extends TestCase {
 
@@ -58,16 +58,16 @@ class HelpTabsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the bookmark list screen receives all three help tabs and a sidebar.
+	 * Verifies the link list screen receives all three help tabs and a sidebar.
 	 *
 	 * @return void
 	 */
-	public function test_adds_tabs_on_bookmark_list_screen(): void {
+	public function test_adds_tabs_on_link_list_screen(): void {
 		$registered = [];
 		$sidebar    = '';
 
 		$screen     = Mockery::mock( WP_Screen::class );
-		$screen->id = 'edit-' . BookmarkPostType::POST_TYPE;
+		$screen->id = 'edit-' . LinkPostType::POST_TYPE;
 		$screen->shouldReceive( 'add_help_tab' )
 			->andReturnUsing(
 				static function ( array $entry ) use ( &$registered ): void {
@@ -85,11 +85,11 @@ class HelpTabsTest extends TestCase {
 
 		$ids = \array_column( $registered, 'id' );
 		self::assertSame(
-			[ 'linkstash-overview', 'linkstash-add-bookmarks', 'linkstash-extension' ],
+			[ 'apermo-stash-overview', 'apermo-stash-add-links', 'linkstash-extension' ],
 			$ids,
 		);
 		self::assertStringContainsString( 'github.com/apermo/linkstash-extension', $registered[2]['content'] );
-		self::assertStringContainsString( 'options-general.php?page=linkstash', $sidebar );
+		self::assertStringContainsString( 'options-general.php?page=apermo-stash', $sidebar );
 	}
 
 	/**

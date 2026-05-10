@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Rest;
+namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
-use Apermo\LinkStash\Url\Canonicalizer;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
+use Apermo\Stash\Url\Canonicalizer;
+use Apermo\Stash\Url\MetadataFetcher;
 use WP_Error;
 use WP_Post;
 use WP_Query;
@@ -19,9 +19,9 @@ use WP_REST_Response;
 use WP_REST_Server;
 
 /**
- * Handles bookmark CRUD over REST.
+ * Handles link CRUD over REST.
  */
-class BookmarksController {
+class LinksController {
 
 	private const MAX_PER_PAGE = 100;
 
@@ -44,15 +44,15 @@ class BookmarksController {
 	/**
 	 * Returns the visibility query fragments for the current request.
 	 *
-	 * Anonymous callers see only published bookmarks. Authenticated callers
-	 * see public bookmarks from anyone plus their own private bookmarks
+	 * Anonymous callers see only published links. Authenticated callers
+	 * see public links from anyone plus their own private links
 	 * (via WP_Query's `perm => 'readable'`). Callers with
 	 * `edit_others_posts` see everything.
 	 *
 	 * The optional `public` / `private` query params narrow the result:
-	 * `public=1` returns only public bookmarks (everyone's); `private=1`
-	 * returns only the caller's own private bookmarks (since others'
-	 * private bookmarks are never readable). When both or neither flag is
+	 * `public=1` returns only public links (everyone's); `private=1`
+	 * returns only the caller's own private links (since others'
+	 * private links are never readable). When both or neither flag is
 	 * set the default "own + public" behaviour applies.
 	 *
 	 * @param WP_REST_Request $request REST request.
@@ -206,8 +206,8 @@ class BookmarksController {
 		$favorite = $request->get_param( 'favorite' );
 		if ( $favorite !== null ) {
 			$meta_query[] = [
-				'key'   => BookmarkMeta::META_FAVORITE,
-				'value' => BookmarkMeta::sanitize_bool_meta( $favorite ),
+				'key'   => LinkMeta::META_FAVORITE,
+				'value' => LinkMeta::sanitize_bool_meta( $favorite ),
 			];
 		}
 
@@ -224,7 +224,7 @@ class BookmarksController {
 	public function register_routes( string $rest_namespace ): void {
 		register_rest_route(
 			$rest_namespace,
-			'/bookmarks',
+			'/links',
 			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
@@ -243,30 +243,30 @@ class BookmarksController {
 
 		register_rest_route(
 			$rest_namespace,
-			'/bookmarks/(?P<id>\d+)',
+			'/links/(?P<id>\d+)',
 			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_item' ],
-					'permission_callback' => [ Permissions::class, 'can_read_bookmark' ],
+					'permission_callback' => [ Permissions::class, 'can_read_link' ],
 				],
 				[
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => [ $this, 'update_item' ],
-					'permission_callback' => [ Permissions::class, 'can_edit_bookmark' ],
+					'permission_callback' => [ Permissions::class, 'can_edit_link' ],
 					'args'                => self::update_args(),
 				],
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_item' ],
-					'permission_callback' => [ Permissions::class, 'can_delete_bookmark' ],
+					'permission_callback' => [ Permissions::class, 'can_delete_link' ],
 				],
 			],
 		);
 	}
 
 	/**
-	 * Lists bookmarks.
+	 * Lists links.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -296,7 +296,7 @@ class BookmarksController {
 		$visibility = self::visibility_filter( $request );
 
 		$args = [
-			'post_type'      => BookmarkPostType::POST_TYPE,
+			'post_type'      => LinkPostType::POST_TYPE,
 			'paged'          => $page,
 			'posts_per_page' => $per_page,
 			'orderby'        => 'date',
@@ -314,7 +314,7 @@ class BookmarksController {
 		$tag = sanitize_text_field( (string) ( $request->get_param( 'tag' ) ?? '' ) );
 		if ( $tag !== '' ) {
 			// Tag filter is the documented way to scope the listing; the
-			// taxonomy is small in practice (one slug per saved bookmark tag).
+			// taxonomy is small in practice (one slug per saved link tag).
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 			$args['tax_query'] = [
 				[
@@ -342,7 +342,7 @@ class BookmarksController {
 	}
 
 	/**
-	 * Creates a bookmark with idempotent dedupe by canonical URL.
+	 * Creates a link with idempotent dedupe by canonical URL.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -356,12 +356,12 @@ class BookmarksController {
 	public function create_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$url = esc_url_raw( (string) $request->get_param( 'url' ) );
 		if ( $url === '' ) {
-			return new WP_Error( 'linkstash_missing_url', __( 'A url is required.', 'linkstash' ), [ 'status' => 400 ] );
+			return new WP_Error( 'apermo_stash_missing_url', __( 'A url is required.', 'apermo-stash' ), [ 'status' => 400 ] );
 		}
 
 		$canonical = Canonicalizer::canonicalize( $url );
 		if ( $canonical === '' ) {
-			return new WP_Error( 'linkstash_invalid_url', __( 'The url is not valid.', 'linkstash' ), [ 'status' => 400 ] );
+			return new WP_Error( 'apermo_stash_invalid_url', __( 'The url is not valid.', 'apermo-stash' ), [ 'status' => 400 ] );
 		}
 
 		$user_id  = get_current_user_id();
@@ -382,7 +382,7 @@ class BookmarksController {
 
 		$post_id = wp_insert_post(
 			[
-				'post_type'    => BookmarkPostType::POST_TYPE,
+				'post_type'    => LinkPostType::POST_TYPE,
 				'post_status'  => $is_public === true ? 'publish' : 'private',
 				'post_title'   => $title !== '' ? $title : $url,
 				'post_content' => $description,
@@ -395,9 +395,9 @@ class BookmarksController {
 			return $post_id;
 		}
 
-		update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
-		update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
-		update_post_meta( $post_id, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( self::optional_bool( $request, 'favorite' ) ?? false ) );
+		update_post_meta( $post_id, LinkMeta::META_URL, $url );
+		update_post_meta( $post_id, LinkMeta::META_URL_CANONICAL, $canonical );
+		update_post_meta( $post_id, LinkMeta::META_FAVORITE, LinkMeta::bool_to_meta( self::optional_bool( $request, 'favorite' ) ?? false ) );
 
 		if ( $tags !== [] ) {
 			wp_set_object_terms( $post_id, $tags, TagTaxonomy::TAXONOMY, false );
@@ -406,14 +406,14 @@ class BookmarksController {
 		$response = rest_ensure_response( $this->prepare_response( get_post( $post_id ) ) );
 		$response->set_status( 201 );
 		if ( $meta_fetched !== null ) {
-			$response->header( 'X-LinkStash-Meta-Fetched', $meta_fetched ? '1' : '0' );
+			$response->header( 'X-Apermo-Stash-Meta-Fetched', $meta_fetched ? '1' : '0' );
 		}
 
 		return $response;
 	}
 
 	/**
-	 * Returns a single bookmark.
+	 * Returns a single link.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -421,15 +421,15 @@ class BookmarksController {
 	 */
 	public function get_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$post = get_post( (int) $request['id'] );
-		if ( $post === null || $post->post_type !== BookmarkPostType::POST_TYPE ) {
-			return new WP_Error( 'linkstash_not_found', __( 'Bookmark not found.', 'linkstash' ), [ 'status' => 404 ] );
+		if ( $post === null || $post->post_type !== LinkPostType::POST_TYPE ) {
+			return new WP_Error( 'apermo_stash_not_found', __( 'Link not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
 		return rest_ensure_response( $this->prepare_response( $post ) );
 	}
 
 	/**
-	 * Updates an existing bookmark.
+	 * Updates an existing link.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -445,8 +445,8 @@ class BookmarksController {
 	public function update_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
-		if ( $post === null || $post->post_type !== BookmarkPostType::POST_TYPE ) {
-			return new WP_Error( 'linkstash_not_found', __( 'Bookmark not found.', 'linkstash' ), [ 'status' => 404 ] );
+		if ( $post === null || $post->post_type !== LinkPostType::POST_TYPE ) {
+			return new WP_Error( 'apermo_stash_not_found', __( 'Link not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
 		$update = [ 'ID' => $post_id ];
@@ -474,18 +474,18 @@ class BookmarksController {
 			$canonical = Canonicalizer::canonicalize( $url );
 			if ( $canonical === '' ) {
 				return new WP_Error(
-					'linkstash_invalid_url',
-					__( 'The url is not valid.', 'linkstash' ),
+					'apermo_stash_invalid_url',
+					__( 'The url is not valid.', 'apermo-stash' ),
 					[ 'status' => 400 ],
 				);
 			}
-			update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
-			update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
+			update_post_meta( $post_id, LinkMeta::META_URL, $url );
+			update_post_meta( $post_id, LinkMeta::META_URL_CANONICAL, $canonical );
 		}
 
 		$favorite = self::optional_bool( $request, 'favorite' );
 		if ( $favorite !== null ) {
-			update_post_meta( $post_id, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( $favorite ) );
+			update_post_meta( $post_id, LinkMeta::META_FAVORITE, LinkMeta::bool_to_meta( $favorite ) );
 		}
 
 		if ( $request->has_param( 'tags' ) ) {
@@ -497,7 +497,7 @@ class BookmarksController {
 	}
 
 	/**
-	 * Deletes a bookmark.
+	 * Deletes a link.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -506,13 +506,13 @@ class BookmarksController {
 	public function delete_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
-		if ( $post === null || $post->post_type !== BookmarkPostType::POST_TYPE ) {
-			return new WP_Error( 'linkstash_not_found', __( 'Bookmark not found.', 'linkstash' ), [ 'status' => 404 ] );
+		if ( $post === null || $post->post_type !== LinkPostType::POST_TYPE ) {
+			return new WP_Error( 'apermo_stash_not_found', __( 'Link not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
 		$deleted = wp_delete_post( $post_id, true );
 		if ( $deleted === false || $deleted === null ) {
-			return new WP_Error( 'linkstash_delete_failed', __( 'Could not delete bookmark.', 'linkstash' ), [ 'status' => 500 ] );
+			return new WP_Error( 'apermo_stash_delete_failed', __( 'Could not delete link.', 'apermo-stash' ), [ 'status' => 500 ] );
 		}
 
 		return rest_ensure_response(
@@ -524,14 +524,14 @@ class BookmarksController {
 	}
 
 	/**
-	 * Updates an existing bookmark to match the create-item request body.
+	 * Updates an existing link to match the create-item request body.
 	 *
 	 * Treats POST as idempotent: tags replace the existing set (rather than
 	 * append), and any field present in the request — title, description,
 	 * unread, archived, public — overwrites what is currently stored. Fields
 	 * the caller did not send are left alone.
 	 *
-	 * @param WP_Post           $existing    Existing bookmark.
+	 * @param WP_Post           $existing    Existing link.
 	 * @param WP_REST_Request   $request     REST request.
 	 * @param array<int,string> $tags        Tags from the request (may be empty).
 	 * @param string            $title       Resolved title (post-enrichment).
@@ -573,7 +573,7 @@ class BookmarksController {
 
 		$favorite = self::optional_bool( $request, 'favorite' );
 		if ( $favorite !== null ) {
-			update_post_meta( $existing->ID, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( $favorite ) );
+			update_post_meta( $existing->ID, LinkMeta::META_FAVORITE, LinkMeta::bool_to_meta( $favorite ) );
 		}
 
 		// Re-fetch by ID so prepare_response sees the post_status that
@@ -581,13 +581,13 @@ class BookmarksController {
 		$fresh = get_post( $existing->ID );
 		$response = rest_ensure_response( $this->prepare_response( $fresh ) );
 		$response->set_status( 200 );
-		$response->header( 'X-LinkStash-Existing', '1' );
+		$response->header( 'X-Apermo-Stash-Existing', '1' );
 
 		return $response;
 	}
 
 	/**
-	 * Locates a bookmark for the user by canonical URL.
+	 * Locates a link for the user by canonical URL.
 	 *
 	 * @param int    $user_id   User ID.
 	 * @param string $canonical Canonical URL.
@@ -601,7 +601,7 @@ class BookmarksController {
 	 * Returns the resolved title, description, and a `reachable` flag that
 	 * is null when the fetcher wasn't called and bool when it was.
 	 *
-	 * @param string $url         Bookmark URL.
+	 * @param string $url         Link URL.
 	 * @param string $title       Caller-supplied title.
 	 * @param string $description Caller-supplied description.
 	 *
@@ -625,7 +625,7 @@ class BookmarksController {
 	}
 
 	/**
-	 * Locates a bookmark for the user by canonical URL.
+	 * Locates a link for the user by canonical URL.
 	 *
 	 * @param int    $user_id   User ID.
 	 * @param string $canonical Canonical URL.
@@ -635,7 +635,7 @@ class BookmarksController {
 	private function find_by_canonical( int $user_id, string $canonical ): ?WP_Post {
 		$query = new WP_Query(
 			[
-				'post_type'      => BookmarkPostType::POST_TYPE,
+				'post_type'      => LinkPostType::POST_TYPE,
 				'author'         => $user_id,
 				'posts_per_page' => 1,
 				'post_status'    => [ 'publish', 'private' ],
@@ -645,7 +645,7 @@ class BookmarksController {
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 				'meta_query'     => [
 					[
-						'key'   => BookmarkMeta::META_URL_CANONICAL,
+						'key'   => LinkMeta::META_URL_CANONICAL,
 						'value' => $canonical,
 					],
 				],
@@ -684,7 +684,7 @@ class BookmarksController {
 	}
 
 	/**
-	 * Prepares a bookmark for the REST response shape.
+	 * Prepares a link for the REST response shape.
 	 *
 	 * @param WP_Post|null $post WP post.
 	 *
@@ -705,11 +705,11 @@ class BookmarksController {
 
 		return [
 			'id'          => $post->ID,
-			'url'         => (string) get_post_meta( $post->ID, BookmarkMeta::META_URL, true ),
+			'url'         => (string) get_post_meta( $post->ID, LinkMeta::META_URL, true ),
 			'title'       => $post->post_title,
 			'description' => $post->post_content,
 			'tags'        => $tags,
-			'favorite'    => (bool) get_post_meta( $post->ID, BookmarkMeta::META_FAVORITE, true ),
+			'favorite'    => (bool) get_post_meta( $post->ID, LinkMeta::META_FAVORITE, true ),
 			'public'      => $post->post_status === 'publish',
 			'created'     => mysql2date( 'c', $post->post_date_gmt, false ),
 			'modified'    => mysql2date( 'c', $post->post_modified_gmt, false ),

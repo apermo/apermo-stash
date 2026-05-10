@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Rest;
+namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\LinkStash\Rest\TagsController;
-use Apermo\LinkStash\Tests\Unit\Rest\Fixtures\WpdbMockForTags;
+use Apermo\Stash\Rest\TagsController;
+use Apermo\Stash\Tests\Unit\Rest\Fixtures\WpdbMockForTags;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
@@ -79,10 +79,10 @@ class TagsControllerTest extends TestCase {
 		Functions\expect( 'register_rest_route' )
 			->once()
 			->withArgs(
-				static fn ( string $rest_namespace, string $route ): bool => $rest_namespace === 'linkstash/v1' && $route === '/tags',
+				static fn ( string $rest_namespace, string $route ): bool => $rest_namespace === 'apermo-stash/v1' && $route === '/tags',
 			);
 
-		( new TagsController() )->register_routes( 'linkstash/v1' );
+		( new TagsController() )->register_routes( 'apermo-stash/v1' );
 	}
 
 	/**
@@ -146,7 +146,7 @@ class TagsControllerTest extends TestCase {
 		self::assertStringContainsString( 'tt.taxonomy = %s', $where );
 		self::assertStringContainsString( 'p.post_status IN (%s)', $where );
 		self::assertStringNotContainsString( 'post_author', $where );
-		self::assertSame( [ 'linkstash_bookmark', 'linkstash_tag', 'publish' ], $args );
+		self::assertSame( [ 'apermo_stash_link', 'apermo_stash_tag', 'publish' ], $args );
 	}
 
 	/**
@@ -167,7 +167,7 @@ class TagsControllerTest extends TestCase {
 
 		self::assertStringContainsString( "(p.post_status = 'publish' OR p.post_author = %d)", $where );
 		self::assertSame(
-			[ 'linkstash_bookmark', 'linkstash_tag', 'publish', 'private', 7 ],
+			[ 'apermo_stash_link', 'apermo_stash_tag', 'publish', 'private', 7 ],
 			$args,
 		);
 	}
@@ -188,6 +188,6 @@ class TagsControllerTest extends TestCase {
 
 		self::assertStringContainsString( 'p.post_author IN (%d)', $where );
 		self::assertStringNotContainsString( "(p.post_status = 'publish'", $where );
-		self::assertSame( [ 'linkstash_bookmark', 'linkstash_tag', 'private', 7 ], $args );
+		self::assertSame( [ 'apermo_stash_link', 'apermo_stash_tag', 'private', 7 ], $args );
 	}
 }

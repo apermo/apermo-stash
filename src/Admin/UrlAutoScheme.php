@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 
 \defined( 'ABSPATH' ) || exit();
 
@@ -12,7 +12,7 @@ use Apermo\LinkStash\PostType\BookmarkPostType;
  * Prepends `https://` to bare URL inputs when the user tabs away.
  *
  * Saves the user from typing the scheme on every quick-add. Targets any
- * `<input type="url">` that opts in via `data-linkstash-url-input`. The
+ * `<input type="url">` that opts in via `data-apermo-stash-url-input`. The
  * blur handler is conservative: it leaves anything that already looks
  * scheme-prefixed alone (`http://`, `https://`, `mailto:`, `//host/...`,
  * etc.).
@@ -20,7 +20,7 @@ use Apermo\LinkStash\PostType\BookmarkPostType;
 class UrlAutoScheme {
 
 	/**
-	 * Returns true on screens that render a LinkStash URL input.
+	 * Returns true on screens that render an Apermo Stash URL input.
 	 *
 	 * @param string $hook Hook suffix passed to admin_enqueue_scripts.
 	 *
@@ -32,14 +32,14 @@ class UrlAutoScheme {
 			return true;
 		}
 
-		// Bookmark add/edit screens carry the URL meta box.
+		// Link add/edit screens carry the URL meta box.
 		if ( ! \in_array( $hook, [ 'post.php', 'post-new.php' ], true ) ) {
 			return false;
 		}
 
 		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
-		return $screen !== null && $screen->post_type === BookmarkPostType::POST_TYPE;
+		return $screen !== null && $screen->post_type === LinkPostType::POST_TYPE;
 	}
 
 	/**
@@ -59,7 +59,7 @@ class UrlAutoScheme {
 			. "\t\t} );\n"
 			. "\t}\n"
 			. "\tfunction init() {\n"
-			. "\t\tdocument.querySelectorAll( 'input[data-linkstash-url-input]' ).forEach( attach );\n"
+			. "\t\tdocument.querySelectorAll( 'input[data-apermo-stash-url-input]' ).forEach( attach );\n"
 			. "\t}\n"
 			. "\tif ( document.readyState === 'loading' ) {\n"
 			. "\t\tdocument.addEventListener( 'DOMContentLoaded', init );\n"
@@ -80,7 +80,7 @@ class UrlAutoScheme {
 
 	/**
 	 * Enqueues the blur-handler script on every screen that renders a
-	 * LinkStash URL input.
+	 * Apermo Stash URL input.
 	 *
 	 * @param string $hook Current admin screen hook suffix.
 	 *
@@ -91,8 +91,8 @@ class UrlAutoScheme {
 			return;
 		}
 
-		wp_register_script( 'linkstash-url-auto-scheme', false, [], '0.1.0', true );
-		wp_enqueue_script( 'linkstash-url-auto-scheme' );
-		wp_add_inline_script( 'linkstash-url-auto-scheme', self::handler_js() );
+		wp_register_script( 'apermo-stash-url-auto-scheme', false, [], '0.1.0', true );
+		wp_enqueue_script( 'apermo-stash-url-auto-scheme' );
+		wp_add_inline_script( 'apermo-stash-url-auto-scheme', self::handler_js() );
 	}
 }

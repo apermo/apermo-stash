@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\QuickAdd;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\Admin\QuickAdd;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\Url\MetadataFetcher;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -66,7 +66,7 @@ class QuickAddTest extends TestCase {
 		$quick = $this->quick_add();
 		$quick->register();
 
-		self::assertNotFalse( has_action( 'admin_post_linkstash_quick_add', [ $quick, 'handle_submission' ] ) );
+		self::assertNotFalse( has_action( 'admin_post_apermo_stash_quick_add', [ $quick, 'handle_submission' ] ) );
 		self::assertFalse( has_action( 'all_admin_notices' ) );
 	}
 
@@ -77,10 +77,10 @@ class QuickAddTest extends TestCase {
 	 */
 	public function test_render_form_html_outputs_form(): void {
 		\ob_start();
-		QuickAdd::render_form_html( 'linkstash-dashboard-widget' );
+		QuickAdd::render_form_html( 'apermo-stash-dashboard-widget' );
 		$output = (string) \ob_get_clean();
 
-		self::assertStringContainsString( 'linkstash-dashboard-widget', $output );
+		self::assertStringContainsString( 'apermo-stash-dashboard-widget', $output );
 		self::assertStringContainsString( 'name="url"', $output );
 		self::assertStringContainsString( 'name="tags"', $output );
 		self::assertStringContainsString( 'name="public"', $output );
@@ -112,7 +112,7 @@ class QuickAddTest extends TestCase {
 	}
 
 	/**
-	 * Verifies list_url builds an admin URL with the bookmark CPT plus a notice query arg.
+	 * Verifies list_url builds an admin URL with the link CPT plus a notice query arg.
 	 *
 	 * @return void
 	 */
@@ -126,8 +126,8 @@ class QuickAddTest extends TestCase {
 		$method = ( new ReflectionClass( QuickAdd::class ) )->getMethod( 'list_url' );
 		$url    = (string) $method->invoke( null, 'saved' );
 
-		self::assertStringContainsString( 'post_type=' . BookmarkPostType::POST_TYPE, $url );
-		self::assertStringContainsString( 'linkstash_notice=saved', $url );
+		self::assertStringContainsString( 'post_type=' . LinkPostType::POST_TYPE, $url );
+		self::assertStringContainsString( 'apermo_stash_notice=saved', $url );
 	}
 
 	/**

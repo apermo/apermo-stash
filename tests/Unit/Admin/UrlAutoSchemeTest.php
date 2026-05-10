@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\UrlAutoScheme;
-use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\Stash\Admin\UrlAutoScheme;
+use Apermo\Stash\PostType\LinkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
@@ -55,21 +55,21 @@ class UrlAutoSchemeTest extends TestCase {
 	 */
 	public function test_enqueues_on_dashboard(): void {
 		Functions\when( 'wp_register_script' )->justReturn( true );
-		Functions\expect( 'wp_enqueue_script' )->once()->with( 'linkstash-url-auto-scheme' );
+		Functions\expect( 'wp_enqueue_script' )->once()->with( 'apermo-stash-url-auto-scheme' );
 		Functions\when( 'wp_add_inline_script' )->justReturn( true );
 
 		( new UrlAutoScheme() )->maybe_enqueue( 'index.php' );
 	}
 
 	/**
-	 * Verifies the bookmark edit screen enqueues the script.
+	 * Verifies the link edit screen enqueues the script.
 	 *
 	 * @return void
 	 */
-	public function test_enqueues_on_bookmark_edit_screen(): void {
+	public function test_enqueues_on_link_edit_screen(): void {
 		$screen            = new WP_Screen();
 		$screen->base      = 'post';
-		$screen->post_type = BookmarkPostType::POST_TYPE;
+		$screen->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_current_screen' )->justReturn( $screen );
 
 		Functions\when( 'wp_register_script' )->justReturn( true );
@@ -91,12 +91,12 @@ class UrlAutoSchemeTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the bookmark list screen is skipped — the quick-add
+	 * Verifies the link list screen is skipped — the quick-add
 	 * form is no longer rendered there, so no URL inputs to bind.
 	 *
 	 * @return void
 	 */
-	public function test_skips_bookmark_list_screen(): void {
+	public function test_skips_link_list_screen(): void {
 		Functions\expect( 'wp_enqueue_script' )->never();
 
 		( new UrlAutoScheme() )->maybe_enqueue( 'edit.php' );

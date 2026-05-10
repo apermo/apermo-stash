@@ -1,6 +1,6 @@
-# LinkStash branding source files
+# Apermo Stash branding source files
 
-This directory holds the source-of-truth artwork for the LinkStash brand
+This directory holds the source-of-truth artwork for the Apermo Stash brand
 mark. It is **excluded from the plugin zip** via `.gitattributes`
 (`/branding/ export-ignore`) and from the WordPress.org `/trunk/` deploy
 via the same mechanism — see `10up/action-wordpress-plugin-deploy`'s

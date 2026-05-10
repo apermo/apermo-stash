@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Url;
+namespace Apermo\Stash\Tests\Unit\Url;
 
-use Apermo\LinkStash\Url\Canonicalizer;
+use Apermo\Stash\Url\Canonicalizer;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\Attributes\DataProvider;

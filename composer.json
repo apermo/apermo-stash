@@ -1,6 +1,6 @@
 {
-    "name": "apermo/linkstash",
-    "description": "A WordPress linkstash plugin.",
+    "name": "apermo/apermo-stash",
+    "description": "Apermo Stash — a self-hosted WordPress bookmark collection with a token-protected REST API.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [
@@ -23,12 +23,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Apermo\\LinkStash\\": "src/"
+            "Apermo\\Stash\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Apermo\\LinkStash\\Tests\\": "tests/"
+            "Apermo\\Stash\\Tests\\": "tests/"
         }
     },
     "scripts": {

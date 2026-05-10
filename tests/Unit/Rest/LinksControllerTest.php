@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Rest;
+namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\Rest\BookmarksController;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\Rest\LinksController;
+use Apermo\Stash\Url\MetadataFetcher;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -18,9 +18,9 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 /**
- * Tests the BookmarksController REST handlers.
+ * Tests the LinksController REST handlers.
  */
-class BookmarksControllerTest extends TestCase {
+class LinksControllerTest extends TestCase {
 
 	/**
 	 * Sets up Brain Monkey and the WP_Query stub queue.
@@ -68,7 +68,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_register_routes_registers_two_route_groups(): void {
 		Functions\expect( 'register_rest_route' )->twice();
 
-		$this->controller()->register_routes( 'linkstash/v1' );
+		$this->controller()->register_routes( 'apermo-stash/v1' );
 	}
 
 	/**
@@ -80,7 +80,7 @@ class BookmarksControllerTest extends TestCase {
 		$post              = new WP_Post();
 		$post->ID          = 1;
 		$post->post_status = 'publish';
-		$post->post_title  = 'A bookmark';
+		$post->post_title  = 'A link';
 
 		WP_Query::$results[] = [
 			'posts'         => [ $post ],
@@ -107,7 +107,7 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->create_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_missing_url', $result->code );
+		self::assertSame( 'apermo_stash_missing_url', $result->code );
 	}
 
 	/**
@@ -122,11 +122,11 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->create_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_invalid_url', $result->code );
+		self::assertSame( 'apermo_stash_invalid_url', $result->code );
 	}
 
 	/**
-	 * Verifies get_item returns 404 for a non-bookmark post.
+	 * Verifies get_item returns 404 for a non-link post.
 	 *
 	 * @return void
 	 */
@@ -139,18 +139,18 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->get_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_not_found', $result->code );
+		self::assertSame( 'apermo_stash_not_found', $result->code );
 	}
 
 	/**
-	 * Verifies get_item wraps a found bookmark in a REST response.
+	 * Verifies get_item wraps a found link in a REST response.
 	 *
 	 * @return void
 	 */
-	public function test_get_item_returns_response_for_known_bookmark(): void {
+	public function test_get_item_returns_response_for_known_link(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
-		$post->post_type = BookmarkPostType::POST_TYPE;
+		$post->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_post' )->justReturn( $post );
 
 		$request         = new WP_REST_Request();
@@ -163,7 +163,7 @@ class BookmarksControllerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies update_item returns 404 for a non-bookmark post.
+	 * Verifies update_item returns 404 for a non-link post.
 	 *
 	 * @return void
 	 */
@@ -176,7 +176,7 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->update_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_not_found', $result->code );
+		self::assertSame( 'apermo_stash_not_found', $result->code );
 	}
 
 	/**
@@ -187,7 +187,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_update_item_rejects_invalid_url_update(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
-		$post->post_type = BookmarkPostType::POST_TYPE;
+		$post->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_post' )->justReturn( $post );
 
 		$request         = new WP_REST_Request();
@@ -199,11 +199,11 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->update_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_invalid_url', $result->code );
+		self::assertSame( 'apermo_stash_invalid_url', $result->code );
 	}
 
 	/**
-	 * Verifies delete_item returns 404 for a non-bookmark post.
+	 * Verifies delete_item returns 404 for a non-link post.
 	 *
 	 * @return void
 	 */
@@ -216,7 +216,7 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->delete_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_not_found', $result->code );
+		self::assertSame( 'apermo_stash_not_found', $result->code );
 	}
 
 	/**
@@ -227,7 +227,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_delete_item_returns_success(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
-		$post->post_type = BookmarkPostType::POST_TYPE;
+		$post->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_post' )->justReturn( $post );
 		Functions\when( 'wp_delete_post' )->justReturn( $post );
 
@@ -242,11 +242,11 @@ class BookmarksControllerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies create_item persists a fresh bookmark and returns 201.
+	 * Verifies create_item persists a fresh link and returns 201.
 	 *
 	 * @return void
 	 */
-	public function test_create_item_persists_new_bookmark(): void {
+	public function test_create_item_persists_new_link(): void {
 		// First WP_Query: dedupe lookup returns nothing.
 		WP_Query::$results[] = [ 'posts' => [] ];
 
@@ -273,7 +273,7 @@ class BookmarksControllerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies create_item returns the existing bookmark on dedupe match.
+	 * Verifies create_item returns the existing link on dedupe match.
 	 *
 	 * @return void
 	 */
@@ -299,7 +299,7 @@ class BookmarksControllerTest extends TestCase {
 
 		self::assertInstanceOf( WP_REST_Response::class, $response );
 		self::assertSame( 200, $response->status );
-		self::assertSame( '1', $response->headers['X-LinkStash-Existing'] );
+		self::assertSame( '1', $response->headers['X-Apermo-Stash-Existing'] );
 	}
 
 	/**
@@ -310,7 +310,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_update_item_applies_changes(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
-		$post->post_type = BookmarkPostType::POST_TYPE;
+		$post->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_post' )->justReturn( $post );
 		Functions\when( 'wp_update_post' )->justReturn( 7 );
 		Functions\when( 'is_wp_error' )->justReturn( false );
@@ -340,7 +340,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_delete_item_returns_500_on_failure(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
-		$post->post_type = BookmarkPostType::POST_TYPE;
+		$post->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_post' )->justReturn( $post );
 		Functions\when( 'wp_delete_post' )->justReturn( false );
 
@@ -350,15 +350,15 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->delete_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_delete_failed', $result->code );
+		self::assertSame( 'apermo_stash_delete_failed', $result->code );
 	}
 
 	/**
 	 * Builds a controller wired to a Mockery'd metadata fetcher.
 	 *
-	 * @return BookmarksController
+	 * @return LinksController
 	 */
-	private function controller(): BookmarksController {
+	private function controller(): LinksController {
 		$fetcher = Mockery::mock( MetadataFetcher::class );
 		$fetcher->shouldReceive( 'fetch' )->andReturn(
 			[
@@ -368,6 +368,6 @@ class BookmarksControllerTest extends TestCase {
 			],
 		);
 
-		return new BookmarksController( $fetcher );
+		return new LinksController( $fetcher );
 	}
 }

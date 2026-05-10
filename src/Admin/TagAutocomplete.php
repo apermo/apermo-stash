@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
-use Apermo\LinkStash\PostType\TagTaxonomy;
+use Apermo\Stash\PostType\TagTaxonomy;
 
 \defined( 'ABSPATH' ) || exit();
 
 /**
  * Wires jQuery UI autocomplete to the comma-separated tags inputs in the
- * dashboard widget and the bookmark list-screen quick-add form.
+ * dashboard widget and the link list-screen quick-add form.
  *
  * Backs onto WordPress's existing `ajax-tag-search` admin-ajax endpoint,
  * which natively understands any taxonomy registered with `show_ui` true
  * — so all we contribute is the script enqueue and a small adapter that
  * suggests against only the last comma-separated segment of the input.
  *
- * The bookmark edit screen relies on core's standard taxonomy meta box,
+ * The link edit screen relies on core's standard taxonomy meta box,
  * which already ships its own autocomplete; this class only targets the
  * standalone forms.
  */
@@ -49,7 +49,7 @@ class TagAutocomplete {
 
 	/**
 	 * Returns the inline adapter script that wires jQuery UI autocomplete
-	 * to inputs marked with `data-linkstash-tag-autocomplete="<taxonomy>"`.
+	 * to inputs marked with `data-apermo-stash-tag-autocomplete="<taxonomy>"`.
 	 *
 	 * @return string
 	 */
@@ -58,9 +58,9 @@ class TagAutocomplete {
 
 		return "( function ( \$ ) {\n"
 			. "\t\$( function () {\n"
-			. "\t\t\$( 'input[data-linkstash-tag-autocomplete]' ).each( function () {\n"
+			. "\t\t\$( 'input[data-apermo-stash-tag-autocomplete]' ).each( function () {\n"
 			. "\t\t\tvar \$input = \$( this );\n"
-			. "\t\t\tvar taxonomy = \$input.data( 'linkstashTagAutocomplete' ) || '" . $taxonomy . "';\n"
+			. "\t\t\tvar taxonomy = \$input.data( 'apermoStashTagAutocomplete' ) || '" . $taxonomy . "';\n"
 			. "\t\t\t\$input.autocomplete( {\n"
 			. "\t\t\t\tminLength: 1,\n"
 			. "\t\t\t\tsource: function ( request, response ) {\n"
@@ -109,7 +109,7 @@ class TagAutocomplete {
 
 	/**
 	 * Enqueues jQuery UI autocomplete + adapter on the screens that show
-	 * a quick-add form (dashboard, bookmark list table).
+	 * a quick-add form (dashboard, link list table).
 	 *
 	 * @param string $hook Current admin screen hook suffix.
 	 *
@@ -122,8 +122,8 @@ class TagAutocomplete {
 
 		wp_enqueue_script( 'jquery-ui-autocomplete' );
 		wp_add_inline_script( 'jquery-ui-autocomplete', self::adapter_js() );
-		wp_register_style( 'linkstash-tag-autocomplete', false, [], '0.1.0' );
-		wp_enqueue_style( 'linkstash-tag-autocomplete' );
-		wp_add_inline_style( 'linkstash-tag-autocomplete', self::dropdown_css() );
+		wp_register_style( 'apermo-stash-tag-autocomplete', false, [], '0.1.0' );
+		wp_enqueue_style( 'apermo-stash-tag-autocomplete' );
+		wp_add_inline_style( 'apermo-stash-tag-autocomplete', self::dropdown_css() );
 	}
 }

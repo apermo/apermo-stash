@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Rest;
+namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\LinkStash\Rest\CorsHandler;
+use Apermo\Stash\Rest\CorsHandler;
 use Brain\Monkey;
 use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
@@ -103,7 +103,7 @@ class CorsHandlerTest extends TestCase {
 
 	/**
 	 * Verifies send_cors_response is a no-op when the request is not for
-	 * a LinkStash route, returning the unchanged $served value.
+	 * an Apermo Stash route, returning the unchanged $served value.
 	 *
 	 * @return void
 	 */
@@ -124,10 +124,10 @@ class CorsHandlerTest extends TestCase {
 	 */
 	public function test_send_cors_response_skips_unknown_origin(): void {
 		$_SERVER['REQUEST_METHOD'] = 'POST';
-		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['REQUEST_URI']    = '/wp-json/apermo-stash/v1/links';
 		$_SERVER['HTTP_ORIGIN']    = 'https://attacker.tld';
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+		Filters\expectApplied( 'apermo_stash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
 
 		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
 		self::assertFalse( $result );
@@ -140,10 +140,10 @@ class CorsHandlerTest extends TestCase {
 	 */
 	public function test_send_cors_response_serves_options_preflight(): void {
 		$_SERVER['REQUEST_METHOD'] = 'OPTIONS';
-		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['REQUEST_URI']    = '/wp-json/apermo-stash/v1/links';
 		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+		Filters\expectApplied( 'apermo_stash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
 		Functions\when( 'status_header' )->justReturn( null );
 
 		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
@@ -151,17 +151,17 @@ class CorsHandlerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies send_cors_response on a non-OPTIONS LinkStash request returns
+	 * Verifies send_cors_response on a non-OPTIONS Apermo Stash request returns
 	 * $served unchanged (we set headers but don't short-circuit the body).
 	 *
 	 * @return void
 	 */
 	public function test_send_cors_response_passes_through_post(): void {
 		$_SERVER['REQUEST_METHOD'] = 'POST';
-		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['REQUEST_URI']    = '/wp-json/apermo-stash/v1/links';
 		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+		Filters\expectApplied( 'apermo_stash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
 
 		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
 		self::assertFalse( $result );

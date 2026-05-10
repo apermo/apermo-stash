@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Rest;
+namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -17,7 +17,7 @@ use WP_REST_Server;
  */
 class TagsController {
 
-	private const CACHE_GROUP   = 'linkstash';
+	private const CACHE_GROUP   = 'apermo-stash';
 	private const CACHE_VERSION = 2;
 
 	/**
@@ -60,7 +60,7 @@ class TagsController {
 		[ $where, $args ] = self::build_where_clause( $visibility );
 
 		// Single aggregate replacing the previous "fetch every visible
-		// bookmark id, then ask get_terms for counts" fan-out. Joins to
+		// link id, then ask get_terms for counts" fan-out. Joins to
 		// indexed columns (post_type, post_status, taxonomy) keep this
 		// fast as the bookmark library grows.
 		$sql = "SELECT t.term_id AS id, t.name, t.slug, COUNT(DISTINCT p.ID) AS count
@@ -105,7 +105,7 @@ class TagsController {
 	 */
 	public static function build_where_clause( array $visibility ): array {
 		$args  = [
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			TagTaxonomy::TAXONOMY,
 		];
 		$where = 'p.post_type = %s AND tt.taxonomy = %s';
@@ -152,19 +152,19 @@ class TagsController {
 	}
 
 	/**
-	 * Lists tags with bookmark counts that respect the requester's visibility.
+	 * Lists tags with link counts that respect the requester's visibility.
 	 *
 	 * Counts are computed in a single aggregate SQL statement that joins
 	 * the terms/term_taxonomy/term_relationships tables to the posts
 	 * table, applying the same visibility constraints used by the
-	 * bookmarks list endpoint.
+	 * links list endpoint.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
 	 * @return WP_REST_Response
 	 */
 	public function list_items( WP_REST_Request $request ): WP_REST_Response {
-		$visibility = BookmarksController::visibility_filter( $request );
+		$visibility = LinksController::visibility_filter( $request );
 		$rows       = self::fetch_term_counts( $visibility );
 
 		$items = [];

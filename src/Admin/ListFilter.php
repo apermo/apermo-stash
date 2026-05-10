@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
 use WP_Query;
 
 /**
- * Wires URL-parameter filters on the bookmark list table.
+ * Wires URL-parameter filters on the link list table.
  *
- * `?favorite=1` narrows the list to favorited bookmarks; the standard
- * `?linkstash_tag=<slug>` taxonomy filter is handled by core.
+ * `?favorite=1` narrows the list to favorited links; the standard
+ * `?apermo_stash_tag=<slug>` taxonomy filter is handled by core.
  */
 class ListFilter {
 
 	/**
 	 * Hooks `pre_get_posts` to add the favorite meta_query when the
-	 * caller passes `?favorite=1` on the bookmark list screen.
+	 * caller passes `?favorite=1` on the link list screen.
 	 *
 	 * @return void
 	 */
@@ -29,7 +29,7 @@ class ListFilter {
 	}
 
 	/**
-	 * Adds a `_linkstash_favorite = 1` meta_query when the URL says so.
+	 * Adds a `_apermo_stash_favorite = 1` meta_query when the URL says so.
 	 *
 	 * @param WP_Query $query Current query.
 	 *
@@ -39,7 +39,7 @@ class ListFilter {
 		if ( ! is_admin() || ! $query->is_main_query() ) {
 			return;
 		}
-		if ( $query->get( 'post_type' ) !== BookmarkPostType::POST_TYPE ) {
+		if ( $query->get( 'post_type' ) !== LinkPostType::POST_TYPE ) {
 			return;
 		}
 
@@ -54,8 +54,8 @@ class ListFilter {
 		$existing = $query->get( 'meta_query' );
 		$existing = \is_array( $existing ) ? $existing : [];
 
-		$existing['linkstash_favorite'] = [
-			'key'   => BookmarkMeta::META_FAVORITE,
+		$existing['apermo_stash_favorite'] = [
+			'key'   => LinkMeta::META_FAVORITE,
 			'value' => '1',
 		];
 		$query->set( 'meta_query', $existing );

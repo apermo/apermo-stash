@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Auth;
+namespace Apermo\Stash\Tests\Unit\Auth;
 
-use Apermo\LinkStash\Auth\BearerTokenAuth;
-use Apermo\LinkStash\Auth\TokenStore;
+use Apermo\Stash\Auth\BearerTokenAuth;
+use Apermo\Stash\Auth\TokenStore;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;

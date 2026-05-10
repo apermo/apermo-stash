@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\PostType;
+namespace Apermo\Stash\PostType;
 
 \defined( 'ABSPATH' ) || exit();
 
 /**
- * Registers post-meta keys for the bookmark CPT.
+ * Registers post-meta keys for the link CPT.
  */
-class BookmarkMeta {
+class LinkMeta {
 
-	public const META_URL           = '_linkstash_url';
-	public const META_URL_CANONICAL = '_linkstash_url_canonical';
-	public const META_FAVORITE      = '_linkstash_favorite';
-	public const META_UNREACHABLE   = '_linkstash_unreachable';
+	public const META_URL           = '_apermo_stash_url';
+	public const META_URL_CANONICAL = '_apermo_stash_url_canonical';
+	public const META_FAVORITE      = '_apermo_stash_favorite';
+	public const META_UNREACHABLE   = '_apermo_stash_unreachable';
 
 	/**
 	 * Registers a single-value string meta with REST exposure.
@@ -26,7 +26,7 @@ class BookmarkMeta {
 	 */
 	private static function register_string_meta( string $key, callable $auth_cb ): void {
 		register_post_meta(
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			$key,
 			[
 				'type'              => 'string',
@@ -49,7 +49,7 @@ class BookmarkMeta {
 	 */
 	private static function register_bool_meta( string $key, callable $auth_cb ): void {
 		register_post_meta(
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			$key,
 			[
 				'type'              => 'boolean',
@@ -100,7 +100,7 @@ class BookmarkMeta {
 	}
 
 	/**
-	 * Registers all bookmark meta keys with REST exposure.
+	 * Registers all link meta keys with REST exposure.
 	 *
 	 * @return void
 	 */

@@ -286,7 +286,7 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
 	/**
 	 * Minimal WP_REST_Request stand-in for unit tests.
 	 *
-	 * Mirrors only the surface that LinkStash code touches: `get_param`,
+	 * Mirrors only the surface that Apermo Stash code touches: `get_param`,
 	 * `has_param`, and `ArrayAccess`. Mockery extends this class to mock
 	 * specific methods per test.
 	 *

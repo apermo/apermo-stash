@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\TagAutocomplete;
+use Apermo\Stash\Admin\TagAutocomplete;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
@@ -73,12 +73,12 @@ class TagAutocompleteTest extends TestCase {
 	}
 
 	/**
-	 * Verifies it skips the bookmark list screen — the quick-add form
+	 * Verifies it skips the link list screen — the quick-add form
 	 * is no longer rendered there, so there are no inputs to bind to.
 	 *
 	 * @return void
 	 */
-	public function test_skips_bookmark_list_screen(): void {
+	public function test_skips_link_list_screen(): void {
 		Functions\expect( 'wp_enqueue_script' )->never();
 
 		( new TagAutocomplete() )->maybe_enqueue( 'edit.php' );

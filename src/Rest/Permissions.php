@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Rest;
+namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 use WP_Error;
 use WP_REST_Request;
 
 /**
- * Holds permission callbacks shared by the LinkStash REST controllers.
+ * Holds permission callbacks shared by the Apermo Stash REST controllers.
  */
 class Permissions {
 
@@ -26,15 +26,15 @@ class Permissions {
 	}
 
 	/**
-	 * Allows write requests when the resolved user can edit bookmarks.
+	 * Allows write requests when the resolved user can edit links.
 	 *
 	 * @return bool|WP_Error
 	 */
 	public static function require_edit_posts(): bool|WP_Error {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error(
-				'linkstash_forbidden',
-				__( 'You are not allowed to create or modify bookmarks.', 'linkstash' ),
+				'apermo_stash_forbidden',
+				__( 'You are not allowed to create or modify links.', 'apermo-stash' ),
 				[ 'status' => 403 ],
 			);
 		}
@@ -44,20 +44,20 @@ class Permissions {
 
 	/**
 	 * Allows read-only requests against the bookmark library when the
-	 * resolved user can edit bookmarks.
+	 * resolved user can edit links.
 	 *
-	 * Same capability check as `require_edit_posts` — bookmark reads via
+	 * Same capability check as `require_edit_posts` — link reads via
 	 * `/check` and friends are editor-only by design — but the error
 	 * message is phrased for a read context so callers see the right
 	 * thing on a 403.
 	 *
 	 * @return bool|WP_Error
 	 */
-	public static function require_read_bookmarks(): bool|WP_Error {
+	public static function require_read_links(): bool|WP_Error {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error(
-				'linkstash_forbidden',
-				__( 'You are not allowed to read bookmarks.', 'linkstash' ),
+				'apermo_stash_forbidden',
+				__( 'You are not allowed to read links.', 'apermo-stash' ),
 				[ 'status' => 403 ],
 			);
 		}
@@ -66,23 +66,23 @@ class Permissions {
 	}
 
 	/**
-	 * Allows reads of a single bookmark when the bookmark is public, the
+	 * Allows reads of a single link when the link is public, the
 	 * caller owns it, or the caller can edit other users' posts.
 	 *
 	 * Returns 404 (not 403) when the caller is not authorised to read,
 	 * so the response is indistinguishable from "post does not exist" —
 	 * preventing ID-enumeration that would otherwise reveal the
-	 * existence of private bookmarks.
+	 * existence of private links.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
 	 * @return bool|WP_Error
 	 */
-	public static function can_read_bookmark( WP_REST_Request $request ): bool|WP_Error {
+	public static function can_read_link( WP_REST_Request $request ): bool|WP_Error {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
 
-		if ( $post !== null && $post->post_type === BookmarkPostType::POST_TYPE ) {
+		if ( $post !== null && $post->post_type === LinkPostType::POST_TYPE ) {
 			if ( $post->post_status === 'publish' ) {
 				return true;
 			}
@@ -98,25 +98,25 @@ class Permissions {
 		}
 
 		return new WP_Error(
-			'linkstash_not_found',
-			__( 'Bookmark not found.', 'linkstash' ),
+			'apermo_stash_not_found',
+			__( 'Link not found.', 'apermo-stash' ),
 			[ 'status' => 404 ],
 		);
 	}
 
 	/**
-	 * Allows updates when the user can edit the targeted bookmark.
+	 * Allows updates when the user can edit the targeted link.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
 	 * @return bool|WP_Error
 	 */
-	public static function can_edit_bookmark( WP_REST_Request $request ): bool|WP_Error {
+	public static function can_edit_link( WP_REST_Request $request ): bool|WP_Error {
 		$post_id = (int) $request['id'];
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new WP_Error(
-				'linkstash_forbidden',
-				__( 'You are not allowed to edit this bookmark.', 'linkstash' ),
+				'apermo_stash_forbidden',
+				__( 'You are not allowed to edit this link.', 'apermo-stash' ),
 				[ 'status' => 403 ],
 			);
 		}
@@ -125,18 +125,18 @@ class Permissions {
 	}
 
 	/**
-	 * Allows deletes when the user can delete the targeted bookmark.
+	 * Allows deletes when the user can delete the targeted link.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
 	 * @return bool|WP_Error
 	 */
-	public static function can_delete_bookmark( WP_REST_Request $request ): bool|WP_Error {
+	public static function can_delete_link( WP_REST_Request $request ): bool|WP_Error {
 		$post_id = (int) $request['id'];
 		if ( ! current_user_can( 'delete_post', $post_id ) ) {
 			return new WP_Error(
-				'linkstash_forbidden',
-				__( 'You are not allowed to delete this bookmark.', 'linkstash' ),
+				'apermo_stash_forbidden',
+				__( 'You are not allowed to delete this link.', 'apermo-stash' ),
 				[ 'status' => 403 ],
 			);
 		}

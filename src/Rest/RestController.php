@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Rest;
+namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
 /**
- * Registers the linkstash/v1 REST namespace and routes.
+ * Registers the apermo-stash/v1 REST namespace and routes.
  */
 class RestController {
 
-	public const NAMESPACE = 'linkstash/v1';
+	public const NAMESPACE = 'apermo-stash/v1';
 
 	/**
-	 * Holds the bookmarks controller.
+	 * Holds the links controller.
 	 *
-	 * @var BookmarksController
+	 * @var LinksController
 	 */
-	private BookmarksController $bookmarks;
+	private LinksController $links;
 
 	/**
 	 * Holds the tags controller.
@@ -37,18 +37,18 @@ class RestController {
 	/**
 	 * Constructs the registrar with its child controllers.
 	 *
-	 * @param BookmarksController $bookmarks Bookmarks controller.
-	 * @param TagsController      $tags      Tags controller.
-	 * @param CheckController     $check     URL check controller.
+	 * @param LinksController $links Links controller.
+	 * @param TagsController  $tags      Tags controller.
+	 * @param CheckController $check     URL check controller.
 	 */
 	public function __construct(
-		BookmarksController $bookmarks,
+		LinksController $links,
 		TagsController $tags,
 		CheckController $check
 	) {
-		$this->bookmarks = $bookmarks;
-		$this->tags      = $tags;
-		$this->check     = $check;
+		$this->links = $links;
+		$this->tags  = $tags;
+		$this->check = $check;
 	}
 
 	/**
@@ -61,12 +61,12 @@ class RestController {
 	}
 
 	/**
-	 * Registers all routes under the linkstash namespace.
+	 * Registers all routes under the apermo-stash namespace.
 	 *
 	 * @return void
 	 */
 	public function register_routes(): void {
-		$this->bookmarks->register_routes( self::NAMESPACE );
+		$this->links->register_routes( self::NAMESPACE );
 		$this->tags->register_routes( self::NAMESPACE );
 		$this->check->register_routes( self::NAMESPACE );
 	}

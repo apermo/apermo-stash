@@ -2,31 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash;
+namespace Apermo\Stash;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\Admin\BookmarkMetabox;
-use Apermo\LinkStash\Admin\DashboardWidget;
-use Apermo\LinkStash\Admin\HelpTabs;
-use Apermo\LinkStash\Admin\ListColumns;
-use Apermo\LinkStash\Admin\ListFilter;
-use Apermo\LinkStash\Admin\Notices;
-use Apermo\LinkStash\Admin\QuickAdd;
-use Apermo\LinkStash\Admin\SettingsPage;
-use Apermo\LinkStash\Admin\TagAutocomplete;
-use Apermo\LinkStash\Admin\UrlAutoScheme;
-use Apermo\LinkStash\Auth\BearerTokenAuth;
-use Apermo\LinkStash\Auth\TokenStore;
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
-use Apermo\LinkStash\Rest\BookmarksController;
-use Apermo\LinkStash\Rest\CheckController;
-use Apermo\LinkStash\Rest\CorsHandler;
-use Apermo\LinkStash\Rest\RestController;
-use Apermo\LinkStash\Rest\TagsController;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\Admin\DashboardWidget;
+use Apermo\Stash\Admin\HelpTabs;
+use Apermo\Stash\Admin\LinkMetabox;
+use Apermo\Stash\Admin\ListColumns;
+use Apermo\Stash\Admin\ListFilter;
+use Apermo\Stash\Admin\Notices;
+use Apermo\Stash\Admin\QuickAdd;
+use Apermo\Stash\Admin\SettingsPage;
+use Apermo\Stash\Admin\TagAutocomplete;
+use Apermo\Stash\Admin\UrlAutoScheme;
+use Apermo\Stash\Auth\BearerTokenAuth;
+use Apermo\Stash\Auth\TokenStore;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
+use Apermo\Stash\Rest\CheckController;
+use Apermo\Stash\Rest\CorsHandler;
+use Apermo\Stash\Rest\LinksController;
+use Apermo\Stash\Rest\RestController;
+use Apermo\Stash\Rest\TagsController;
+use Apermo\Stash\Url\MetadataFetcher;
 
 /**
  * Bootstraps the plugin.
@@ -35,7 +35,7 @@ class Main {
 
 	public const VERSION = '0.1.3';
 
-	private const STARTER_TAGS_SEEDED_OPTION = 'linkstash_starter_tags_seeded';
+	private const STARTER_TAGS_SEEDED_OPTION = 'apermo_stash_starter_tags_seeded';
 
 	/**
 	 * Holds the main plugin file path.
@@ -77,7 +77,7 @@ class Main {
 	 * @return void
 	 */
 	public static function activate(): void {
-		( new BookmarkPostType() )->register_post_type();
+		( new LinkPostType() )->register_post_type();
 		( new TagTaxonomy() )->register_taxonomy();
 		self::seed_starter_tags();
 		flush_rewrite_rules();
@@ -86,7 +86,7 @@ class Main {
 	/**
 	 * Seeds a small set of starter tags exactly once.
 	 *
-	 * Sets `linkstash_starter_tags_seeded` after the first fully-successful
+	 * Sets `apermo_stash_starter_tags_seeded` after the first fully-successful
 	 * run; subsequent (re-)activations short-circuit on that option, so a
 	 * user who deletes a starter tag and later reactivates the plugin
 	 * will not see it resurrected. Existing tags with the same slug are
@@ -105,10 +105,10 @@ class Main {
 		}
 
 		$tags = [
-			'read-later'  => __( 'Read later', 'linkstash' ),
-			'reference'   => __( 'Reference', 'linkstash' ),
-			'inspiration' => __( 'Inspiration', 'linkstash' ),
-			'archive'     => __( 'Archive', 'linkstash' ),
+			'read-later'  => __( 'Read later', 'apermo-stash' ),
+			'reference'   => __( 'Reference', 'apermo-stash' ),
+			'inspiration' => __( 'Inspiration', 'apermo-stash' ),
+			'archive'     => __( 'Archive', 'apermo-stash' ),
 		];
 
 		$all_ok = true;
@@ -142,12 +142,12 @@ class Main {
 	 * @return void
 	 */
 	public static function boot(): void {
-		( new BookmarkPostType() )->register();
+		( new LinkPostType() )->register();
 		( new TagTaxonomy() )->register();
-		( new BookmarkMeta() )->register();
+		( new LinkMeta() )->register();
 		( new BearerTokenAuth( new TokenStore() ) )->register();
 		( new RestController(
-			new BookmarksController( new MetadataFetcher() ),
+			new LinksController( new MetadataFetcher() ),
 			new TagsController(),
 			new CheckController(),
 		) )->register();
@@ -160,7 +160,7 @@ class Main {
 			( new Notices() )->register();
 			( new QuickAdd( new MetadataFetcher() ) )->register();
 			( new SettingsPage( $store ) )->register();
-			( new BookmarkMetabox( new MetadataFetcher() ) )->register();
+			( new LinkMetabox( new MetadataFetcher() ) )->register();
 			( new DashboardWidget() )->register();
 			( new TagAutocomplete() )->register();
 			( new UrlAutoScheme() )->register();

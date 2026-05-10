@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Rest;
+namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\LinkStash\Rest\BookmarksController;
-use Apermo\LinkStash\Rest\CheckController;
-use Apermo\LinkStash\Rest\RestController;
-use Apermo\LinkStash\Rest\TagsController;
+use Apermo\Stash\Rest\CheckController;
+use Apermo\Stash\Rest\LinksController;
+use Apermo\Stash\Rest\RestController;
+use Apermo\Stash\Rest\TagsController;
 use Brain\Monkey;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -43,11 +43,11 @@ class RestControllerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_register_hooks_rest_api_init(): void {
-		$bookmarks = Mockery::mock( BookmarksController::class );
-		$tags      = Mockery::mock( TagsController::class );
-		$check     = Mockery::mock( CheckController::class );
+		$links = Mockery::mock( LinksController::class );
+		$tags  = Mockery::mock( TagsController::class );
+		$check = Mockery::mock( CheckController::class );
 
-		$rest = new RestController( $bookmarks, $tags, $check );
+		$rest = new RestController( $links, $tags, $check );
 		$rest->register();
 
 		self::assertNotFalse( has_action( 'rest_api_init', [ $rest, 'register_routes' ] ) );
@@ -59,15 +59,15 @@ class RestControllerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_register_routes_delegates_to_children(): void {
-		$bookmarks = Mockery::mock( BookmarksController::class );
-		$tags      = Mockery::mock( TagsController::class );
-		$check     = Mockery::mock( CheckController::class );
+		$links = Mockery::mock( LinksController::class );
+		$tags  = Mockery::mock( TagsController::class );
+		$check = Mockery::mock( CheckController::class );
 
-		$bookmarks->shouldReceive( 'register_routes' )->once()->with( RestController::NAMESPACE );
+		$links->shouldReceive( 'register_routes' )->once()->with( RestController::NAMESPACE );
 		$tags->shouldReceive( 'register_routes' )->once()->with( RestController::NAMESPACE );
 		$check->shouldReceive( 'register_routes' )->once()->with( RestController::NAMESPACE );
 
-		( new RestController( $bookmarks, $tags, $check ) )->register_routes();
+		( new RestController( $links, $tags, $check ) )->register_routes();
 	}
 
 	/**
@@ -76,6 +76,6 @@ class RestControllerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_namespace_constant(): void {
-		self::assertSame( 'linkstash/v1', RestController::NAMESPACE );
+		self::assertSame( 'apermo-stash/v1', RestController::NAMESPACE );
 	}
 }

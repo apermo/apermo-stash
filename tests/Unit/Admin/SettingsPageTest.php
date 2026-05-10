@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\SettingsPage;
-use Apermo\LinkStash\Auth\TokenStore;
-use Apermo\LinkStash\Main;
+use Apermo\Stash\Admin\SettingsPage;
+use Apermo\Stash\Auth\TokenStore;
+use Apermo\Stash\Main;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests the Tools → LinkStash settings page.
+ * Tests the Tools → Apermo Stash settings page.
  *
  * Branches that call `wp_safe_redirect` followed by `exit()` are not
  * exercised here — `exit()` in PHP cannot be intercepted in-process — but
@@ -81,8 +81,8 @@ class SettingsPageTest extends TestCase {
 		$page->register();
 
 		self::assertNotFalse( has_action( 'admin_menu', [ $page, 'register_menu' ] ) );
-		self::assertNotFalse( has_action( 'admin_post_linkstash_token_create', [ $page, 'handle_create' ] ) );
-		self::assertNotFalse( has_action( 'admin_post_linkstash_token_revoke', [ $page, 'handle_revoke' ] ) );
+		self::assertNotFalse( has_action( 'admin_post_apermo_stash_token_create', [ $page, 'handle_create' ] ) );
+		self::assertNotFalse( has_action( 'admin_post_apermo_stash_token_revoke', [ $page, 'handle_revoke' ] ) );
 		self::assertNotFalse( has_filter( 'plugin_action_links_' . Main::file() ) );
 	}
 
@@ -97,9 +97,33 @@ class SettingsPageTest extends TestCase {
 		$links = $this->page()->plugin_action_links( $existing );
 
 		self::assertCount( 2, $links );
-		self::assertStringContainsString( 'options-general.php?page=linkstash', $links[0] );
+		self::assertStringContainsString( 'options-general.php?page=apermo-stash', $links[0] );
 		self::assertStringContainsString( 'Settings', $links[0] );
 		self::assertSame( $existing['deactivate'], $links['deactivate'] );
+	}
+
+	/**
+	 * Verifies register_menu calls add_options_page with the expected
+	 * slug, capability, and render callback.
+	 *
+	 * @return void
+	 */
+	public function test_register_menu_adds_options_page(): void {
+		$page     = $this->page();
+		$captured = null;
+		Functions\when( 'add_options_page' )->alias(
+			static function ( ...$args ) use ( &$captured ): string {
+				$captured = $args;
+				return '';
+			},
+		);
+
+		$page->register_menu();
+
+		self::assertSame(
+			[ 'Apermo Stash', 'Apermo Stash', 'manage_options', 'apermo-stash', [ $page, 'render' ] ],
+			$captured,
+		);
 	}
 
 	/**
@@ -115,7 +139,7 @@ class SettingsPageTest extends TestCase {
 		( new SettingsPage( $store ) )->render();
 		$output = (string) \ob_get_clean();
 
-		self::assertStringContainsString( 'LinkStash API Tokens', $output );
+		self::assertStringContainsString( 'Apermo Stash API Tokens', $output );
 		self::assertStringContainsString( 'Generate a new token', $output );
 		self::assertStringContainsString( 'No tokens yet', $output );
 	}

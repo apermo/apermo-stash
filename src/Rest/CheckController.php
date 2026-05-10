@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Rest;
+namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\Url\Canonicalizer;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\Url\Canonicalizer;
 use WP_Query;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -34,7 +34,7 @@ class CheckController {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'check' ],
-					'permission_callback' => [ Permissions::class, 'require_read_bookmarks' ],
+					'permission_callback' => [ Permissions::class, 'require_read_links' ],
 					'args'                => [
 						'url' => [
 							'type'     => 'string',
@@ -48,7 +48,7 @@ class CheckController {
 	}
 
 	/**
-	 * Returns whether a bookmark for the given URL exists in the visible scope.
+	 * Returns whether a link for the given URL exists in the visible scope.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -62,10 +62,10 @@ class CheckController {
 			return rest_ensure_response( [ 'exists' => false ] );
 		}
 
-		$visibility = BookmarksController::visibility_filter( $request );
+		$visibility = LinksController::visibility_filter( $request );
 
 		$args = [
-			'post_type'      => BookmarkPostType::POST_TYPE,
+			'post_type'      => LinkPostType::POST_TYPE,
 			'post_status'    => $visibility['post_status'],
 			'posts_per_page' => 1,
 			'fields'         => 'ids',
@@ -75,7 +75,7 @@ class CheckController {
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			'meta_query'     => [
 				[
-					'key'   => BookmarkMeta::META_URL_CANONICAL,
+					'key'   => LinkMeta::META_URL_CANONICAL,
 					'value' => $canonical,
 				],
 			],

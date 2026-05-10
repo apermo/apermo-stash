@@ -2,31 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\Main;
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\Url\Canonicalizer;
-use Apermo\LinkStash\Url\DisplayUrl;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\Main;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\Url\Canonicalizer;
+use Apermo\Stash\Url\DisplayUrl;
+use Apermo\Stash\Url\MetadataFetcher;
 use WP_Post;
 
 /**
- * Replaces the default bookmark edit screen with a small classic-editor form.
+ * Replaces the default link edit screen with a small classic-editor form.
  *
  * Registers two meta boxes — a URL panel (URL + Favorite flag)
  * and a Notes panel (plain textarea bound to post_content) — and disables
- * the block editor for the bookmark CPT so the classic edit screen is
+ * the block editor for the link CPT so the classic edit screen is
  * used instead. Saving falls back to a simplified URL as the post_title
  * when the user does not supply an explicit label.
  */
-class BookmarkMetabox {
+class LinkMetabox {
 
-	private const NONCE_FIELD  = 'linkstash_metabox_nonce';
-	private const NONCE_ACTION = 'linkstash_save_metabox';
+	private const NONCE_FIELD  = 'apermo_stash_metabox_nonce';
+	private const NONCE_ACTION = 'apermo_stash_save_metabox';
 
 	/**
 	 * URL metadata fetcher (used on save to mark unreachable URLs).
@@ -103,7 +103,7 @@ class BookmarkMetabox {
 	 * @return void
 	 */
 	private function update_post_fields( int $post_id, array $fields ): void {
-		$hook_name = 'save_post_' . BookmarkPostType::POST_TYPE;
+		$hook_name = 'save_post_' . LinkPostType::POST_TYPE;
 
 		remove_action( $hook_name, [ $this, 'save_post' ], 10 );
 		wp_update_post( \array_merge( [ 'ID' => $post_id ], $fields ) );
@@ -116,14 +116,14 @@ class BookmarkMetabox {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'add_meta_boxes_' . BookmarkPostType::POST_TYPE, [ $this, 'register_meta_boxes' ] );
-		add_action( 'save_post_' . BookmarkPostType::POST_TYPE, [ $this, 'save_post' ], 10, 2 );
+		add_action( 'add_meta_boxes_' . LinkPostType::POST_TYPE, [ $this, 'register_meta_boxes' ] );
+		add_action( 'save_post_' . LinkPostType::POST_TYPE, [ $this, 'save_post' ], 10, 2 );
 		add_filter( 'use_block_editor_for_post_type', [ $this, 'disable_block_editor' ], 10, 2 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_unsaved_changes_script' ] );
 	}
 
 	/**
-	 * Enqueues the beforeunload guard script on the bookmark add/edit screen.
+	 * Enqueues the beforeunload guard script on the link add/edit screen.
 	 *
 	 * Wires a small DOM-level dirty-tracking script to `#post` (the
 	 * standard classic-editor `<form>` id WordPress emits on
@@ -139,13 +139,13 @@ class BookmarkMetabox {
 		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 		if ( $screen === null
 			|| $screen->base !== 'post'
-			|| $screen->post_type !== BookmarkPostType::POST_TYPE
+			|| $screen->post_type !== LinkPostType::POST_TYPE
 		) {
 			return;
 		}
 
 		wp_enqueue_script(
-			'linkstash-unsaved-changes',
+			'apermo-stash-unsaved-changes',
 			plugins_url( 'assets/js/unsaved-changes.js', Main::file() ),
 			[],
 			Main::VERSION,
@@ -154,7 +154,7 @@ class BookmarkMetabox {
 	}
 
 	/**
-	 * Returns false for the bookmark CPT so the classic editor is used.
+	 * Returns false for the link CPT so the classic editor is used.
 	 *
 	 * @param bool   $use_block_editor Whether to use the block editor.
 	 * @param string $post_type        Post-type slug.
@@ -162,7 +162,7 @@ class BookmarkMetabox {
 	 * @return bool
 	 */
 	public function disable_block_editor( bool $use_block_editor, string $post_type ): bool {
-		if ( $post_type === BookmarkPostType::POST_TYPE ) {
+		if ( $post_type === LinkPostType::POST_TYPE ) {
 			return false;
 		}
 
@@ -170,7 +170,7 @@ class BookmarkMetabox {
 	}
 
 	/**
-	 * Registers the URL and Notes meta boxes for the bookmark CPT.
+	 * Registers the URL and Notes meta boxes for the link CPT.
 	 *
 	 * @return void
 	 */
@@ -179,19 +179,19 @@ class BookmarkMetabox {
 		// uses 'high' priority so it renders directly under the title and
 		// above the Notes panel.
 		add_meta_box(
-			'linkstash_bookmark_url',
-			__( 'Bookmark URL', 'linkstash' ),
+			'apermo_stash_link_url',
+			__( 'Link URL', 'apermo-stash' ),
 			[ $this, 'render_url_meta_box' ],
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			'normal',
 			'high',
 		);
 
 		add_meta_box(
-			'linkstash_bookmark_note',
-			__( 'Notes', 'linkstash' ),
+			'apermo_stash_link_note',
+			__( 'Notes', 'apermo-stash' ),
 			[ $this, 'render_note_meta_box' ],
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			'normal',
 			'default',
 		);
@@ -205,39 +205,39 @@ class BookmarkMetabox {
 	 * @return void
 	 */
 	public function render_url_meta_box( WP_Post $post ): void {
-		$url         = (string) get_post_meta( $post->ID, BookmarkMeta::META_URL, true );
-		$favorite    = (bool) get_post_meta( $post->ID, BookmarkMeta::META_FAVORITE, true );
-		$unreachable = (bool) get_post_meta( $post->ID, BookmarkMeta::META_UNREACHABLE, true );
+		$url         = (string) get_post_meta( $post->ID, LinkMeta::META_URL, true );
+		$favorite    = (bool) get_post_meta( $post->ID, LinkMeta::META_FAVORITE, true );
+		$unreachable = (bool) get_post_meta( $post->ID, LinkMeta::META_UNREACHABLE, true );
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_FIELD );
 		?>
 		<p>
-			<label for="linkstash-url"><strong><?php esc_html_e( 'URL', 'linkstash' ); ?></strong></label><br />
+			<label for="apermo-stash-url"><strong><?php esc_html_e( 'URL', 'apermo-stash' ); ?></strong></label><br />
 			<input type="url"
-					id="linkstash-url"
-					name="linkstash_url"
+					id="apermo-stash-url"
+					name="apermo_stash_url"
 					value="<?php echo esc_attr( $url ); ?>"
 					required
 					class="widefat"
 					placeholder="https://&hellip;"
-					data-linkstash-url-input />
+					data-apermo-stash-url-input />
 		</p>
 		<?php if ( $unreachable && $url !== '' ) { ?>
 			<div class="notice notice-warning inline" style="margin: 0.5rem 0; padding: 0.5rem 0.75rem;">
 				<p style="margin: 0;">
-					<strong><?php esc_html_e( 'URL didn\'t respond on last save.', 'linkstash' ); ?></strong>
+					<strong><?php esc_html_e( 'URL didn\'t respond on last save.', 'apermo-stash' ); ?></strong>
 					<br />
-					<?php esc_html_e( 'It may be private, behind a VPN or login wall, or temporarily down. The bookmark is saved either way; re-saving will re-check.', 'linkstash' ); ?>
+					<?php esc_html_e( 'It may be private, behind a VPN or login wall, or temporarily down. The link is saved either way; re-saving will re-check.', 'apermo-stash' ); ?>
 				</p>
 			</div>
 		<?php } ?>
 		<p>
 			<label>
-				<input type="checkbox" name="linkstash_favorite" value="1" <?php checked( $favorite ); ?> />
-				<?php esc_html_e( 'Favorite', 'linkstash' ); ?>
+				<input type="checkbox" name="apermo_stash_favorite" value="1" <?php checked( $favorite ); ?> />
+				<?php esc_html_e( 'Favorite', 'apermo-stash' ); ?>
 			</label>
 		</p>
 		<p class="description">
-			<?php esc_html_e( 'Leave the title field empty to use the URL as the title.', 'linkstash' ); ?>
+			<?php esc_html_e( 'Leave the title field empty to use the URL as the title.', 'apermo-stash' ); ?>
 		</p>
 		<?php
 	}
@@ -251,18 +251,18 @@ class BookmarkMetabox {
 	 */
 	public function render_note_meta_box( WP_Post $post ): void {
 		?>
-		<textarea name="linkstash_note"
-					id="linkstash-note"
+		<textarea name="apermo_stash_note"
+					id="apermo-stash-note"
 					class="widefat"
 					rows="8"
-					placeholder="<?php esc_attr_e( 'Optional note&hellip;', 'linkstash' ); ?>"><?php echo esc_textarea( $post->post_content ); ?></textarea>
+					placeholder="<?php esc_attr_e( 'Optional note&hellip;', 'apermo-stash' ); ?>"><?php echo esc_textarea( $post->post_content ); ?></textarea>
 		<?php
 	}
 
 	/**
-	 * Persists the meta-box fields when a bookmark is saved.
+	 * Persists the meta-box fields when a link is saved.
 	 *
-	 * @param int     $post_id Bookmark post ID.
+	 * @param int     $post_id Link post ID.
 	 * @param WP_Post $post    The saved post.
 	 *
 	 * @return void
@@ -276,28 +276,28 @@ class BookmarkMetabox {
 			return;
 		}
 
-		$url       = self::read_text( 'linkstash_url' );
+		$url       = self::read_text( 'apermo_stash_url' );
 		$canonical = Canonicalizer::canonicalize( $url );
 		if ( $url !== '' && $canonical !== '' ) {
-			update_post_meta( $post_id, BookmarkMeta::META_URL, esc_url_raw( $url ) );
-			update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
+			update_post_meta( $post_id, LinkMeta::META_URL, esc_url_raw( $url ) );
+			update_post_meta( $post_id, LinkMeta::META_URL_CANONICAL, $canonical );
 
 			// Re-check reachability on every save, even when the URL
 			// itself didn't change — a previously-down host coming back
 			// up should clear the warning automatically the next time
-			// the user touches the bookmark.
+			// the user touches the link.
 			$result = $this->fetcher->fetch( $url );
-			update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, BookmarkMeta::bool_to_meta( ! $result['reachable'] ) );
+			update_post_meta( $post_id, LinkMeta::META_UNREACHABLE, LinkMeta::bool_to_meta( ! $result['reachable'] ) );
 		}
 
 		update_post_meta(
 			$post_id,
-			BookmarkMeta::META_FAVORITE,
-			BookmarkMeta::bool_to_meta( isset( $_POST['linkstash_favorite'] ) ),
+			LinkMeta::META_FAVORITE,
+			LinkMeta::bool_to_meta( isset( $_POST['apermo_stash_favorite'] ) ),
 		);
 
-		$note_raw = isset( $_POST['linkstash_note'] ) && \is_string( $_POST['linkstash_note'] )
-			? wp_kses_post( wp_unslash( $_POST['linkstash_note'] ) )
+		$note_raw = isset( $_POST['apermo_stash_note'] ) && \is_string( $_POST['apermo_stash_note'] )
+			? wp_kses_post( wp_unslash( $_POST['apermo_stash_note'] ) )
 			: '';
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
@@ -307,7 +307,7 @@ class BookmarkMetabox {
 		}
 
 		if ( \trim( $post->post_title ) === '' ) {
-			$resolved_url = $url !== '' ? $url : (string) get_post_meta( $post_id, BookmarkMeta::META_URL, true );
+			$resolved_url = $url !== '' ? $url : (string) get_post_meta( $post_id, LinkMeta::META_URL, true );
 			$display      = DisplayUrl::simplify( $resolved_url );
 			if ( $display !== '' ) {
 				$update['post_title'] = $display;

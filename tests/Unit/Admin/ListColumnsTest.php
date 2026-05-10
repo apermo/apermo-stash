@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\ListColumns;
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
+use Apermo\Stash\Admin\ListColumns;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
@@ -15,7 +15,7 @@ use WP_Post;
 use WP_Term;
 
 /**
- * Tests the bookmark list table column hooks and renderers.
+ * Tests the link list table column hooks and renderers.
  */
 class ListColumnsTest extends TestCase {
 
@@ -54,17 +54,17 @@ class ListColumnsTest extends TestCase {
 		$columns = new ListColumns();
 		$columns->register();
 
-		$post_type = BookmarkPostType::POST_TYPE;
+		$post_type = LinkPostType::POST_TYPE;
 		self::assertNotFalse( has_filter( "manage_{$post_type}_posts_columns", [ $columns, 'filter_columns' ] ) );
 		self::assertNotFalse( has_action( "manage_{$post_type}_posts_custom_column", [ $columns, 'render_column' ] ) );
 	}
 
 	/**
-	 * Verifies filter_columns adds the LinkStash columns.
+	 * Verifies filter_columns adds the Apermo Stash columns.
 	 *
 	 * @return void
 	 */
-	public function test_filter_columns_returns_linkstash_columns(): void {
+	public function test_filter_columns_returns_apermo_stash_columns(): void {
 		$result = ( new ListColumns() )->filter_columns(
 			[
 				'cb'   => '<input type="checkbox" />',
@@ -75,7 +75,7 @@ class ListColumnsTest extends TestCase {
 		self::assertArrayHasKey( 'cb', $result );
 		self::assertArrayHasKey( 'title', $result );
 		self::assertArrayHasKey( 'url', $result );
-		self::assertArrayHasKey( 'linkstash_tag', $result );
+		self::assertArrayHasKey( 'apermo_stash_tag', $result );
 		self::assertArrayHasKey( 'visibility', $result );
 		self::assertArrayHasKey( 'favorite', $result );
 		self::assertArrayHasKey( 'date', $result );
@@ -88,7 +88,7 @@ class ListColumnsTest extends TestCase {
 	 */
 	public function test_render_url_column(): void {
 		Functions\when( 'get_post_meta' )->alias(
-			static fn ( int $id, string $key ): string => $key === BookmarkMeta::META_URL ? 'https://example.tld' : '',
+			static fn ( int $id, string $key ): string => $key === LinkMeta::META_URL ? 'https://example.tld' : '',
 		);
 
 		$output = $this->capture_render( 'url', 7 );
@@ -129,11 +129,11 @@ class ListColumnsTest extends TestCase {
 		);
 		Functions\when( 'admin_url' )->alias( static fn ( string $path ): string => '/wp-admin/' . $path );
 
-		$output = $this->capture_render( 'linkstash_tag', 7 );
+		$output = $this->capture_render( 'apermo_stash_tag', 7 );
 
-		self::assertStringContainsString( 'post_type=linkstash_bookmark', $output );
-		self::assertStringContainsString( 'linkstash_tag=reading', $output );
-		self::assertStringContainsString( 'linkstash_tag=archive', $output );
+		self::assertStringContainsString( 'post_type=apermo_stash_link', $output );
+		self::assertStringContainsString( 'apermo_stash_tag=reading', $output );
+		self::assertStringContainsString( 'apermo_stash_tag=archive', $output );
 		self::assertStringContainsString( '>reading</a>', $output );
 		self::assertStringContainsString( '>archive</a>', $output );
 		self::assertStringContainsString( ', ', $output );
@@ -147,7 +147,7 @@ class ListColumnsTest extends TestCase {
 	public function test_render_tags_column_empty(): void {
 		Functions\when( 'get_the_terms' )->justReturn( [] );
 
-		$output = $this->capture_render( 'linkstash_tag', 7 );
+		$output = $this->capture_render( 'apermo_stash_tag', 7 );
 
 		self::assertSame( '—', $output );
 	}
@@ -164,7 +164,7 @@ class ListColumnsTest extends TestCase {
 
 		$output = $this->capture_render( 'visibility', 7 );
 
-		self::assertStringContainsString( 'linkstash-badge--public', $output );
+		self::assertStringContainsString( 'apermo-stash-badge--public', $output );
 		self::assertStringContainsString( 'Public', $output );
 	}
 
@@ -180,7 +180,7 @@ class ListColumnsTest extends TestCase {
 
 		$output = $this->capture_render( 'visibility', 7 );
 
-		self::assertStringContainsString( 'linkstash-badge--private', $output );
+		self::assertStringContainsString( 'apermo-stash-badge--private', $output );
 		self::assertStringContainsString( 'Private', $output );
 	}
 
@@ -192,7 +192,7 @@ class ListColumnsTest extends TestCase {
 	public function test_render_favorite_column_renders_star(): void {
 		Functions\when( 'esc_attr__' )->returnArg();
 		Functions\when( 'get_post_meta' )->alias(
-			static fn ( int $id, string $key ): bool => $key === BookmarkMeta::META_FAVORITE,
+			static fn ( int $id, string $key ): bool => $key === LinkMeta::META_FAVORITE,
 		);
 
 		$output = $this->capture_render( 'favorite', 7 );
@@ -247,6 +247,6 @@ class ListColumnsTest extends TestCase {
 	 * @return void
 	 */
 	public function test_taxonomy_constant_is_imported(): void {
-		self::assertSame( 'linkstash_tag', TagTaxonomy::TAXONOMY );
+		self::assertSame( 'apermo_stash_tag', TagTaxonomy::TAXONOMY );
 	}
 }

@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Auth;
+namespace Apermo\Stash\Auth;
 
 \defined( 'ABSPATH' ) || exit();
 
 /**
  * Persists plugin-issued API tokens as WordPress user meta.
  *
- * Tokens are stored as an array of entries on the `_linkstash_tokens` user
+ * Tokens are stored as an array of entries on the `_apermo_stash_tokens` user
  * meta key. Each entry holds the token id, name, hash (sha256 of the plain
  * token), creation time, and last-used time. The plain token value is shown
  * once at creation time and never re-derivable from storage.
  */
 class TokenStore {
 
-	public const META_KEY     = '_linkstash_tokens';
-	public const INDEX_OPTION = 'linkstash_token_index';
+	public const META_KEY     = '_apermo_stash_tokens';
+	public const INDEX_OPTION = 'apermo_stash_token_index';
 
 	private const TOKEN_LENGTH = 40;
 

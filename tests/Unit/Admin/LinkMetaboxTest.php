@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\BookmarkMetabox;
-use Apermo\LinkStash\Main;
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\Admin\LinkMetabox;
+use Apermo\Stash\Main;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\Url\MetadataFetcher;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -18,9 +18,9 @@ use WP_Post;
 use WP_Screen;
 
 /**
- * Tests the bookmark edit-screen metabox class.
+ * Tests the link edit-screen metabox class.
  */
-class BookmarkMetaboxTest extends TestCase {
+class LinkMetaboxTest extends TestCase {
 
 	/**
 	 * Holds the recorded update_post_meta calls.
@@ -117,7 +117,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$metabox = $this->metabox();
 		$metabox->register();
 
-		$post_type = BookmarkPostType::POST_TYPE;
+		$post_type = LinkPostType::POST_TYPE;
 		self::assertNotFalse( has_action( "add_meta_boxes_{$post_type}", [ $metabox, 'register_meta_boxes' ] ) );
 		self::assertNotFalse( has_action( "save_post_{$post_type}", [ $metabox, 'save_post' ] ) );
 		self::assertNotFalse( has_filter( 'use_block_editor_for_post_type', [ $metabox, 'disable_block_editor' ] ) );
@@ -125,14 +125,14 @@ class BookmarkMetaboxTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the editor filter returns false for the bookmark CPT only.
+	 * Verifies the editor filter returns false for the link CPT only.
 	 *
 	 * @return void
 	 */
-	public function test_disable_block_editor_only_for_bookmark_cpt(): void {
+	public function test_disable_block_editor_only_for_link_cpt(): void {
 		$metabox = $this->metabox();
 
-		self::assertFalse( $metabox->disable_block_editor( true, BookmarkPostType::POST_TYPE ) );
+		self::assertFalse( $metabox->disable_block_editor( true, LinkPostType::POST_TYPE ) );
 		self::assertTrue( $metabox->disable_block_editor( true, 'post' ) );
 		self::assertFalse( $metabox->disable_block_editor( false, 'post' ) );
 	}
@@ -149,17 +149,17 @@ class BookmarkMetaboxTest extends TestCase {
 	}
 
 	/**
-	 * Verifies enqueue_unsaved_changes_script enqueues on the bookmark add/edit screen.
+	 * Verifies enqueue_unsaved_changes_script enqueues on the link add/edit screen.
 	 *
 	 * @return void
 	 */
-	public function test_enqueue_unsaved_changes_script_on_bookmark_post_screen(): void {
+	public function test_enqueue_unsaved_changes_script_on_link_post_screen(): void {
 		$screen            = Mockery::mock( WP_Screen::class );
 		$screen->base      = 'post';
-		$screen->post_type = BookmarkPostType::POST_TYPE;
+		$screen->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_current_screen' )->justReturn( $screen );
 		Functions\when( 'plugins_url' )->alias(
-			static fn ( string $path ): string => '/wp-content/plugins/linkstash/' . $path,
+			static fn ( string $path ): string => '/wp-content/plugins/apermo-stash/' . $path,
 		);
 
 		$enqueued = null;
@@ -173,7 +173,7 @@ class BookmarkMetaboxTest extends TestCase {
 
 		$this->metabox()->enqueue_unsaved_changes_script();
 
-		self::assertSame( 'linkstash-unsaved-changes', $enqueued );
+		self::assertSame( 'apermo-stash-unsaved-changes', $enqueued );
 	}
 
 	/**
@@ -213,8 +213,8 @@ class BookmarkMetaboxTest extends TestCase {
 	public function test_render_url_meta_box_outputs_inputs(): void {
 		Functions\when( 'get_post_meta' )->alias(
 			static fn ( int $post_id, string $key ) => match ( $key ) {
-				BookmarkMeta::META_URL      => 'https://example.tld',
-				BookmarkMeta::META_FAVORITE => true,
+				LinkMeta::META_URL      => 'https://example.tld',
+				LinkMeta::META_FAVORITE => true,
 				default                     => '',
 			},
 		);
@@ -226,9 +226,9 @@ class BookmarkMetaboxTest extends TestCase {
 		$this->metabox()->render_url_meta_box( $post );
 		$output = (string) \ob_get_clean();
 
-		self::assertStringContainsString( 'name="linkstash_url"', $output );
+		self::assertStringContainsString( 'name="apermo_stash_url"', $output );
 		self::assertStringContainsString( 'value="https://example.tld"', $output );
-		self::assertStringContainsString( 'name="linkstash_favorite"', $output );
+		self::assertStringContainsString( 'name="apermo_stash_favorite"', $output );
 	}
 
 	/**
@@ -239,8 +239,8 @@ class BookmarkMetaboxTest extends TestCase {
 	public function test_render_url_meta_box_unreachable_notice(): void {
 		Functions\when( 'get_post_meta' )->alias(
 			static fn ( int $post_id, string $key ) => match ( $key ) {
-				BookmarkMeta::META_URL         => 'https://example.tld/down',
-				BookmarkMeta::META_UNREACHABLE => true,
+				LinkMeta::META_URL         => 'https://example.tld/down',
+				LinkMeta::META_UNREACHABLE => true,
 				default                        => '',
 			},
 		);
@@ -296,9 +296,9 @@ class BookmarkMetaboxTest extends TestCase {
 	 */
 	public function test_save_post_persists_url_and_flags(): void {
 		$_POST = [
-			'linkstash_metabox_nonce' => 'nonce',
-			'linkstash_url'           => 'https://www.example.tld/article',
-			'linkstash_favorite'      => '1',
+			'apermo_stash_metabox_nonce' => 'nonce',
+			'apermo_stash_url'           => 'https://www.example.tld/article',
+			'apermo_stash_favorite'      => '1',
 		];
 
 		$post               = new WP_Post();
@@ -309,9 +309,9 @@ class BookmarkMetaboxTest extends TestCase {
 		$this->metabox()->save_post( 7, $post );
 
 		$keys = \array_column( $this->meta_writes, 1 );
-		self::assertContains( BookmarkMeta::META_URL, $keys );
-		self::assertContains( BookmarkMeta::META_URL_CANONICAL, $keys );
-		self::assertContains( BookmarkMeta::META_FAVORITE, $keys );
+		self::assertContains( LinkMeta::META_URL, $keys );
+		self::assertContains( LinkMeta::META_URL_CANONICAL, $keys );
+		self::assertContains( LinkMeta::META_FAVORITE, $keys );
 
 		// Title was non-empty, so we should NOT have rewritten it.
 		$post_title_writes = \array_filter(
@@ -328,8 +328,8 @@ class BookmarkMetaboxTest extends TestCase {
 	 */
 	public function test_save_post_derives_fallback_title(): void {
 		$_POST = [
-			'linkstash_metabox_nonce' => 'nonce',
-			'linkstash_url'           => 'https://www.example.tld/blog/article',
+			'apermo_stash_metabox_nonce' => 'nonce',
+			'apermo_stash_url'           => 'https://www.example.tld/blog/article',
 		];
 
 		$post               = new WP_Post();
@@ -357,9 +357,9 @@ class BookmarkMetaboxTest extends TestCase {
 	 */
 	public function test_save_post_persists_notes(): void {
 		$_POST = [
-			'linkstash_metabox_nonce' => 'nonce',
-			'linkstash_url'           => 'https://example.tld',
-			'linkstash_note'          => 'New notes',
+			'apermo_stash_metabox_nonce' => 'nonce',
+			'apermo_stash_url'           => 'https://example.tld',
+			'apermo_stash_note'          => 'New notes',
 		];
 
 		$post               = new WP_Post();
@@ -385,9 +385,9 @@ class BookmarkMetaboxTest extends TestCase {
 	 * unreachable. The fetcher only runs when the URL changes during save,
 	 * so most tests don't actually invoke it.
 	 *
-	 * @return BookmarkMetabox
+	 * @return LinkMetabox
 	 */
-	private function metabox(): BookmarkMetabox {
+	private function metabox(): LinkMetabox {
 		$fetcher = Mockery::mock( MetadataFetcher::class );
 		$fetcher->shouldReceive( 'fetch' )->andReturn(
 			[
@@ -397,6 +397,6 @@ class BookmarkMetaboxTest extends TestCase {
 			],
 		);
 
-		return new BookmarkMetabox( $fetcher );
+		return new LinkMetabox( $fetcher );
 	}
 }

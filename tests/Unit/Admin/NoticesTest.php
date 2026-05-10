@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\Notices;
-use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\Stash\Admin\Notices;
+use Apermo\Stash\PostType\LinkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
 use WP_Screen;
 
 /**
- * Tests the bookmark-list-screen notice renderer.
+ * Tests the link-list-screen notice renderer.
  */
 class NoticesTest extends TestCase {
 
@@ -73,13 +73,13 @@ class NoticesTest extends TestCase {
 	}
 
 	/**
-	 * Verifies nothing renders outside the bookmark list screen.
+	 * Verifies nothing renders outside the link list screen.
 	 *
 	 * @return void
 	 */
-	public function test_silent_outside_bookmark_screen(): void {
+	public function test_silent_outside_link_screen(): void {
 		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', 'post' ) );
-		$_GET['linkstash_notice'] = 'saved';
+		$_GET['apermo_stash_notice'] = 'saved';
 
 		\ob_start();
 		( new Notices() )->maybe_render();
@@ -94,7 +94,7 @@ class NoticesTest extends TestCase {
 	 * @return void
 	 */
 	public function test_silent_without_notice_param(): void {
-		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
 
 		\ob_start();
 		( new Notices() )->maybe_render();
@@ -109,8 +109,8 @@ class NoticesTest extends TestCase {
 	 * @return void
 	 */
 	public function test_renders_saved_unreachable_warning(): void {
-		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
-		$_GET['linkstash_notice'] = 'saved-unreachable';
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
+		$_GET['apermo_stash_notice'] = 'saved-unreachable';
 
 		\ob_start();
 		( new Notices() )->maybe_render();
@@ -126,8 +126,8 @@ class NoticesTest extends TestCase {
 	 * @return void
 	 */
 	public function test_renders_saved_success(): void {
-		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
-		$_GET['linkstash_notice'] = 'saved';
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
+		$_GET['apermo_stash_notice'] = 'saved';
 
 		\ob_start();
 		( new Notices() )->maybe_render();
@@ -137,13 +137,47 @@ class NoticesTest extends TestCase {
 	}
 
 	/**
+	 * Verifies the invalid-URL notice renders as an error.
+	 *
+	 * @return void
+	 */
+	public function test_renders_invalid_error(): void {
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
+		$_GET['apermo_stash_notice'] = 'invalid';
+
+		\ob_start();
+		( new Notices() )->maybe_render();
+		$output = (string) \ob_get_clean();
+
+		self::assertStringContainsString( 'notice-error', $output );
+		self::assertStringContainsString( 'unparseable', $output );
+	}
+
+	/**
+	 * Verifies the save-failed notice renders as an error.
+	 *
+	 * @return void
+	 */
+	public function test_renders_failed_error(): void {
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
+		$_GET['apermo_stash_notice'] = 'failed';
+
+		\ob_start();
+		( new Notices() )->maybe_render();
+		$output = (string) \ob_get_clean();
+
+		self::assertStringContainsString( 'notice-error', $output );
+		self::assertStringContainsString( 'Could not save', $output );
+	}
+
+	/**
 	 * Verifies an unrecognised slug renders nothing.
 	 *
 	 * @return void
 	 */
 	public function test_unknown_slug_renders_nothing(): void {
-		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
-		$_GET['linkstash_notice'] = 'random-junk';
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
+		$_GET['apermo_stash_notice'] = 'random-junk';
 
 		\ob_start();
 		( new Notices() )->maybe_render();

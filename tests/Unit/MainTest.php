@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit;
+namespace Apermo\Stash\Tests\Unit;
 
-use Apermo\LinkStash\Main;
+use Apermo\Stash\Main;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
@@ -96,14 +96,14 @@ class MainTest extends TestCase {
 		Functions\expect( 'flush_rewrite_rules' )->once();
 		Functions\expect( 'get_option' )
 			->once()
-			->with( 'linkstash_starter_tags_seeded', false )
+			->with( 'apermo_stash_starter_tags_seeded', false )
 			->andReturn( false );
 		Functions\when( 'term_exists' )->justReturn( null );
 		Functions\when( 'is_wp_error' )->justReturn( false );
 		Functions\expect( 'wp_insert_term' )->times( 4 )->andReturn( [ 'term_id' => 1 ] );
 		Functions\expect( 'update_option' )
 			->once()
-			->with( 'linkstash_starter_tags_seeded', true, false );
+			->with( 'apermo_stash_starter_tags_seeded', true, false );
 
 		Main::activate();
 	}
@@ -126,7 +126,7 @@ class MainTest extends TestCase {
 		Functions\expect( 'flush_rewrite_rules' )->once();
 		Functions\expect( 'get_option' )
 			->once()
-			->with( 'linkstash_starter_tags_seeded', false )
+			->with( 'apermo_stash_starter_tags_seeded', false )
 			->andReturn( false );
 		Functions\when( 'term_exists' )->justReturn( null );
 		Functions\when( 'is_wp_error' )->alias( static fn ( $value ): bool => $value instanceof WP_Error );
@@ -160,7 +160,7 @@ class MainTest extends TestCase {
 		Functions\expect( 'flush_rewrite_rules' )->once();
 		Functions\expect( 'get_option' )
 			->once()
-			->with( 'linkstash_starter_tags_seeded', false )
+			->with( 'apermo_stash_starter_tags_seeded', false )
 			->andReturn( true );
 		Functions\expect( 'wp_insert_term' )->never();
 		Functions\expect( 'update_option' )->never();
@@ -180,7 +180,7 @@ class MainTest extends TestCase {
 	}
 
 	/**
-	 * Verifies boot wires the bookmark post type.
+	 * Verifies boot wires the link post type.
 	 *
 	 * @return void
 	 */
@@ -190,5 +190,24 @@ class MainTest extends TestCase {
 		Functions\when( 'is_admin' )->justReturn( false );
 
 		Main::boot();
+	}
+
+	/**
+	 * Verifies boot also wires the admin classes when running in wp-admin.
+	 *
+	 * @return void
+	 */
+	public function test_boot_wires_admin_classes(): void {
+		Functions\when( 'add_action' )->justReturn( true );
+		Functions\when( 'add_filter' )->justReturn( true );
+		Functions\when( 'is_admin' )->justReturn( true );
+		Functions\when( 'plugin_basename' )->returnArg();
+		Functions\when( 'plugins_url' )->returnArg();
+
+		Main::boot();
+
+		// boot completing without throwing exercises the
+		// `if ( is_admin() ) { … }` branch in src/Main.php.
+		self::assertTrue( true );
 	}
 }

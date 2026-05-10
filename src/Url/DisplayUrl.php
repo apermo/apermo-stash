@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Url;
+namespace Apermo\Stash\Url;
 
 \defined( 'ABSPATH' ) || exit();
 
 /**
  * Renders a URL as a short, human-readable string for display fallbacks.
  *
- * Used as the bookmark title fallback when the user does not provide an
+ * Used as the link title fallback when the user does not provide an
  * explicit label. Distinct from {@see Canonicalizer}: canonicalization
  * preserves enough of the URL to compare two links for dedupe identity
  * (sorted query, scheme, port); display drops everything that does not

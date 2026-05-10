@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
-use Apermo\LinkStash\Url\Canonicalizer;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
+use Apermo\Stash\Url\Canonicalizer;
+use Apermo\Stash\Url\MetadataFetcher;
 
 /**
- * Renders the paste-a-URL quick-add form on the bookmark list screen
+ * Renders the paste-a-URL quick-add form on the link list screen
  * and handles its submission.
  */
 class QuickAdd {
 
-	private const ACTION = 'linkstash_quick_add';
+	private const ACTION = 'apermo_stash_quick_add';
 
 	/**
 	 * Holds the metadata fetcher.
@@ -61,7 +61,7 @@ class QuickAdd {
 	}
 
 	/**
-	 * Returns the URL of the bookmark list screen, optionally with a notice param.
+	 * Returns the URL of the link list screen, optionally with a notice param.
 	 *
 	 * @param string $notice Notice slug.
 	 *
@@ -70,8 +70,8 @@ class QuickAdd {
 	private static function list_url( string $notice ): string {
 		return add_query_arg(
 			[
-				'post_type'        => BookmarkPostType::POST_TYPE,
-				'linkstash_notice' => $notice,
+				'post_type'           => LinkPostType::POST_TYPE,
+				'apermo_stash_notice' => $notice,
 			],
 			admin_url( 'edit.php' ),
 		);
@@ -80,31 +80,31 @@ class QuickAdd {
 	/**
 	 * Renders the standalone quick-add form HTML.
 	 *
-	 * Shared by the bookmark list screen and the dashboard widget so the
+	 * Shared by the link list screen and the dashboard widget so the
 	 * markup, nonce, and submit target stay in lockstep.
 	 *
 	 * @param string $css_class Extra CSS class to apply to the form element.
 	 *
 	 * @return void
 	 */
-	public static function render_form_html( string $css_class = 'linkstash-quick-add' ): void {
+	public static function render_form_html( string $css_class = 'apermo-stash-quick-add' ): void {
 		$nonce = wp_create_nonce( self::ACTION );
 		?>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="<?php echo esc_attr( $css_class ); ?>" style="margin: 0.5rem 0;">
 			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
 			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
 			<p>
-				<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'linkstash' ); ?>" required class="widefat" data-linkstash-url-input />
+				<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'apermo-stash' ); ?>" required class="widefat" data-apermo-stash-url-input />
 			</p>
 			<p>
-				<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'linkstash' ); ?>" class="widefat" data-linkstash-tag-autocomplete="<?php echo esc_attr( TagTaxonomy::TAXONOMY ); ?>" autocomplete="off" />
+				<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'apermo-stash' ); ?>" class="widefat" data-apermo-stash-tag-autocomplete="<?php echo esc_attr( TagTaxonomy::TAXONOMY ); ?>" autocomplete="off" />
 			</p>
 			<p>
 				<label>
 					<input type="checkbox" name="public" value="1" />
-					<?php esc_html_e( 'Public', 'linkstash' ); ?>
+					<?php esc_html_e( 'Public', 'apermo-stash' ); ?>
 				</label>
-				<button type="submit" class="button button-primary alignright"><?php esc_html_e( 'Save bookmark', 'linkstash' ); ?></button>
+				<button type="submit" class="button button-primary alignright"><?php esc_html_e( 'Save link', 'apermo-stash' ); ?></button>
 			</p>
 		</form>
 		<?php
@@ -132,7 +132,7 @@ class QuickAdd {
 	 */
 	public function handle_submission(): void {
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'You are not allowed to add bookmarks.', 'linkstash' ), '', [ 'response' => 403 ] );
+			wp_die( esc_html__( 'You are not allowed to add links.', 'apermo-stash' ), '', [ 'response' => 403 ] );
 		}
 
 		check_admin_referer( self::ACTION );
@@ -158,7 +158,7 @@ class QuickAdd {
 
 		$post_id = wp_insert_post(
 			[
-				'post_type'    => BookmarkPostType::POST_TYPE,
+				'post_type'    => LinkPostType::POST_TYPE,
 				'post_status'  => $is_public ? 'publish' : 'private',
 				'post_title'   => $meta['title'] ?? $url,
 				'post_content' => $meta['description'] ?? '',
@@ -172,10 +172,10 @@ class QuickAdd {
 			exit();
 		}
 
-		update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
-		update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
-		update_post_meta( $post_id, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( false ) );
-		update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, BookmarkMeta::bool_to_meta( ! $meta['reachable'] ) );
+		update_post_meta( $post_id, LinkMeta::META_URL, $url );
+		update_post_meta( $post_id, LinkMeta::META_URL_CANONICAL, $canonical );
+		update_post_meta( $post_id, LinkMeta::META_FAVORITE, LinkMeta::bool_to_meta( false ) );
+		update_post_meta( $post_id, LinkMeta::META_UNREACHABLE, LinkMeta::bool_to_meta( ! $meta['reachable'] ) );
 
 		if ( $tags !== [] ) {
 			wp_set_object_terms( $post_id, $tags, TagTaxonomy::TAXONOMY, false );

@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
 
 /**
- * Customises the bookmark CPT list table columns.
+ * Customises the link CPT list table columns.
  */
 class ListColumns {
 
 	/**
 	 * Renders the URL column.
 	 *
-	 * @param int $post_id Bookmark post ID.
+	 * @param int $post_id Link post ID.
 	 *
 	 * @return void
 	 */
 	private static function render_url( int $post_id ): void {
-		$url = (string) get_post_meta( $post_id, BookmarkMeta::META_URL, true );
+		$url = (string) get_post_meta( $post_id, LinkMeta::META_URL, true );
 		if ( $url === '' ) {
 			return;
 		}
@@ -37,7 +37,7 @@ class ListColumns {
 	/**
 	 * Renders the tags column with clickable per-tag filter links.
 	 *
-	 * @param int $post_id Bookmark post ID.
+	 * @param int $post_id Link post ID.
 	 *
 	 * @return void
 	 */
@@ -52,7 +52,7 @@ class ListColumns {
 		foreach ( $terms as $term ) {
 			$url = add_query_arg(
 				[
-					'post_type'           => BookmarkPostType::POST_TYPE,
+					'post_type'           => LinkPostType::POST_TYPE,
 					TagTaxonomy::TAXONOMY => $term->slug,
 				],
 				admin_url( 'edit.php' ),
@@ -71,7 +71,7 @@ class ListColumns {
 	/**
 	 * Renders the visibility column.
 	 *
-	 * @param int $post_id Bookmark post ID.
+	 * @param int $post_id Link post ID.
 	 *
 	 * @return void
 	 */
@@ -79,24 +79,24 @@ class ListColumns {
 		$post      = get_post( $post_id );
 		$is_public = $post !== null && $post->post_status === 'publish';
 		\printf(
-			'<span class="linkstash-badge linkstash-badge--%1$s">%2$s</span>',
+			'<span class="apermo-stash-badge apermo-stash-badge--%1$s">%2$s</span>',
 			esc_attr( $is_public ? 'public' : 'private' ),
-			esc_html( $is_public ? __( 'Public', 'linkstash' ) : __( 'Private', 'linkstash' ) ),
+			esc_html( $is_public ? __( 'Public', 'apermo-stash' ) : __( 'Private', 'apermo-stash' ) ),
 		);
 	}
 
 	/**
 	 * Renders the favorite column — a star when set, em-dash otherwise.
 	 *
-	 * @param int $post_id Bookmark post ID.
+	 * @param int $post_id Link post ID.
 	 *
 	 * @return void
 	 */
 	private static function render_favorite( int $post_id ): void {
-		$favorite = (bool) get_post_meta( $post_id, BookmarkMeta::META_FAVORITE, true );
+		$favorite = (bool) get_post_meta( $post_id, LinkMeta::META_FAVORITE, true );
 
 		echo $favorite
-			? '<span aria-label="' . esc_attr__( 'Favorite', 'linkstash' ) . '">&#9733;</span>'
+			? '<span aria-label="' . esc_attr__( 'Favorite', 'apermo-stash' ) . '">&#9733;</span>'
 			: '—';
 	}
 
@@ -106,14 +106,14 @@ class ListColumns {
 	 * @return void
 	 */
 	public function register(): void {
-		$post_type = BookmarkPostType::POST_TYPE;
+		$post_type = LinkPostType::POST_TYPE;
 
 		add_filter( "manage_{$post_type}_posts_columns", [ $this, 'filter_columns' ] );
 		add_action( "manage_{$post_type}_posts_custom_column", [ $this, 'render_column' ], 10, 2 );
 	}
 
 	/**
-	 * Replaces the default columns with LinkStash-specific ones.
+	 * Replaces the default columns with Apermo Stash-specific ones.
 	 *
 	 * @param array<string, string> $columns Existing columns.
 	 *
@@ -121,13 +121,13 @@ class ListColumns {
 	 */
 	public function filter_columns( array $columns ): array {
 		return [
-			'cb'            => $columns['cb'] ?? '<input type="checkbox" />',
-			'title'         => esc_html__( 'Title', 'linkstash' ),
-			'url'           => esc_html__( 'URL', 'linkstash' ),
-			'linkstash_tag' => esc_html__( 'Tags', 'linkstash' ),
-			'visibility'    => esc_html__( 'Visibility', 'linkstash' ),
-			'favorite'      => esc_html__( 'Favorite', 'linkstash' ),
-			'date'          => $columns['date'] ?? esc_html__( 'Date', 'linkstash' ),
+			'cb'               => $columns['cb'] ?? '<input type="checkbox" />',
+			'title'            => esc_html__( 'Title', 'apermo-stash' ),
+			'url'              => esc_html__( 'URL', 'apermo-stash' ),
+			'apermo_stash_tag' => esc_html__( 'Tags', 'apermo-stash' ),
+			'visibility'       => esc_html__( 'Visibility', 'apermo-stash' ),
+			'favorite'         => esc_html__( 'Favorite', 'apermo-stash' ),
+			'date'             => $columns['date'] ?? esc_html__( 'Date', 'apermo-stash' ),
 		];
 	}
 
@@ -135,14 +135,14 @@ class ListColumns {
 	 * Renders the value for a custom column.
 	 *
 	 * @param string $column  Column key.
-	 * @param int    $post_id Bookmark post ID.
+	 * @param int    $post_id Link post ID.
 	 *
 	 * @return void
 	 */
 	public function render_column( string $column, int $post_id ): void {
 		match ( $column ) {
 			'url'           => self::render_url( $post_id ),
-			'linkstash_tag' => self::render_tags( $post_id ),
+			'apermo_stash_tag' => self::render_tags( $post_id ),
 			'visibility'    => self::render_visibility( $post_id ),
 			'favorite'      => self::render_favorite( $post_id ),
 			default         => null,

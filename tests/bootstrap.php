@@ -57,7 +57,7 @@ if ( $loading_wp ) {
 
 	require_once $wp_tests_dir . '/includes/functions.php';
 
-	tests_add_filter( 'muplugins_loaded', 'linkstash_tests_load_project' );
+	tests_add_filter( 'muplugins_loaded', 'apermo_stash_tests_load_project' );
 
 	require_once $wp_tests_dir . '/includes/bootstrap.php';
 }
@@ -67,7 +67,7 @@ if ( $loading_wp ) {
  *
  * @return void
  */
-function linkstash_tests_load_project(): void {
+function apermo_stash_tests_load_project(): void {
 	$plugin_file = dirname( __DIR__ ) . '/plugin.php';
 	if ( file_exists( $plugin_file ) ) {
 		require $plugin_file;

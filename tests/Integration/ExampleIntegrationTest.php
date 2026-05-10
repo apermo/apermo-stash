@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Integration;
+namespace Apermo\Stash\Tests\Integration;
 
-use Apermo\LinkStash\Main;
+use Apermo\Stash\Main;
 use WP_UnitTestCase;
 
 /**

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    name="linkstash"
+    name="apermo-stash"
     xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PHPCSStandards/PHP_CodeSniffer/master/phpcs.xsd">
 
-    <description>PHPCS configuration for linkstash.</description>
+    <description>PHPCS configuration for apermo-stash.</description>
 
     <file>.</file>
     <exclude-pattern>.ddev/*</exclude-pattern>
@@ -18,21 +18,21 @@
     <rule ref="WordPress.WP.I18n">
         <properties>
             <property name="text_domain" type="array">
-                <element value="linkstash"/>
+                <element value="apermo-stash"/>
             </property>
         </properties>
     </rule>
 
     <!--
         Project prefix for global functions, hooks, constants,
-        and namespace roots. E.g. prefix "Apermo\LinkStash" allows
-        namespace Apermo\LinkStash\Admin but flags Other\Admin.
+        and namespace roots. E.g. prefix "Apermo\Stash" allows
+        namespace Apermo\Stash\Admin but flags Other\Admin.
     -->
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
         <properties>
             <property name="prefixes" type="array">
-                <element value="Apermo\LinkStash"/>
-                <element value="linkstash"/>
+                <element value="Apermo\Stash"/>
+                <element value="apermo_stash"/>
             </property>
         </properties>
         <!-- Test bootstrap uses standard WP test globals, not plugin globals. -->

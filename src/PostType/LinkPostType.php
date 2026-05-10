@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\PostType;
+namespace Apermo\Stash\PostType;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\Main;
+use Apermo\Stash\Main;
 
 /**
- * Registers the linkstash_bookmark custom post type.
+ * Registers the apermo_stash_link custom post type.
  */
-class BookmarkPostType {
+class LinkPostType {
 
-	public const POST_TYPE = 'linkstash_bookmark';
+	public const POST_TYPE = 'apermo_stash_link';
 
 	/**
 	 * Caches the SVG markup so the file is read at most once per request.
@@ -71,25 +71,25 @@ class BookmarkPostType {
 			// phpcs:ignore Apermo.DataStructures.ArrayComplexity.TooManyKeys
 			[
 				'labels'             => [
-					'name'               => __( 'Bookmarks', 'linkstash' ),
-					'singular_name'      => __( 'Bookmark', 'linkstash' ),
-					'menu_name'          => __( 'LinkStash', 'linkstash' ),
-					'add_new'            => __( 'Add New', 'linkstash' ),
-					'add_new_item'       => __( 'Add New Bookmark', 'linkstash' ),
-					'edit_item'          => __( 'Edit Bookmark', 'linkstash' ),
-					'new_item'           => __( 'New Bookmark', 'linkstash' ),
-					'view_item'          => __( 'View Bookmark', 'linkstash' ),
-					'search_items'       => __( 'Search Bookmarks', 'linkstash' ),
-					'not_found'          => __( 'No bookmarks found.', 'linkstash' ),
-					'not_found_in_trash' => __( 'No bookmarks found in Trash.', 'linkstash' ),
-					'all_items'          => __( 'All Bookmarks', 'linkstash' ),
+					'name'               => __( 'Links', 'apermo-stash' ),
+					'singular_name'      => __( 'Link', 'apermo-stash' ),
+					'menu_name'          => __( 'Apermo Stash', 'apermo-stash' ),
+					'add_new'            => __( 'Add New', 'apermo-stash' ),
+					'add_new_item'       => __( 'Add New Link', 'apermo-stash' ),
+					'edit_item'          => __( 'Edit Link', 'apermo-stash' ),
+					'new_item'           => __( 'New Link', 'apermo-stash' ),
+					'view_item'          => __( 'View Link', 'apermo-stash' ),
+					'search_items'       => __( 'Search Links', 'apermo-stash' ),
+					'not_found'          => __( 'No links found.', 'apermo-stash' ),
+					'not_found_in_trash' => __( 'No links found in Trash.', 'apermo-stash' ),
+					'all_items'          => __( 'All Links', 'apermo-stash' ),
 				],
 				'public'             => false,
 				'publicly_queryable' => false,
 				'show_ui'            => true,
 				'show_in_menu'       => true,
 				'show_in_rest'       => true,
-				'rest_base'          => 'bookmarks',
+				'rest_base'          => 'links',
 				'menu_icon'          => 'none',
 				'capability_type'    => 'post',
 				'map_meta_cap'       => true,
@@ -147,7 +147,7 @@ class BookmarkPostType {
 		// constants composed from a class constant. No user data flows in.
 		$selector = '#menu-posts-' . self::POST_TYPE . ' .wp-menu-image';
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo '<script id="linkstash-menu-icon">'
+		echo '<script id="apermo-stash-menu-icon">'
 			. '(function(){'
 			. 'var d=document.querySelector(' . wp_json_encode( $selector ) . ');'
 			. 'if(d){d.innerHTML=' . wp_json_encode( $markup ) . ';}'

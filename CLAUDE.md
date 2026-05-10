@@ -131,10 +131,10 @@ After running `setup.sh` on a new project derived from this template, remind the
 
 ## Naming
 
-- Plugin slug: `linkstash`
-- Namespace: `Apermo\LinkStash` (PSR-4 root)
-- Constants prefix: `LINKSTASH_`
-- User-facing brand: **LinkStash** (capital S; not `Linkstash`)
+- Plugin slug: `apermo-stash`
+- Namespace: `Apermo\Stash` (PSR-4 root)
+- Constants prefix: `APERMO_STASH_`
+- User-facing brand: **Apermo Stash** (two words, capital A and capital S)
 
 The bootstrapping `setup.sh` script that derived this project from
 `apermo/template-wordpress` was removed once it had done its job; the
