@@ -1,8 +1,8 @@
-# LinkStash - Code Review Style Guide
+# Apermo Stash - Code Review Style Guide
 
 ## Project Context
 
-LinkStash is a self-hosted WordPress bookmark plugin (linkding-inspired) with a token-protected REST API used by a forthcoming Chrome MV3 extension. PHP 8.1+ minimum, strict types everywhere. PSR-4 namespace `Apermo\LinkStash` under `src/`.
+Apermo Stash is a self-hosted WordPress bookmark plugin (linkding-inspired) with a token-protected REST API used by a forthcoming Chrome MV3 extension. PHP 8.1+ minimum, strict types everywhere. PSR-4 namespace `Apermo\Stash` under `src/`.
 
 ## Code Style
 
@@ -16,8 +16,8 @@ LinkStash is a self-hosted WordPress bookmark plugin (linkding-inspired) with a 
 - Follow the [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/).
 - Use tabs for indentation (not spaces).
 - All files must declare `declare(strict_types=1)`.
-- PSR-4 autoloading under `src/` with the `Apermo\LinkStash` namespace.
-- All user-facing strings must be translatable using `__()`, `_e()`, `esc_html__()`, `esc_html_e()`, `esc_attr__()`, or `esc_attr_e()` with the `linkstash` text domain.
+- PSR-4 autoloading under `src/` with the `Apermo\Stash` namespace.
+- All user-facing strings must be translatable using `__()`, `_e()`, `esc_html__()`, `esc_html_e()`, `esc_attr__()`, or `esc_attr_e()` with the `apermo-stash` text domain.
 - Translator comments (`/* translators: ... */`) are required before any translation function call that contains placeholders.
 - All output must be properly escaped using `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`, etc.
 - Use post-increment (`$i++`) over pre-increment (`++$i`).

@@ -1,4 +1,4 @@
-# LinkStash
+# Apermo Stash
 
 [![PHP CI](https://github.com/apermo/linkstash/actions/workflows/ci.yml/badge.svg)](https://github.com/apermo/linkstash/actions/workflows/ci.yml)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPLv2+-blue.svg)](LICENSE)
@@ -21,15 +21,15 @@ and CORS configured for `chrome-extension://*` origins out of the box.
 
 ## Installation
 
-1. Clone or download this repository into `wp-content/plugins/linkstash/`.
+1. Clone or download this repository into `wp-content/plugins/apermo-stash/`.
 2. Run `composer install --no-dev` to generate the autoloader.
 3. Activate the plugin through the WordPress "Plugins" screen.
-4. Visit **Settings → LinkStash** to generate an API token (see Authentication
+4. Visit **Settings → Apermo Stash** to generate an API token (see Authentication
    below).
 
 ## Authentication
 
-LinkStash accepts two equivalent authentication schemes; pick whichever fits
+Apermo Stash accepts two equivalent authentication schemes; pick whichever fits
 your client.
 
 ### WordPress Application Passwords (Basic Auth)
@@ -39,18 +39,18 @@ Passwords** and pass it as Basic Auth:
 
 ```bash
 curl -u "your-username:xxxx xxxx xxxx xxxx xxxx xxxx" \
-     https://example.tld/wp-json/linkstash/v1/bookmarks
+     https://example.tld/wp-json/apermo-stash/v1/bookmarks
 ```
 
-### LinkStash Bearer Tokens
+### Apermo Stash Bearer Tokens
 
-Better suited for browser extensions: generate at **Settings → LinkStash → API
+Better suited for browser extensions: generate at **Settings → Apermo Stash → API
 Tokens**. The plain token is shown **once** at creation time — copy it
 immediately. Send it as:
 
 ```bash
 curl -H "Authorization: Bearer <token>" \
-     https://example.tld/wp-json/linkstash/v1/bookmarks
+     https://example.tld/wp-json/apermo-stash/v1/bookmarks
 ```
 
 Each token is bound to a WordPress user; permission checks run against that
@@ -58,7 +58,7 @@ user's capabilities (`edit_posts` for write endpoints).
 
 ## REST API
 
-Base path: `/wp-json/linkstash/v1`.
+Base path: `/wp-json/apermo-stash/v1`.
 
 | Method | Path | Description |
 |---|---|---|
@@ -75,7 +75,7 @@ Base path: `/wp-json/linkstash/v1`.
 Save a bookmark; let the server fetch the title and description:
 
 ```bash
-curl -X POST https://example.tld/wp-json/linkstash/v1/bookmarks \
+curl -X POST https://example.tld/wp-json/apermo-stash/v1/bookmarks \
      -H "Authorization: Bearer <token>" \
      -H "Content-Type: application/json" \
      -d '{"url":"https://example.tld/article","tags":["reading"],"public":true}'
@@ -85,14 +85,14 @@ Check whether a URL is already saved (browser-extension "already saved" badge):
 
 ```bash
 curl -H "Authorization: Bearer <token>" \
-     "https://example.tld/wp-json/linkstash/v1/check?url=https://example.tld/article"
+     "https://example.tld/wp-json/apermo-stash/v1/check?url=https://example.tld/article"
 ```
 
 Search and filter:
 
 ```bash
 curl -H "Authorization: Bearer <token>" \
-     "https://example.tld/wp-json/linkstash/v1/bookmarks?tag=reading&unread=1"
+     "https://example.tld/wp-json/apermo-stash/v1/bookmarks?tag=reading&unread=1"
 ```
 
 ### Public versus private bookmarks
@@ -108,11 +108,11 @@ PATCH, DELETE always require authentication.
 
 ### CORS
 
-By default LinkStash sends CORS headers permitting `chrome-extension://*`
-origins. Add additional origins via the `linkstash_allowed_origins` filter:
+By default Apermo Stash sends CORS headers permitting `chrome-extension://*`
+origins. Add additional origins via the `apermo_stash_allowed_origins` filter:
 
 ```php
-add_filter( 'linkstash_allowed_origins', static function ( array $origins ): array {
+add_filter( 'apermo_stash_allowed_origins', static function ( array $origins ): array {
     $origins[] = 'https://my-frontend.example.tld';
     return $origins;
 } );
@@ -123,14 +123,14 @@ specific ID — defense-in-depth on top of the Bearer requirement —
 return only that origin:
 
 ```php
-add_filter( 'linkstash_allowed_origins', static function (): array {
+add_filter( 'apermo_stash_allowed_origins', static function (): array {
     return [ 'chrome-extension://abcdefghijklmnopqrstuvwxyzabcdef' ];
 } );
 ```
 
 ### Outbound HTTP
 
-LinkStash makes one outbound HTTP request per saved bookmark — to
+Apermo Stash makes one outbound HTTP request per saved bookmark — to
 the bookmarked URL itself, via `wp_safe_remote_get` (5 s timeout, up
 to three redirects, all re-validated). The fetched body is parsed
 for `<title>` and `<meta name="description" / og:description>`; on

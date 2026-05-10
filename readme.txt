@@ -1,4 +1,4 @@
-=== LinkStash ===
+=== Apermo Stash ===
 Contributors: apermo
 Tags: bookmarks, links, rest-api, self-hosted, archive
 Requires at least: 6.4
@@ -13,7 +13,7 @@ companion Chrome extension.
 
 == Description ==
 
-LinkStash turns your WordPress site into a personal bookmark archive,
+Apermo Stash turns your WordPress site into a personal bookmark archive,
 inspired by linkding and Delicious. Save URLs with a title,
 notes, and tags from the WordPress admin or from your browser via a
 [Chrome extension](https://chromewebstore.google.com/detail/linkstash/midebpgblmgkcgljcgojjbehnonljnmk); read
@@ -22,7 +22,7 @@ extensions and your own scripts.
 
 = Highlights =
 
-* **Bookmarks as a custom post type.** Every URL is a `linkstash_bookmark`
+* **Bookmarks as a custom post type.** Every URL is a `apermo_stash_bookmark`
   post — searchable, filterable, taggable, and reachable through
   WordPress's existing tooling.
 * **Public or private per-bookmark.** Visibility uses native
@@ -41,7 +41,7 @@ extensions and your own scripts.
   optional notes, and tags. Title falls back to a simplified URL when
   you leave it empty.
 * **REST API, Bearer-authenticated.** Every endpoint under
-  `linkstash/v1` accepts WordPress Application Passwords and
+  `apermo-stash/v1` accepts WordPress Application Passwords and
   plugin-issued Bearer tokens. CORS is preconfigured for
   `chrome-extension://*` so the companion extension works without
   additional setup.
@@ -54,7 +54,7 @@ extensions and your own scripts.
 
 = REST API =
 
-`linkstash/v1` exposes:
+`apermo-stash/v1` exposes:
 
 * `GET /bookmarks` (list, paged, filterable by tag / favorite / public /
   private)
@@ -63,7 +63,7 @@ extensions and your own scripts.
 * `GET /tags?q=` (tag listing with counts; respects visibility)
 * `GET /check?url=` (browser-extension "is this saved?" check)
 
-Token CRUD lives under **Settings → LinkStash**. New tokens are shown
+Token CRUD lives under **Settings → Apermo Stash**. New tokens are shown
 once at creation time; their hash is stored in user meta and never
 recoverable.
 
@@ -80,23 +80,23 @@ or edit the current tab from the popup, and offers a right-click
 
 == Installation ==
 
-1. Upload the plugin files to `/wp-content/plugins/linkstash/`, or
+1. Upload the plugin files to `/wp-content/plugins/apermo-stash/`, or
    install via the Plugins screen in WordPress.
 2. Activate the plugin.
 3. Visit **Settings → Permalinks** and pick anything other than
    "Plain" — the REST API needs rewrite rules. Most installs default
    to a sensible setting already.
-4. Visit **Settings → LinkStash** to generate an API token for your
+4. Visit **Settings → Apermo Stash** to generate an API token for your
    browser extension or scripting.
 
 == Frequently Asked Questions ==
 
 = Where are my bookmarks stored? =
 
-In your WordPress database, as posts of type `linkstash_bookmark`.
+In your WordPress database, as posts of type `apermo_stash_bookmark`.
 The URL, canonical URL, favorite flag, and unreachable flag live in
 post meta. Tags use a custom non-hierarchical taxonomy
-(`linkstash_tag`), separate from your standard post tags.
+(`apermo_stash_tag`), separate from your standard post tags.
 
 = Can multiple users on the same site have separate libraries? =
 
@@ -127,7 +127,7 @@ sharing page is on the roadmap.
 = What data does the plugin send anywhere? =
 
 Outbound HTTP from your server to one place only: the URL you save.
-On every save (admin form, dashboard widget, REST POST), LinkStash
+On every save (admin form, dashboard widget, REST POST), Apermo Stash
 issues a single `wp_safe_remote_get` against the bookmarked URL with
 a 5-second timeout to fetch its title and meta description. If the
 URL cannot be reached the bookmark is still saved and a "URL didn't
@@ -137,7 +137,7 @@ malicious URL cannot be used to probe internal services.
 
 The plugin does not call any third-party services, does not send
 analytics or telemetry, and does not load resources from third-party
-CDNs. The companion Chrome extension talks only to the LinkStash
+CDNs. The companion Chrome extension talks only to the Apermo Stash
 host you configure on its options page.
 
 = Can I lock down which browser extensions can talk to the API? =
@@ -151,7 +151,7 @@ also has a valid Bearer token.
 To restrict the allow-list to a specific extension after install,
 add a snippet to your `mu-plugins/` folder or theme's functions.php:
 
-    add_filter( 'linkstash_allowed_origins', static function () {
+    add_filter( 'apermo_stash_allowed_origins', static function () {
         return [ 'chrome-extension://abcdefghijklmnopqrstuvwxyzabcdef' ];
     } );
 
@@ -164,7 +164,7 @@ defense-in-depth narrowing of the CORS surface.
 1. Bookmark list screen with the URL / tags / visibility / favorite columns.
 2. Bookmark edit screen with URL meta box and unreachable-URL warning.
 3. Dashboard widget for one-click capture from anywhere in the admin.
-4. Settings → LinkStash token settings page.
+4. Settings → Apermo Stash token settings page.
 5. Companion Chrome extension popup saving the current tab.
 
 == Changelog ==
@@ -175,7 +175,7 @@ defense-in-depth narrowing of the CORS surface.
   `chrome-extension://` origins (the scheme is not in
   `wp_allowed_protocols()`) and emits an empty
   `Access-Control-Allow-Origin` header, which browsers reject. The
-  plugin now removes the core hook for LinkStash routes and emits a
+  plugin now removes the core hook for Apermo Stash routes and emits a
   complete CORS header set itself.
 
 = 0.1.2 =
@@ -191,7 +191,7 @@ defense-in-depth narrowing of the CORS surface.
   if you delete them.
 * New: unsaved-changes guard on the bookmark add/edit screen.
 * New: contextual help tabs on the bookmark list screen.
-* Changed: settings moved from Tools to Settings → LinkStash.
+* Changed: settings moved from Tools to Settings → Apermo Stash.
 * Security: /check now requires authentication (was anonymous);
   unauthorized reads of private bookmarks return 404 instead of 403
   to prevent ID enumeration.
@@ -207,4 +207,4 @@ defense-in-depth narrowing of the CORS surface.
   bookmark, CORS for `chrome-extension://*`, admin list columns,
   quick-add form, classic-editor metaboxes, dashboard widget, tag
   autocomplete, https:// auto-prepend, URL-reachability check,
-  Settings → LinkStash settings page, uninstall cleanup.
+  Settings → Apermo Stash settings page, uninstall cleanup.
