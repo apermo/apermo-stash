@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Tests\Unit\Rest;
 
+use Apermo\Stash\Rest\Permissions;
 use Apermo\Stash\Rest\TagsController;
 use Apermo\Stash\Tests\Unit\Rest\Fixtures\WpdbMockForTags;
 use Brain\Monkey;
@@ -71,7 +72,8 @@ class TagsControllerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies register_routes registers the /tags route.
+	 * Verifies register_routes registers the /tags route with the
+	 * `require_read_links` permission_callback (anonymous callers blocked).
 	 *
 	 * @return void
 	 */
@@ -79,7 +81,12 @@ class TagsControllerTest extends TestCase {
 		Functions\expect( 'register_rest_route' )
 			->once()
 			->withArgs(
-				static fn ( string $rest_namespace, string $route ): bool => $rest_namespace === 'apermo-stash/v1' && $route === '/tags',
+				static function ( string $rest_namespace, string $route, array $args ): bool {
+					return $rest_namespace === 'apermo-stash/v1'
+						&& $route === '/tags'
+						&& $args[0]['permission_callback']
+							=== [ Permissions::class, 'require_read_links' ];
+				},
 			);
 
 		( new TagsController() )->register_routes( 'apermo-stash/v1' );
