@@ -3,7 +3,7 @@
  * Plugin Name: Apermo Stash
  * Plugin URI:  https://github.com/apermo/apermo-stash
  * Description: A self-hosted link collection with a token-protected REST API.
- * Version:     0.1.3
+ * Version:     0.2.0
  * Author:      Christoph Daum
  * Author URI:  https://christoph-daum.com
  * License:     GPL-2.0-or-later

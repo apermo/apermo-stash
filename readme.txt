@@ -1,10 +1,10 @@
 === Apermo Stash ===
 Contributors: apermo
-Tags: links, links, rest-api, self-hosted, archive
+Tags: links, bookmarks, rest-api, self-hosted, archive
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.1.3
+Stable tag: 0.2.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -168,6 +168,17 @@ defense-in-depth narrowing of the CORS surface.
 5. Companion Chrome extension popup saving the current tab.
 
 == Changelog ==
+
+= 0.2.0 =
+* Renamed plugin: LinkStash → Apermo Stash. Slug, namespace,
+  text domain, REST namespace and Composer package all updated.
+* Renamed content type: bookmark → link. Post type slug
+  `apermo_stash_link`, REST endpoint `/links`, admin labels
+  "Link"/"Links". The 21-character `apermo_stash_bookmark` would
+  have exceeded WordPress's 20-char `register_post_type` limit.
+* Security: `GET /links` and `GET /tags` now require `edit_posts`
+  — both were previously reachable by unauthenticated callers.
+* Author URI changed from apermo.de to christoph-daum.com.
 
 = 0.1.3 =
 * Fixed: the Chrome extension's save flow now actually reaches the
