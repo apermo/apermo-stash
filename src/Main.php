@@ -35,7 +35,7 @@ class Main {
 
 	public const VERSION = '0.1.3';
 
-	private const STARTER_TAGS_SEEDED_OPTION = 'linkstash_starter_tags_seeded';
+	private const STARTER_TAGS_SEEDED_OPTION = 'apermo_stash_starter_tags_seeded';
 
 	/**
 	 * Holds the main plugin file path.
@@ -86,7 +86,7 @@ class Main {
 	/**
 	 * Seeds a small set of starter tags exactly once.
 	 *
-	 * Sets `linkstash_starter_tags_seeded` after the first fully-successful
+	 * Sets `apermo_stash_starter_tags_seeded` after the first fully-successful
 	 * run; subsequent (re-)activations short-circuit on that option, so a
 	 * user who deletes a starter tag and later reactivates the plugin
 	 * will not see it resurrected. Existing tags with the same slug are

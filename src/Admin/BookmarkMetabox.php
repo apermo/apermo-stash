@@ -25,8 +25,8 @@ use WP_Post;
  */
 class BookmarkMetabox {
 
-	private const NONCE_FIELD  = 'linkstash_metabox_nonce';
-	private const NONCE_ACTION = 'linkstash_save_metabox';
+	private const NONCE_FIELD  = 'apermo_stash_metabox_nonce';
+	private const NONCE_ACTION = 'apermo_stash_save_metabox';
 
 	/**
 	 * URL metadata fetcher (used on save to mark unreachable URLs).
@@ -179,7 +179,7 @@ class BookmarkMetabox {
 		// uses 'high' priority so it renders directly under the title and
 		// above the Notes panel.
 		add_meta_box(
-			'linkstash_bookmark_url',
+			'apermo_stash_bookmark_url',
 			__( 'Bookmark URL', 'apermo-stash' ),
 			[ $this, 'render_url_meta_box' ],
 			BookmarkPostType::POST_TYPE,
@@ -188,7 +188,7 @@ class BookmarkMetabox {
 		);
 
 		add_meta_box(
-			'linkstash_bookmark_note',
+			'apermo_stash_bookmark_note',
 			__( 'Notes', 'apermo-stash' ),
 			[ $this, 'render_note_meta_box' ],
 			BookmarkPostType::POST_TYPE,
@@ -214,7 +214,7 @@ class BookmarkMetabox {
 			<label for="linkstash-url"><strong><?php esc_html_e( 'URL', 'apermo-stash' ); ?></strong></label><br />
 			<input type="url"
 					id="linkstash-url"
-					name="linkstash_url"
+					name="apermo_stash_url"
 					value="<?php echo esc_attr( $url ); ?>"
 					required
 					class="widefat"
@@ -232,7 +232,7 @@ class BookmarkMetabox {
 		<?php } ?>
 		<p>
 			<label>
-				<input type="checkbox" name="linkstash_favorite" value="1" <?php checked( $favorite ); ?> />
+				<input type="checkbox" name="apermo_stash_favorite" value="1" <?php checked( $favorite ); ?> />
 				<?php esc_html_e( 'Favorite', 'apermo-stash' ); ?>
 			</label>
 		</p>
@@ -251,7 +251,7 @@ class BookmarkMetabox {
 	 */
 	public function render_note_meta_box( WP_Post $post ): void {
 		?>
-		<textarea name="linkstash_note"
+		<textarea name="apermo_stash_note"
 					id="linkstash-note"
 					class="widefat"
 					rows="8"
@@ -276,7 +276,7 @@ class BookmarkMetabox {
 			return;
 		}
 
-		$url       = self::read_text( 'linkstash_url' );
+		$url       = self::read_text( 'apermo_stash_url' );
 		$canonical = Canonicalizer::canonicalize( $url );
 		if ( $url !== '' && $canonical !== '' ) {
 			update_post_meta( $post_id, BookmarkMeta::META_URL, esc_url_raw( $url ) );
@@ -293,11 +293,11 @@ class BookmarkMetabox {
 		update_post_meta(
 			$post_id,
 			BookmarkMeta::META_FAVORITE,
-			BookmarkMeta::bool_to_meta( isset( $_POST['linkstash_favorite'] ) ),
+			BookmarkMeta::bool_to_meta( isset( $_POST['apermo_stash_favorite'] ) ),
 		);
 
-		$note_raw = isset( $_POST['linkstash_note'] ) && \is_string( $_POST['linkstash_note'] )
-			? wp_kses_post( wp_unslash( $_POST['linkstash_note'] ) )
+		$note_raw = isset( $_POST['apermo_stash_note'] ) && \is_string( $_POST['apermo_stash_note'] )
+			? wp_kses_post( wp_unslash( $_POST['apermo_stash_note'] ) )
 			: '';
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 

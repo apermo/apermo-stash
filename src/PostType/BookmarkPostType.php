@@ -9,11 +9,11 @@ namespace Apermo\Stash\PostType;
 use Apermo\Stash\Main;
 
 /**
- * Registers the linkstash_bookmark custom post type.
+ * Registers the apermo_stash_bookmark custom post type.
  */
 class BookmarkPostType {
 
-	public const POST_TYPE = 'linkstash_bookmark';
+	public const POST_TYPE = 'apermo_stash_bookmark';
 
 	/**
 	 * Caches the SVG markup so the file is read at most once per request.

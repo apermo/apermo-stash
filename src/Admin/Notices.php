@@ -10,7 +10,7 @@ use Apermo\Stash\PostType\BookmarkPostType;
 
 /**
  * Renders admin notices on the bookmark list screen in response to the
- * `linkstash_notice` query arg the QuickAdd handler appends after a save.
+ * `apermo_stash_notice` query arg the QuickAdd handler appends after a save.
  *
  * Recognised notice slugs:
  *
@@ -62,7 +62,7 @@ class Notices {
 
 	/**
 	 * Renders the notice when the current screen is the bookmark list and a
-	 * recognised `linkstash_notice` slug is present.
+	 * recognised `apermo_stash_notice` slug is present.
 	 *
 	 * @return void
 	 */
@@ -75,11 +75,11 @@ class Notices {
 			return;
 		}
 
-		// $_GET['linkstash_notice'] is a flash flag set by our own
+		// $_GET['apermo_stash_notice'] is a flash flag set by our own
 		// admin-post redirect; nothing security-relevant goes through it.
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$notice = isset( $_GET['linkstash_notice'] ) && \is_string( $_GET['linkstash_notice'] )
-			? sanitize_key( wp_unslash( $_GET['linkstash_notice'] ) )
+		$notice = isset( $_GET['apermo_stash_notice'] ) && \is_string( $_GET['apermo_stash_notice'] )
+			? sanitize_key( wp_unslash( $_GET['apermo_stash_notice'] ) )
 			: '';
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 

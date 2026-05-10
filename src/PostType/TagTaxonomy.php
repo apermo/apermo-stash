@@ -7,11 +7,11 @@ namespace Apermo\Stash\PostType;
 \defined( 'ABSPATH' ) || exit();
 
 /**
- * Registers the linkstash_tag taxonomy attached to the bookmark CPT.
+ * Registers the apermo_stash_tag taxonomy attached to the bookmark CPT.
  */
 class TagTaxonomy {
 
-	public const TAXONOMY = 'linkstash_tag';
+	public const TAXONOMY = 'apermo_stash_tag';
 
 	/**
 	 * Registers the WordPress hook that triggers taxonomy registration.

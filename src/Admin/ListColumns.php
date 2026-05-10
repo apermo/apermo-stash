@@ -121,13 +121,13 @@ class ListColumns {
 	 */
 	public function filter_columns( array $columns ): array {
 		return [
-			'cb'            => $columns['cb'] ?? '<input type="checkbox" />',
-			'title'         => esc_html__( 'Title', 'apermo-stash' ),
-			'url'           => esc_html__( 'URL', 'apermo-stash' ),
-			'linkstash_tag' => esc_html__( 'Tags', 'apermo-stash' ),
-			'visibility'    => esc_html__( 'Visibility', 'apermo-stash' ),
-			'favorite'      => esc_html__( 'Favorite', 'apermo-stash' ),
-			'date'          => $columns['date'] ?? esc_html__( 'Date', 'apermo-stash' ),
+			'cb'               => $columns['cb'] ?? '<input type="checkbox" />',
+			'title'            => esc_html__( 'Title', 'apermo-stash' ),
+			'url'              => esc_html__( 'URL', 'apermo-stash' ),
+			'apermo_stash_tag' => esc_html__( 'Tags', 'apermo-stash' ),
+			'visibility'       => esc_html__( 'Visibility', 'apermo-stash' ),
+			'favorite'         => esc_html__( 'Favorite', 'apermo-stash' ),
+			'date'             => $columns['date'] ?? esc_html__( 'Date', 'apermo-stash' ),
 		];
 	}
 
@@ -142,7 +142,7 @@ class ListColumns {
 	public function render_column( string $column, int $post_id ): void {
 		match ( $column ) {
 			'url'           => self::render_url( $post_id ),
-			'linkstash_tag' => self::render_tags( $post_id ),
+			'apermo_stash_tag' => self::render_tags( $post_id ),
 			'visibility'    => self::render_visibility( $post_id ),
 			'favorite'      => self::render_favorite( $post_id ),
 			default         => null,

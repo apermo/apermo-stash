@@ -94,6 +94,6 @@ class TagTaxonomyTest extends TestCase {
 	 * @return void
 	 */
 	public function test_taxonomy_constant(): void {
-		self::assertSame( 'linkstash_tag', TagTaxonomy::TAXONOMY );
+		self::assertSame( 'apermo_stash_tag', TagTaxonomy::TAXONOMY );
 	}
 }

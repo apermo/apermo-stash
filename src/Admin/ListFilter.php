@@ -14,7 +14,7 @@ use WP_Query;
  * Wires URL-parameter filters on the bookmark list table.
  *
  * `?favorite=1` narrows the list to favorited bookmarks; the standard
- * `?linkstash_tag=<slug>` taxonomy filter is handled by core.
+ * `?apermo_stash_tag=<slug>` taxonomy filter is handled by core.
  */
 class ListFilter {
 
@@ -29,7 +29,7 @@ class ListFilter {
 	}
 
 	/**
-	 * Adds a `_linkstash_favorite = 1` meta_query when the URL says so.
+	 * Adds a `_apermo_stash_favorite = 1` meta_query when the URL says so.
 	 *
 	 * @param WP_Query $query Current query.
 	 *
@@ -54,7 +54,7 @@ class ListFilter {
 		$existing = $query->get( 'meta_query' );
 		$existing = \is_array( $existing ) ? $existing : [];
 
-		$existing['linkstash_favorite'] = [
+		$existing['apermo_stash_favorite'] = [
 			'key'   => BookmarkMeta::META_FAVORITE,
 			'value' => '1',
 		];

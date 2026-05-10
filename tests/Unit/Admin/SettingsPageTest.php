@@ -81,8 +81,8 @@ class SettingsPageTest extends TestCase {
 		$page->register();
 
 		self::assertNotFalse( has_action( 'admin_menu', [ $page, 'register_menu' ] ) );
-		self::assertNotFalse( has_action( 'admin_post_linkstash_token_create', [ $page, 'handle_create' ] ) );
-		self::assertNotFalse( has_action( 'admin_post_linkstash_token_revoke', [ $page, 'handle_revoke' ] ) );
+		self::assertNotFalse( has_action( 'admin_post_apermo_stash_token_create', [ $page, 'handle_create' ] ) );
+		self::assertNotFalse( has_action( 'admin_post_apermo_stash_token_revoke', [ $page, 'handle_revoke' ] ) );
 		self::assertNotFalse( has_filter( 'plugin_action_links_' . Main::file() ) );
 	}
 
@@ -97,7 +97,7 @@ class SettingsPageTest extends TestCase {
 		$links = $this->page()->plugin_action_links( $existing );
 
 		self::assertCount( 2, $links );
-		self::assertStringContainsString( 'options-general.php?page=linkstash', $links[0] );
+		self::assertStringContainsString( 'options-general.php?page=apermo-stash', $links[0] );
 		self::assertStringContainsString( 'Settings', $links[0] );
 		self::assertSame( $existing['deactivate'], $links['deactivate'] );
 	}

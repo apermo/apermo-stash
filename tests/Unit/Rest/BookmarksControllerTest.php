@@ -107,7 +107,7 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->create_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_missing_url', $result->code );
+		self::assertSame( 'apermo_stash_missing_url', $result->code );
 	}
 
 	/**
@@ -122,7 +122,7 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->create_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_invalid_url', $result->code );
+		self::assertSame( 'apermo_stash_invalid_url', $result->code );
 	}
 
 	/**
@@ -139,7 +139,7 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->get_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_not_found', $result->code );
+		self::assertSame( 'apermo_stash_not_found', $result->code );
 	}
 
 	/**
@@ -176,7 +176,7 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->update_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_not_found', $result->code );
+		self::assertSame( 'apermo_stash_not_found', $result->code );
 	}
 
 	/**
@@ -199,7 +199,7 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->update_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_invalid_url', $result->code );
+		self::assertSame( 'apermo_stash_invalid_url', $result->code );
 	}
 
 	/**
@@ -216,7 +216,7 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->delete_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_not_found', $result->code );
+		self::assertSame( 'apermo_stash_not_found', $result->code );
 	}
 
 	/**
@@ -350,7 +350,7 @@ class BookmarksControllerTest extends TestCase {
 		$result = $this->controller()->delete_item( $request );
 
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_delete_failed', $result->code );
+		self::assertSame( 'apermo_stash_delete_failed', $result->code );
 	}
 
 	/**

@@ -356,12 +356,12 @@ class BookmarksController {
 	public function create_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$url = esc_url_raw( (string) $request->get_param( 'url' ) );
 		if ( $url === '' ) {
-			return new WP_Error( 'linkstash_missing_url', __( 'A url is required.', 'apermo-stash' ), [ 'status' => 400 ] );
+			return new WP_Error( 'apermo_stash_missing_url', __( 'A url is required.', 'apermo-stash' ), [ 'status' => 400 ] );
 		}
 
 		$canonical = Canonicalizer::canonicalize( $url );
 		if ( $canonical === '' ) {
-			return new WP_Error( 'linkstash_invalid_url', __( 'The url is not valid.', 'apermo-stash' ), [ 'status' => 400 ] );
+			return new WP_Error( 'apermo_stash_invalid_url', __( 'The url is not valid.', 'apermo-stash' ), [ 'status' => 400 ] );
 		}
 
 		$user_id  = get_current_user_id();
@@ -422,7 +422,7 @@ class BookmarksController {
 	public function get_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$post = get_post( (int) $request['id'] );
 		if ( $post === null || $post->post_type !== BookmarkPostType::POST_TYPE ) {
-			return new WP_Error( 'linkstash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
+			return new WP_Error( 'apermo_stash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
 		return rest_ensure_response( $this->prepare_response( $post ) );
@@ -446,7 +446,7 @@ class BookmarksController {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
 		if ( $post === null || $post->post_type !== BookmarkPostType::POST_TYPE ) {
-			return new WP_Error( 'linkstash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
+			return new WP_Error( 'apermo_stash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
 		$update = [ 'ID' => $post_id ];
@@ -474,7 +474,7 @@ class BookmarksController {
 			$canonical = Canonicalizer::canonicalize( $url );
 			if ( $canonical === '' ) {
 				return new WP_Error(
-					'linkstash_invalid_url',
+					'apermo_stash_invalid_url',
 					__( 'The url is not valid.', 'apermo-stash' ),
 					[ 'status' => 400 ],
 				);
@@ -507,12 +507,12 @@ class BookmarksController {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
 		if ( $post === null || $post->post_type !== BookmarkPostType::POST_TYPE ) {
-			return new WP_Error( 'linkstash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
+			return new WP_Error( 'apermo_stash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
 		$deleted = wp_delete_post( $post_id, true );
 		if ( $deleted === false || $deleted === null ) {
-			return new WP_Error( 'linkstash_delete_failed', __( 'Could not delete bookmark.', 'apermo-stash' ), [ 'status' => 500 ] );
+			return new WP_Error( 'apermo_stash_delete_failed', __( 'Could not delete bookmark.', 'apermo-stash' ), [ 'status' => 500 ] );
 		}
 
 		return rest_ensure_response(

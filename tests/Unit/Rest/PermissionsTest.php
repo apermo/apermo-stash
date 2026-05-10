@@ -146,7 +146,7 @@ class PermissionsTest extends TestCase {
 
 		$result = Permissions::can_read_bookmark( $request );
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_not_found', $result->code );
+		self::assertSame( 'apermo_stash_not_found', $result->code );
 	}
 
 	/**
@@ -226,6 +226,6 @@ class PermissionsTest extends TestCase {
 
 		$result = Permissions::can_read_bookmark( $request );
 		self::assertInstanceOf( WP_Error::class, $result );
-		self::assertSame( 'linkstash_not_found', $result->code );
+		self::assertSame( 'apermo_stash_not_found', $result->code );
 	}
 }

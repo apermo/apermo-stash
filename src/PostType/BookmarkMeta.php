@@ -11,10 +11,10 @@ namespace Apermo\Stash\PostType;
  */
 class BookmarkMeta {
 
-	public const META_URL           = '_linkstash_url';
-	public const META_URL_CANONICAL = '_linkstash_url_canonical';
-	public const META_FAVORITE      = '_linkstash_favorite';
-	public const META_UNREACHABLE   = '_linkstash_unreachable';
+	public const META_URL           = '_apermo_stash_url';
+	public const META_URL_CANONICAL = '_apermo_stash_url_canonical';
+	public const META_FAVORITE      = '_apermo_stash_favorite';
+	public const META_UNREACHABLE   = '_apermo_stash_unreachable';
 
 	/**
 	 * Registers a single-value string meta with REST exposure.

@@ -127,7 +127,7 @@ class CorsHandlerTest extends TestCase {
 		$_SERVER['REQUEST_URI']    = '/wp-json/apermo-stash/v1/bookmarks';
 		$_SERVER['HTTP_ORIGIN']    = 'https://attacker.tld';
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+		Filters\expectApplied( 'apermo_stash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
 
 		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
 		self::assertFalse( $result );
@@ -143,7 +143,7 @@ class CorsHandlerTest extends TestCase {
 		$_SERVER['REQUEST_URI']    = '/wp-json/apermo-stash/v1/bookmarks';
 		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+		Filters\expectApplied( 'apermo_stash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
 		Functions\when( 'status_header' )->justReturn( null );
 
 		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
@@ -161,7 +161,7 @@ class CorsHandlerTest extends TestCase {
 		$_SERVER['REQUEST_URI']    = '/wp-json/apermo-stash/v1/bookmarks';
 		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
-		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
+		Filters\expectApplied( 'apermo_stash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
 
 		$result = ( new CorsHandler() )->send_cors_response( false, null, null, null );
 		self::assertFalse( $result );

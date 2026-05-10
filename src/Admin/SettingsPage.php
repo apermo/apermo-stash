@@ -14,10 +14,10 @@ use Apermo\Stash\Main;
  */
 class SettingsPage {
 
-	private const PAGE_SLUG = 'linkstash';
-	private const ACTION_CREATE = 'linkstash_token_create';
-	private const ACTION_REVOKE = 'linkstash_token_revoke';
-	private const TRANSIENT_PREFIX = 'linkstash_new_token_';
+	private const PAGE_SLUG = 'apermo-stash';
+	private const ACTION_CREATE = 'apermo_stash_token_create';
+	private const ACTION_REVOKE = 'apermo_stash_token_revoke';
+	private const TRANSIENT_PREFIX = 'apermo_stash_new_token_';
 
 	/**
 	 * Holds the token store.

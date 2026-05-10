@@ -226,9 +226,9 @@ class BookmarkMetaboxTest extends TestCase {
 		$this->metabox()->render_url_meta_box( $post );
 		$output = (string) \ob_get_clean();
 
-		self::assertStringContainsString( 'name="linkstash_url"', $output );
+		self::assertStringContainsString( 'name="apermo_stash_url"', $output );
 		self::assertStringContainsString( 'value="https://example.tld"', $output );
-		self::assertStringContainsString( 'name="linkstash_favorite"', $output );
+		self::assertStringContainsString( 'name="apermo_stash_favorite"', $output );
 	}
 
 	/**
@@ -296,9 +296,9 @@ class BookmarkMetaboxTest extends TestCase {
 	 */
 	public function test_save_post_persists_url_and_flags(): void {
 		$_POST = [
-			'linkstash_metabox_nonce' => 'nonce',
-			'linkstash_url'           => 'https://www.example.tld/article',
-			'linkstash_favorite'      => '1',
+			'apermo_stash_metabox_nonce' => 'nonce',
+			'apermo_stash_url'           => 'https://www.example.tld/article',
+			'apermo_stash_favorite'      => '1',
 		];
 
 		$post               = new WP_Post();
@@ -328,8 +328,8 @@ class BookmarkMetaboxTest extends TestCase {
 	 */
 	public function test_save_post_derives_fallback_title(): void {
 		$_POST = [
-			'linkstash_metabox_nonce' => 'nonce',
-			'linkstash_url'           => 'https://www.example.tld/blog/article',
+			'apermo_stash_metabox_nonce' => 'nonce',
+			'apermo_stash_url'           => 'https://www.example.tld/blog/article',
 		];
 
 		$post               = new WP_Post();
@@ -357,9 +357,9 @@ class BookmarkMetaboxTest extends TestCase {
 	 */
 	public function test_save_post_persists_notes(): void {
 		$_POST = [
-			'linkstash_metabox_nonce' => 'nonce',
-			'linkstash_url'           => 'https://example.tld',
-			'linkstash_note'          => 'New notes',
+			'apermo_stash_metabox_nonce' => 'nonce',
+			'apermo_stash_url'           => 'https://example.tld',
+			'apermo_stash_note'          => 'New notes',
 		];
 
 		$post               = new WP_Post();

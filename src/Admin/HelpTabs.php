@@ -31,7 +31,7 @@ class HelpTabs {
 	 */
 	private static function overview_html(): string {
 		return '<p>' . esc_html__(
-			'LinkStash turns your WordPress site into a personal bookmark archive. Every URL you save is a real WordPress post (custom post type linkstash_bookmark), so it is searchable, taggable, and exportable like any other content on the site.',
+			'LinkStash turns your WordPress site into a personal bookmark archive. Every URL you save is a real WordPress post (custom post type apermo_stash_bookmark), so it is searchable, taggable, and exportable like any other content on the site.',
 			'apermo-stash',
 		) . '</p>'
 			. '<p>' . esc_html__( 'Use this screen to browse and edit your saved bookmarks. The columns show:', 'apermo-stash' ) . '</p>'

@@ -96,14 +96,14 @@ class MainTest extends TestCase {
 		Functions\expect( 'flush_rewrite_rules' )->once();
 		Functions\expect( 'get_option' )
 			->once()
-			->with( 'linkstash_starter_tags_seeded', false )
+			->with( 'apermo_stash_starter_tags_seeded', false )
 			->andReturn( false );
 		Functions\when( 'term_exists' )->justReturn( null );
 		Functions\when( 'is_wp_error' )->justReturn( false );
 		Functions\expect( 'wp_insert_term' )->times( 4 )->andReturn( [ 'term_id' => 1 ] );
 		Functions\expect( 'update_option' )
 			->once()
-			->with( 'linkstash_starter_tags_seeded', true, false );
+			->with( 'apermo_stash_starter_tags_seeded', true, false );
 
 		Main::activate();
 	}
@@ -126,7 +126,7 @@ class MainTest extends TestCase {
 		Functions\expect( 'flush_rewrite_rules' )->once();
 		Functions\expect( 'get_option' )
 			->once()
-			->with( 'linkstash_starter_tags_seeded', false )
+			->with( 'apermo_stash_starter_tags_seeded', false )
 			->andReturn( false );
 		Functions\when( 'term_exists' )->justReturn( null );
 		Functions\when( 'is_wp_error' )->alias( static fn ( $value ): bool => $value instanceof WP_Error );
@@ -160,7 +160,7 @@ class MainTest extends TestCase {
 		Functions\expect( 'flush_rewrite_rules' )->once();
 		Functions\expect( 'get_option' )
 			->once()
-			->with( 'linkstash_starter_tags_seeded', false )
+			->with( 'apermo_stash_starter_tags_seeded', false )
 			->andReturn( true );
 		Functions\expect( 'wp_insert_term' )->never();
 		Functions\expect( 'update_option' )->never();

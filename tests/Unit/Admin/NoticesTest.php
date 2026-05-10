@@ -79,7 +79,7 @@ class NoticesTest extends TestCase {
 	 */
 	public function test_silent_outside_bookmark_screen(): void {
 		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', 'post' ) );
-		$_GET['linkstash_notice'] = 'saved';
+		$_GET['apermo_stash_notice'] = 'saved';
 
 		\ob_start();
 		( new Notices() )->maybe_render();
@@ -110,7 +110,7 @@ class NoticesTest extends TestCase {
 	 */
 	public function test_renders_saved_unreachable_warning(): void {
 		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
-		$_GET['linkstash_notice'] = 'saved-unreachable';
+		$_GET['apermo_stash_notice'] = 'saved-unreachable';
 
 		\ob_start();
 		( new Notices() )->maybe_render();
@@ -127,7 +127,7 @@ class NoticesTest extends TestCase {
 	 */
 	public function test_renders_saved_success(): void {
 		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
-		$_GET['linkstash_notice'] = 'saved';
+		$_GET['apermo_stash_notice'] = 'saved';
 
 		\ob_start();
 		( new Notices() )->maybe_render();
@@ -143,7 +143,7 @@ class NoticesTest extends TestCase {
 	 */
 	public function test_unknown_slug_renders_nothing(): void {
 		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
-		$_GET['linkstash_notice'] = 'random-junk';
+		$_GET['apermo_stash_notice'] = 'random-junk';
 
 		\ob_start();
 		( new Notices() )->maybe_render();

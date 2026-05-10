@@ -17,7 +17,7 @@ use WP_REST_Server;
  */
 class TagsController {
 
-	private const CACHE_GROUP   = 'linkstash';
+	private const CACHE_GROUP   = 'apermo-stash';
 	private const CACHE_VERSION = 2;
 
 	/**

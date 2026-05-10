@@ -80,8 +80,8 @@ class ListFilterTest extends TestCase {
 		( new ListFilter() )->apply_favorite_filter( $query );
 
 		self::assertIsArray( $captured );
-		self::assertSame( BookmarkMeta::META_FAVORITE, $captured['linkstash_favorite']['key'] );
-		self::assertSame( '1', $captured['linkstash_favorite']['value'] );
+		self::assertSame( BookmarkMeta::META_FAVORITE, $captured['apermo_stash_favorite']['key'] );
+		self::assertSame( '1', $captured['apermo_stash_favorite']['value'] );
 	}
 
 	/**

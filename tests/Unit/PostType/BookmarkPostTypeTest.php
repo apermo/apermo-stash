@@ -171,6 +171,6 @@ class BookmarkPostTypeTest extends TestCase {
 	 * @return void
 	 */
 	public function test_post_type_constant(): void {
-		self::assertSame( 'linkstash_bookmark', BookmarkPostType::POST_TYPE );
+		self::assertSame( 'apermo_stash_bookmark', BookmarkPostType::POST_TYPE );
 	}
 }

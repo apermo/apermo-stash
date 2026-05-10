@@ -66,7 +66,7 @@ class QuickAddTest extends TestCase {
 		$quick = $this->quick_add();
 		$quick->register();
 
-		self::assertNotFalse( has_action( 'admin_post_linkstash_quick_add', [ $quick, 'handle_submission' ] ) );
+		self::assertNotFalse( has_action( 'admin_post_apermo_stash_quick_add', [ $quick, 'handle_submission' ] ) );
 		self::assertFalse( has_action( 'all_admin_notices' ) );
 	}
 
@@ -127,7 +127,7 @@ class QuickAddTest extends TestCase {
 		$url    = (string) $method->invoke( null, 'saved' );
 
 		self::assertStringContainsString( 'post_type=' . BookmarkPostType::POST_TYPE, $url );
-		self::assertStringContainsString( 'linkstash_notice=saved', $url );
+		self::assertStringContainsString( 'apermo_stash_notice=saved', $url );
 	}
 
 	/**

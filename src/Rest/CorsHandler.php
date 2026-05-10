@@ -39,7 +39,7 @@ class CorsHandler {
 	/**
 	 * Returns true when the origin matches the allow-list.
 	 *
-	 * Extensions can extend the list via the `linkstash_allowed_origins` filter.
+	 * Extensions can extend the list via the `apermo_stash_allowed_origins` filter.
 	 * The default list contains the literal `chrome-extension://*` wildcard.
 	 *
 	 * @param string $origin Origin header value.
@@ -54,7 +54,7 @@ class CorsHandler {
 		 *
 		 * @return mixed Filter consumers may return anything; non-array values fall back to deny.
 		 */
-		$allowed = apply_filters( 'linkstash_allowed_origins', [ 'chrome-extension://*' ] );
+		$allowed = apply_filters( 'apermo_stash_allowed_origins', [ 'chrome-extension://*' ] );
 		// @phpstan-ignore function.alreadyNarrowedType
 		if ( ! \is_array( $allowed ) ) {
 			return false;
@@ -131,7 +131,7 @@ class CorsHandler {
 	 *
 	 * @return bool
 	 */
-	private static function is_linkstash_route(): bool {
+	private static function is_apermo_stash_route(): bool {
 		$route = self::current_route();
 
 		return $route !== '' && \str_starts_with( $route, '/' . RestController::NAMESPACE );
@@ -212,7 +212,7 @@ class CorsHandler {
 	public function send_cors_response( bool $served, mixed $result, mixed $request, mixed $server ): bool {
 		unset( $result, $request, $server );
 
-		if ( ! self::is_linkstash_route() ) {
+		if ( ! self::is_apermo_stash_route() ) {
 			return $served;
 		}
 

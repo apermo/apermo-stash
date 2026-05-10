@@ -64,7 +64,7 @@ class ListColumnsTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function test_filter_columns_returns_linkstash_columns(): void {
+	public function test_filter_columns_returns_apermo_stash_columns(): void {
 		$result = ( new ListColumns() )->filter_columns(
 			[
 				'cb'   => '<input type="checkbox" />',
@@ -75,7 +75,7 @@ class ListColumnsTest extends TestCase {
 		self::assertArrayHasKey( 'cb', $result );
 		self::assertArrayHasKey( 'title', $result );
 		self::assertArrayHasKey( 'url', $result );
-		self::assertArrayHasKey( 'linkstash_tag', $result );
+		self::assertArrayHasKey( 'apermo_stash_tag', $result );
 		self::assertArrayHasKey( 'visibility', $result );
 		self::assertArrayHasKey( 'favorite', $result );
 		self::assertArrayHasKey( 'date', $result );
@@ -129,11 +129,11 @@ class ListColumnsTest extends TestCase {
 		);
 		Functions\when( 'admin_url' )->alias( static fn ( string $path ): string => '/wp-admin/' . $path );
 
-		$output = $this->capture_render( 'linkstash_tag', 7 );
+		$output = $this->capture_render( 'apermo_stash_tag', 7 );
 
-		self::assertStringContainsString( 'post_type=linkstash_bookmark', $output );
-		self::assertStringContainsString( 'linkstash_tag=reading', $output );
-		self::assertStringContainsString( 'linkstash_tag=archive', $output );
+		self::assertStringContainsString( 'post_type=apermo_stash_bookmark', $output );
+		self::assertStringContainsString( 'apermo_stash_tag=reading', $output );
+		self::assertStringContainsString( 'apermo_stash_tag=archive', $output );
 		self::assertStringContainsString( '>reading</a>', $output );
 		self::assertStringContainsString( '>archive</a>', $output );
 		self::assertStringContainsString( ', ', $output );
@@ -147,7 +147,7 @@ class ListColumnsTest extends TestCase {
 	public function test_render_tags_column_empty(): void {
 		Functions\when( 'get_the_terms' )->justReturn( [] );
 
-		$output = $this->capture_render( 'linkstash_tag', 7 );
+		$output = $this->capture_render( 'apermo_stash_tag', 7 );
 
 		self::assertSame( '—', $output );
 	}
@@ -247,6 +247,6 @@ class ListColumnsTest extends TestCase {
 	 * @return void
 	 */
 	public function test_taxonomy_constant_is_imported(): void {
-		self::assertSame( 'linkstash_tag', TagTaxonomy::TAXONOMY );
+		self::assertSame( 'apermo_stash_tag', TagTaxonomy::TAXONOMY );
 	}
 }

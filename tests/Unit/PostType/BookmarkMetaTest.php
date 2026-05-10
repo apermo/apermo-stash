@@ -67,9 +67,9 @@ class BookmarkMetaTest extends TestCase {
 	 * @return void
 	 */
 	public function test_meta_key_constants(): void {
-		self::assertSame( '_linkstash_url', BookmarkMeta::META_URL );
-		self::assertSame( '_linkstash_url_canonical', BookmarkMeta::META_URL_CANONICAL );
-		self::assertSame( '_linkstash_favorite', BookmarkMeta::META_FAVORITE );
+		self::assertSame( '_apermo_stash_url', BookmarkMeta::META_URL );
+		self::assertSame( '_apermo_stash_url_canonical', BookmarkMeta::META_URL_CANONICAL );
+		self::assertSame( '_apermo_stash_favorite', BookmarkMeta::META_FAVORITE );
 	}
 
 	/**

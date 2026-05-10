@@ -18,7 +18,7 @@ use Apermo\Stash\Url\MetadataFetcher;
  */
 class QuickAdd {
 
-	private const ACTION = 'linkstash_quick_add';
+	private const ACTION = 'apermo_stash_quick_add';
 
 	/**
 	 * Holds the metadata fetcher.
@@ -70,8 +70,8 @@ class QuickAdd {
 	private static function list_url( string $notice ): string {
 		return add_query_arg(
 			[
-				'post_type'        => BookmarkPostType::POST_TYPE,
-				'linkstash_notice' => $notice,
+				'post_type'           => BookmarkPostType::POST_TYPE,
+				'apermo_stash_notice' => $notice,
 			],
 			admin_url( 'edit.php' ),
 		);
