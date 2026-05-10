@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    name="linkstash"
+    name="apermo-stash"
     xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PHPCSStandards/PHP_CodeSniffer/master/phpcs.xsd">
 
-    <description>PHPCS configuration for linkstash.</description>
+    <description>PHPCS configuration for apermo-stash.</description>
 
     <file>.</file>
     <exclude-pattern>.ddev/*</exclude-pattern>
