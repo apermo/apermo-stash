@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 use WP_Screen;
 
 /**
- * Tests the contextual help tabs added to the bookmark list screen.
+ * Tests the contextual help tabs added to the link list screen.
  */
 class HelpTabsTest extends TestCase {
 
@@ -58,11 +58,11 @@ class HelpTabsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the bookmark list screen receives all three help tabs and a sidebar.
+	 * Verifies the link list screen receives all three help tabs and a sidebar.
 	 *
 	 * @return void
 	 */
-	public function test_adds_tabs_on_bookmark_list_screen(): void {
+	public function test_adds_tabs_on_link_list_screen(): void {
 		$registered = [];
 		$sidebar    = '';
 
@@ -85,7 +85,7 @@ class HelpTabsTest extends TestCase {
 
 		$ids = \array_column( $registered, 'id' );
 		self::assertSame(
-			[ 'apermo-stash-overview', 'apermo-stash-add-bookmarks', 'linkstash-extension' ],
+			[ 'apermo-stash-overview', 'apermo-stash-add-links', 'linkstash-extension' ],
 			$ids,
 		);
 		self::assertStringContainsString( 'github.com/apermo/linkstash-extension', $registered[2]['content'] );

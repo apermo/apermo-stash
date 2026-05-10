@@ -15,11 +15,11 @@ use Apermo\Stash\Url\MetadataFetcher;
 use WP_Post;
 
 /**
- * Replaces the default bookmark edit screen with a small classic-editor form.
+ * Replaces the default link edit screen with a small classic-editor form.
  *
  * Registers two meta boxes — a URL panel (URL + Favorite flag)
  * and a Notes panel (plain textarea bound to post_content) — and disables
- * the block editor for the bookmark CPT so the classic edit screen is
+ * the block editor for the link CPT so the classic edit screen is
  * used instead. Saving falls back to a simplified URL as the post_title
  * when the user does not supply an explicit label.
  */
@@ -123,7 +123,7 @@ class LinkMetabox {
 	}
 
 	/**
-	 * Enqueues the beforeunload guard script on the bookmark add/edit screen.
+	 * Enqueues the beforeunload guard script on the link add/edit screen.
 	 *
 	 * Wires a small DOM-level dirty-tracking script to `#post` (the
 	 * standard classic-editor `<form>` id WordPress emits on
@@ -154,7 +154,7 @@ class LinkMetabox {
 	}
 
 	/**
-	 * Returns false for the bookmark CPT so the classic editor is used.
+	 * Returns false for the link CPT so the classic editor is used.
 	 *
 	 * @param bool   $use_block_editor Whether to use the block editor.
 	 * @param string $post_type        Post-type slug.
@@ -170,7 +170,7 @@ class LinkMetabox {
 	}
 
 	/**
-	 * Registers the URL and Notes meta boxes for the bookmark CPT.
+	 * Registers the URL and Notes meta boxes for the link CPT.
 	 *
 	 * @return void
 	 */
@@ -180,7 +180,7 @@ class LinkMetabox {
 		// above the Notes panel.
 		add_meta_box(
 			'apermo_stash_link_url',
-			__( 'Bookmark URL', 'apermo-stash' ),
+			__( 'Link URL', 'apermo-stash' ),
 			[ $this, 'render_url_meta_box' ],
 			LinkPostType::POST_TYPE,
 			'normal',
@@ -226,7 +226,7 @@ class LinkMetabox {
 				<p style="margin: 0;">
 					<strong><?php esc_html_e( 'URL didn\'t respond on last save.', 'apermo-stash' ); ?></strong>
 					<br />
-					<?php esc_html_e( 'It may be private, behind a VPN or login wall, or temporarily down. The bookmark is saved either way; re-saving will re-check.', 'apermo-stash' ); ?>
+					<?php esc_html_e( 'It may be private, behind a VPN or login wall, or temporarily down. The link is saved either way; re-saving will re-check.', 'apermo-stash' ); ?>
 				</p>
 			</div>
 		<?php } ?>
@@ -260,9 +260,9 @@ class LinkMetabox {
 	}
 
 	/**
-	 * Persists the meta-box fields when a bookmark is saved.
+	 * Persists the meta-box fields when a link is saved.
 	 *
-	 * @param int     $post_id Bookmark post ID.
+	 * @param int     $post_id Link post ID.
 	 * @param WP_Post $post    The saved post.
 	 *
 	 * @return void
@@ -285,7 +285,7 @@ class LinkMetabox {
 			// Re-check reachability on every save, even when the URL
 			// itself didn't change — a previously-down host coming back
 			// up should clear the warning automatically the next time
-			// the user touches the bookmark.
+			// the user touches the link.
 			$result = $this->fetcher->fetch( $url );
 			update_post_meta( $post_id, LinkMeta::META_UNREACHABLE, LinkMeta::bool_to_meta( ! $result['reachable'] ) );
 		}

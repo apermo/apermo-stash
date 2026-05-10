@@ -54,7 +54,7 @@ class ListFilterTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the meta_query is added when ?favorite=1 is present on the bookmark CPT main query.
+	 * Verifies the meta_query is added when ?favorite=1 is present on the link CPT main query.
 	 *
 	 * @return void
 	 */
@@ -85,7 +85,7 @@ class ListFilterTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the filter is a no-op for non-bookmark queries.
+	 * Verifies the filter is a no-op for non-link queries.
 	 *
 	 * @return void
 	 */

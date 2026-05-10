@@ -10,14 +10,14 @@ use Apermo\Stash\PostType\TagTaxonomy;
 
 /**
  * Wires jQuery UI autocomplete to the comma-separated tags inputs in the
- * dashboard widget and the bookmark list-screen quick-add form.
+ * dashboard widget and the link list-screen quick-add form.
  *
  * Backs onto WordPress's existing `ajax-tag-search` admin-ajax endpoint,
  * which natively understands any taxonomy registered with `show_ui` true
  * — so all we contribute is the script enqueue and a small adapter that
  * suggests against only the last comma-separated segment of the input.
  *
- * The bookmark edit screen relies on core's standard taxonomy meta box,
+ * The link edit screen relies on core's standard taxonomy meta box,
  * which already ships its own autocomplete; this class only targets the
  * standalone forms.
  */
@@ -109,7 +109,7 @@ class TagAutocomplete {
 
 	/**
 	 * Enqueues jQuery UI autocomplete + adapter on the screens that show
-	 * a quick-add form (dashboard, bookmark list table).
+	 * a quick-add form (dashboard, link list table).
 	 *
 	 * @param string $hook Current admin screen hook suffix.
 	 *

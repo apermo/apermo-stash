@@ -12,7 +12,7 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests the bookmark tag taxonomy registration.
+ * Tests the link tag taxonomy registration.
  */
 class TagTaxonomyTest extends TestCase {
 

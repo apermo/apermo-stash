@@ -3,7 +3,7 @@
  * Uninstall handler for Apermo Stash.
  *
  * Removes plugin-owned data (API tokens, transients) but intentionally
- * preserves user-created bookmarks so an accidental delete + reinstall
+ * preserves user-created links so an accidental delete + reinstall
  * does not destroy the archive.
  *
  * Re-runs after the plugin is deleted from the WordPress UI.
@@ -37,4 +37,4 @@ $wpdb->query(
 	),
 );
 
-// Bookmarks are deliberately retained — see README.
+// Links are deliberately retained — see README.

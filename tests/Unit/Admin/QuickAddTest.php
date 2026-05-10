@@ -112,7 +112,7 @@ class QuickAddTest extends TestCase {
 	}
 
 	/**
-	 * Verifies list_url builds an admin URL with the bookmark CPT plus a notice query arg.
+	 * Verifies list_url builds an admin URL with the link CPT plus a notice query arg.
 	 *
 	 * @return void
 	 */

@@ -11,14 +11,14 @@ use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\PostType\TagTaxonomy;
 
 /**
- * Customises the bookmark CPT list table columns.
+ * Customises the link CPT list table columns.
  */
 class ListColumns {
 
 	/**
 	 * Renders the URL column.
 	 *
-	 * @param int $post_id Bookmark post ID.
+	 * @param int $post_id Link post ID.
 	 *
 	 * @return void
 	 */
@@ -37,7 +37,7 @@ class ListColumns {
 	/**
 	 * Renders the tags column with clickable per-tag filter links.
 	 *
-	 * @param int $post_id Bookmark post ID.
+	 * @param int $post_id Link post ID.
 	 *
 	 * @return void
 	 */
@@ -71,7 +71,7 @@ class ListColumns {
 	/**
 	 * Renders the visibility column.
 	 *
-	 * @param int $post_id Bookmark post ID.
+	 * @param int $post_id Link post ID.
 	 *
 	 * @return void
 	 */
@@ -88,7 +88,7 @@ class ListColumns {
 	/**
 	 * Renders the favorite column — a star when set, em-dash otherwise.
 	 *
-	 * @param int $post_id Bookmark post ID.
+	 * @param int $post_id Link post ID.
 	 *
 	 * @return void
 	 */
@@ -135,7 +135,7 @@ class ListColumns {
 	 * Renders the value for a custom column.
 	 *
 	 * @param string $column  Column key.
-	 * @param int    $post_id Bookmark post ID.
+	 * @param int    $post_id Link post ID.
 	 *
 	 * @return void
 	 */

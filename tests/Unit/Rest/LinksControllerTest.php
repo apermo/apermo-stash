@@ -80,7 +80,7 @@ class LinksControllerTest extends TestCase {
 		$post              = new WP_Post();
 		$post->ID          = 1;
 		$post->post_status = 'publish';
-		$post->post_title  = 'A bookmark';
+		$post->post_title  = 'A link';
 
 		WP_Query::$results[] = [
 			'posts'         => [ $post ],
@@ -126,7 +126,7 @@ class LinksControllerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies get_item returns 404 for a non-bookmark post.
+	 * Verifies get_item returns 404 for a non-link post.
 	 *
 	 * @return void
 	 */
@@ -143,11 +143,11 @@ class LinksControllerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies get_item wraps a found bookmark in a REST response.
+	 * Verifies get_item wraps a found link in a REST response.
 	 *
 	 * @return void
 	 */
-	public function test_get_item_returns_response_for_known_bookmark(): void {
+	public function test_get_item_returns_response_for_known_link(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
 		$post->post_type = LinkPostType::POST_TYPE;
@@ -163,7 +163,7 @@ class LinksControllerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies update_item returns 404 for a non-bookmark post.
+	 * Verifies update_item returns 404 for a non-link post.
 	 *
 	 * @return void
 	 */
@@ -203,7 +203,7 @@ class LinksControllerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies delete_item returns 404 for a non-bookmark post.
+	 * Verifies delete_item returns 404 for a non-link post.
 	 *
 	 * @return void
 	 */
@@ -242,11 +242,11 @@ class LinksControllerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies create_item persists a fresh bookmark and returns 201.
+	 * Verifies create_item persists a fresh link and returns 201.
 	 *
 	 * @return void
 	 */
-	public function test_create_item_persists_new_bookmark(): void {
+	public function test_create_item_persists_new_link(): void {
 		// First WP_Query: dedupe lookup returns nothing.
 		WP_Query::$results[] = [ 'posts' => [] ];
 
@@ -273,7 +273,7 @@ class LinksControllerTest extends TestCase {
 	}
 
 	/**
-	 * Verifies create_item returns the existing bookmark on dedupe match.
+	 * Verifies create_item returns the existing link on dedupe match.
 	 *
 	 * @return void
 	 */

@@ -41,7 +41,7 @@ class PermissionsAndVisibilityTest extends TestCase {
 	}
 
 	/**
-	 * Verifies anonymous callers only ever see published bookmarks.
+	 * Verifies anonymous callers only ever see published links.
 	 *
 	 * @return void
 	 */
@@ -74,7 +74,7 @@ class PermissionsAndVisibilityTest extends TestCase {
 	}
 
 	/**
-	 * Verifies public=1 narrows to only public bookmarks (everyone's).
+	 * Verifies public=1 narrows to only public links (everyone's).
 	 *
 	 * @return void
 	 */
@@ -91,7 +91,7 @@ class PermissionsAndVisibilityTest extends TestCase {
 	}
 
 	/**
-	 * Verifies private=1 narrows to only the caller's own private bookmarks.
+	 * Verifies private=1 narrows to only the caller's own private links.
 	 *
 	 * @return void
 	 */

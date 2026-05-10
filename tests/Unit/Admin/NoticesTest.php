@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use WP_Screen;
 
 /**
- * Tests the bookmark-list-screen notice renderer.
+ * Tests the link-list-screen notice renderer.
  */
 class NoticesTest extends TestCase {
 
@@ -73,11 +73,11 @@ class NoticesTest extends TestCase {
 	}
 
 	/**
-	 * Verifies nothing renders outside the bookmark list screen.
+	 * Verifies nothing renders outside the link list screen.
 	 *
 	 * @return void
 	 */
-	public function test_silent_outside_bookmark_screen(): void {
+	public function test_silent_outside_link_screen(): void {
 		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', 'post' ) );
 		$_GET['apermo_stash_notice'] = 'saved';
 

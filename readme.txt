@@ -1,6 +1,6 @@
 === Apermo Stash ===
 Contributors: apermo
-Tags: bookmarks, links, rest-api, self-hosted, archive
+Tags: links, links, rest-api, self-hosted, archive
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.1
@@ -8,12 +8,12 @@ Stable tag: 0.1.3
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Self-hosted bookmark archive with a token-protected REST API and a
+Self-hosted link archive with a token-protected REST API and a
 companion Chrome extension.
 
 == Description ==
 
-Apermo Stash turns your WordPress site into a personal bookmark archive,
+Apermo Stash turns your WordPress site into a personal link archive,
 inspired by linkding and Delicious. Save URLs with a title,
 notes, and tags from the WordPress admin or from your browser via a
 [Chrome extension](https://chromewebstore.google.com/detail/linkstash/midebpgblmgkcgljcgojjbehnonljnmk); read
@@ -22,21 +22,21 @@ extensions and your own scripts.
 
 = Highlights =
 
-* **Bookmarks as a custom post type.** Every URL is a `apermo_stash_link`
+* **Links as a custom post type.** Every URL is a `apermo_stash_link`
   post — searchable, filterable, taggable, and reachable through
   WordPress's existing tooling.
-* **Public or private per-bookmark.** Visibility uses native
-  `post_status`: `publish` for shareable bookmarks, `private` for the
+* **Public or private per-link.** Visibility uses native
+  `post_status`: `publish` for shareable links, `private` for the
   ones only you should see. Anonymous REST clients see only public;
   authenticated users see public + their own private; admins see
   everything.
 * **Dashboard widget for quick capture.** A QuickDraft-style "Add
-  bookmark" tile lives on the WordPress dashboard. Paste a URL,
+  link" tile lives on the WordPress dashboard. Paste a URL,
   optionally type tags (with autocomplete) and pick public/private,
   hit save. The plugin fetches the page title and meta description
   automatically and records whether the URL responded so you know
   later when a link rots.
-* **Classic editor for bookmark detail.** No Gutenberg overhead — the
+* **Classic editor for link detail.** No Gutenberg overhead — the
   Add/Edit screen is a small classic-editor form with URL, title,
   optional notes, and tags. Title falls back to a simplified URL when
   you leave it empty.
@@ -91,7 +91,7 @@ or edit the current tab from the popup, and offers a right-click
 
 == Frequently Asked Questions ==
 
-= Where are my bookmarks stored? =
+= Where are my links stored? =
 
 In your WordPress database, as posts of type `apermo_stash_link`.
 The URL, canonical URL, favorite flag, and unreachable flag live in
@@ -100,15 +100,15 @@ post meta. Tags use a custom non-hierarchical taxonomy
 
 = Can multiple users on the same site have separate libraries? =
 
-Yes. Each bookmark has an author and a public/private visibility
-flag. Anonymous visitors see only public bookmarks; logged-in users
+Yes. Each link has an author and a public/private visibility
+flag. Anonymous visitors see only public links; logged-in users
 see public + their own private. Editors / admins (anyone with
-`edit_others_posts`) see every bookmark across the site.
+`edit_others_posts`) see every link across the site.
 
-= Will uninstalling the plugin delete my bookmarks? =
+= Will uninstalling the plugin delete my links? =
 
-No — bookmarks are deliberately preserved on uninstall, so you can
-deactivate, switch to another bookmark plugin, or come back later
+No — links are deliberately preserved on uninstall, so you can
+deactivate, switch to another link plugin, or come back later
 without losing the archive. Only API tokens and transient state are
 removed.
 
@@ -121,16 +121,16 @@ built-in authentication.
 
 = Does it modify the front end? =
 
-Not currently. Bookmarks live in the admin and the REST API. A public
+Not currently. Links live in the admin and the REST API. A public
 sharing page is on the roadmap.
 
 = What data does the plugin send anywhere? =
 
 Outbound HTTP from your server to one place only: the URL you save.
 On every save (admin form, dashboard widget, REST POST), Apermo Stash
-issues a single `wp_safe_remote_get` against the bookmarked URL with
+issues a single `wp_safe_remote_get` against the saved URL with
 a 5-second timeout to fetch its title and meta description. If the
-URL cannot be reached the bookmark is still saved and a "URL didn't
+URL cannot be reached the link is still saved and a "URL didn't
 respond" warning is shown next time you edit it. WordPress's
 `wp_safe_remote_get` blocks loopback and private IP ranges, so a
 malicious URL cannot be used to probe internal services.
@@ -161,8 +161,8 @@ defense-in-depth narrowing of the CORS surface.
 
 == Screenshots ==
 
-1. Bookmark list screen with the URL / tags / visibility / favorite columns.
-2. Bookmark edit screen with URL meta box and unreachable-URL warning.
+1. Link list screen with the URL / tags / visibility / favorite columns.
+2. Link edit screen with URL meta box and unreachable-URL warning.
 3. Dashboard widget for one-click capture from anywhere in the admin.
 4. Settings → Apermo Stash token settings page.
 5. Companion Chrome extension popup saving the current tab.
@@ -179,7 +179,7 @@ defense-in-depth narrowing of the CORS surface.
   complete CORS header set itself.
 
 = 0.1.2 =
-* Hardening: tighter output escaping in the bookmark list table and
+* Hardening: tighter output escaping in the link list table and
   contextual help tabs. No functional changes.
 
 = 0.1.1 =
@@ -189,13 +189,13 @@ defense-in-depth narrowing of the CORS surface.
 * New: starter tags created on first activation (read-later /
   reference / inspiration / archive); seeded once and never recreated
   if you delete them.
-* New: unsaved-changes guard on the bookmark add/edit screen.
-* New: contextual help tabs on the bookmark list screen.
+* New: unsaved-changes guard on the link add/edit screen.
+* New: contextual help tabs on the link list screen.
 * Changed: settings moved from Tools to Settings → Apermo Stash.
 * Security: /check now requires authentication (was anonymous);
-  unauthorized reads of private bookmarks return 404 instead of 403
+  unauthorized reads of private links return 404 instead of 403
   to prevent ID enumeration.
-* Fixed: the Tags column on the bookmark list screen showed nothing
+* Fixed: the Tags column on the link list screen showed nothing
   because the column key collided with WordPress core's reserved
   `tags` slot for the `post_tag` taxonomy.
 * Listing: WordPress.org assets (banner, icon, screenshots) and an
@@ -204,7 +204,7 @@ defense-in-depth narrowing of the CORS surface.
 = 0.1.0 =
 * Initial release. Custom post type, custom tag taxonomy, REST API
   (CRUD + tags + check), Bearer-token auth, public/private per
-  bookmark, CORS for `chrome-extension://*`, admin list columns,
+  link, CORS for `chrome-extension://*`, admin list columns,
   quick-add form, classic-editor metaboxes, dashboard widget, tag
   autocomplete, https:// auto-prepend, URL-reachability check,
   Settings → Apermo Stash settings page, uninstall cleanup.

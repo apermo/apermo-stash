@@ -3,12 +3,12 @@
 [![PHP CI](https://github.com/apermo/apermo-stash/actions/workflows/ci.yml/badge.svg)](https://github.com/apermo/apermo-stash/actions/workflows/ci.yml)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPLv2+-blue.svg)](LICENSE)
 
-A self-hosted WordPress plugin for collecting bookmarks. Inspired by
+A self-hosted WordPress plugin for collecting links. Inspired by
 [linkding](https://linkding.link/). Stores URL + title + notes + tags as a
 custom post type and exposes a token-protected REST API so a browser extension
 can save links from anywhere.
 
-Per-bookmark public/private visibility, idempotent save (safe to re-submit),
+Per-link public/private visibility, idempotent save (safe to re-submit),
 and CORS configured for `chrome-extension://*` origins out of the box.
 
 ## Requirements
@@ -62,17 +62,17 @@ Base path: `/wp-json/apermo-stash/v1`.
 
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/links` | List bookmarks (filters: `tag`, `q`, `unread`, `archived`, `public`/`private`, `page`, `per_page`) |
-| `POST` | `/links` | Create a bookmark (idempotent — same URL returns existing record with `X-Apermo-Stash-Existing: 1`) |
-| `GET` | `/links/{id}` | Fetch a single bookmark |
+| `GET` | `/links` | List links (filters: `tag`, `q`, `unread`, `archived`, `public`/`private`, `page`, `per_page`) |
+| `POST` | `/links` | Create a link (idempotent — same URL returns existing record with `X-Apermo-Stash-Existing: 1`) |
+| `GET` | `/links/{id}` | Fetch a single link |
 | `PATCH` | `/links/{id}` | Update fields |
-| `DELETE` | `/links/{id}` | Delete a bookmark |
-| `GET` | `/tags` | List tags with bookmark counts |
+| `DELETE` | `/links/{id}` | Delete a link |
+| `GET` | `/tags` | List tags with link counts |
 | `GET` | `/check?url=...` | Returns `{exists: bool, id?: int}` for a given URL |
 
 ### Examples
 
-Save a bookmark; let the server fetch the title and description:
+Save a link; let the server fetch the title and description:
 
 ```bash
 curl -X POST https://example.tld/wp-json/apermo-stash/v1/links \
@@ -95,15 +95,15 @@ curl -H "Authorization: Bearer <token>" \
      "https://example.tld/wp-json/apermo-stash/v1/links?tag=reading&unread=1"
 ```
 
-### Public versus private bookmarks
+### Public versus private links
 
-Bookmarks use WordPress's native `post_status`:
+Links use WordPress's native `post_status`:
 
 - `publish` (public) — readable without authentication via the REST API.
 - `private` — only the owner (and users with `edit_others_posts`) can read.
 
-Anonymous `GET /links` returns only public bookmarks. Authenticated users
-see their own bookmarks plus any public bookmarks owned by other users. POST,
+Anonymous `GET /links` returns only public links. Authenticated users
+see their own links plus any public links owned by other users. POST,
 PATCH, DELETE always require authentication.
 
 ### CORS
@@ -130,11 +130,11 @@ add_filter( 'apermo_stash_allowed_origins', static function (): array {
 
 ### Outbound HTTP
 
-Apermo Stash makes one outbound HTTP request per saved bookmark — to
-the bookmarked URL itself, via `wp_safe_remote_get` (5 s timeout, up
+Apermo Stash makes one outbound HTTP request per saved link — to
+the saved URL itself, via `wp_safe_remote_get` (5 s timeout, up
 to three redirects, all re-validated). The fetched body is parsed
 for `<title>` and `<meta name="description" / og:description>`; on
-failure the bookmark still saves and an "unreachable" warning is
+failure the link still saves and an "unreachable" warning is
 shown on next edit. `wp_safe_remote_get` blocks loopback and private
 IP ranges, so a hostile URL can't be used to probe internal services.
 

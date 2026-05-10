@@ -13,7 +13,7 @@ use Apermo\Stash\Url\Canonicalizer;
 use Apermo\Stash\Url\MetadataFetcher;
 
 /**
- * Renders the paste-a-URL quick-add form on the bookmark list screen
+ * Renders the paste-a-URL quick-add form on the link list screen
  * and handles its submission.
  */
 class QuickAdd {
@@ -61,7 +61,7 @@ class QuickAdd {
 	}
 
 	/**
-	 * Returns the URL of the bookmark list screen, optionally with a notice param.
+	 * Returns the URL of the link list screen, optionally with a notice param.
 	 *
 	 * @param string $notice Notice slug.
 	 *
@@ -80,7 +80,7 @@ class QuickAdd {
 	/**
 	 * Renders the standalone quick-add form HTML.
 	 *
-	 * Shared by the bookmark list screen and the dashboard widget so the
+	 * Shared by the link list screen and the dashboard widget so the
 	 * markup, nonce, and submit target stay in lockstep.
 	 *
 	 * @param string $css_class Extra CSS class to apply to the form element.
@@ -104,7 +104,7 @@ class QuickAdd {
 					<input type="checkbox" name="public" value="1" />
 					<?php esc_html_e( 'Public', 'apermo-stash' ); ?>
 				</label>
-				<button type="submit" class="button button-primary alignright"><?php esc_html_e( 'Save bookmark', 'apermo-stash' ); ?></button>
+				<button type="submit" class="button button-primary alignright"><?php esc_html_e( 'Save link', 'apermo-stash' ); ?></button>
 			</p>
 		</form>
 		<?php
@@ -132,7 +132,7 @@ class QuickAdd {
 	 */
 	public function handle_submission(): void {
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'You are not allowed to add bookmarks.', 'apermo-stash' ), '', [ 'response' => 403 ] );
+			wp_die( esc_html__( 'You are not allowed to add links.', 'apermo-stash' ), '', [ 'response' => 403 ] );
 		}
 
 		check_admin_referer( self::ACTION );

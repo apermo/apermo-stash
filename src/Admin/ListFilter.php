@@ -11,16 +11,16 @@ use Apermo\Stash\PostType\LinkPostType;
 use WP_Query;
 
 /**
- * Wires URL-parameter filters on the bookmark list table.
+ * Wires URL-parameter filters on the link list table.
  *
- * `?favorite=1` narrows the list to favorited bookmarks; the standard
+ * `?favorite=1` narrows the list to favorited links; the standard
  * `?apermo_stash_tag=<slug>` taxonomy filter is handled by core.
  */
 class ListFilter {
 
 	/**
 	 * Hooks `pre_get_posts` to add the favorite meta_query when the
-	 * caller passes `?favorite=1` on the bookmark list screen.
+	 * caller passes `?favorite=1` on the link list screen.
 	 *
 	 * @return void
 	 */

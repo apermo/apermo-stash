@@ -31,21 +31,21 @@ class HelpTabs {
 	 */
 	private static function overview_html(): string {
 		return '<p>' . esc_html__(
-			'Apermo Stash turns your WordPress site into a personal bookmark archive. Every URL you save is a real WordPress post (custom post type apermo_stash_link), so it is searchable, taggable, and exportable like any other content on the site.',
+			'Apermo Stash turns your WordPress site into a personal link archive. Every URL you save is a real WordPress post (custom post type apermo_stash_link), so it is searchable, taggable, and exportable like any other content on the site.',
 			'apermo-stash',
 		) . '</p>'
-			. '<p>' . esc_html__( 'Use this screen to browse and edit your saved bookmarks. The columns show:', 'apermo-stash' ) . '</p>'
+			. '<p>' . esc_html__( 'Use this screen to browse and edit your saved links. The columns show:', 'apermo-stash' ) . '</p>'
 			. '<ul>'
 			. '<li>' . wp_kses(
-				__( '<strong>URL</strong> — the bookmarked page; click the link to open it in a new tab.', 'apermo-stash' ),
+				__( '<strong>URL</strong> — the saved page; click the link to open it in a new tab.', 'apermo-stash' ),
 				[ 'strong' => [] ],
 			) . '</li>'
 			. '<li>' . wp_kses(
-				__( '<strong>Tags</strong> — comma-separated tags. Click a tag to filter the list to only matching bookmarks.', 'apermo-stash' ),
+				__( '<strong>Tags</strong> — comma-separated tags. Click a tag to filter the list to only matching links.', 'apermo-stash' ),
 				[ 'strong' => [] ],
 			) . '</li>'
 			. '<li>' . wp_kses(
-				__( '<strong>Visibility</strong> — Public bookmarks are visible to anyone (including unauthenticated REST callers); Private are visible only to you and editors with the edit_others_posts capability.', 'apermo-stash' ),
+				__( '<strong>Visibility</strong> — Public links are visible to anyone (including unauthenticated REST callers); Private are visible only to you and editors with the edit_others_posts capability.', 'apermo-stash' ),
 				[ 'strong' => [] ],
 			) . '</li>'
 			. '<li>' . wp_kses(
@@ -56,19 +56,19 @@ class HelpTabs {
 	}
 
 	/**
-	 * Returns the Adding bookmarks tab markup.
+	 * Returns the Adding links tab markup.
 	 *
 	 * @return string
 	 */
-	private static function add_bookmarks_html(): string {
+	private static function add_links_html(): string {
 		return '<p>' . esc_html__( 'There are several ways to save a URL to Apermo Stash:', 'apermo-stash' ) . '</p>'
 			. '<ul>'
 			. '<li>' . wp_kses(
-				__( '<strong>Add New Bookmark</strong> — the button at the top of this screen opens the bookmark editor. Paste a URL, optionally set a title, notes, tags, and visibility.', 'apermo-stash' ),
+				__( '<strong>Add New Link</strong> — the button at the top of this screen opens the link editor. Paste a URL, optionally set a title, notes, tags, and visibility.', 'apermo-stash' ),
 				[ 'strong' => [] ],
 			) . '</li>'
 			. '<li>' . wp_kses(
-				__( '<strong>Dashboard widget</strong> — the "Add bookmark" tile on your WordPress dashboard offers one-step capture from anywhere in the admin. Tag autocomplete works there too.', 'apermo-stash' ),
+				__( '<strong>Dashboard widget</strong> — the "Add link" tile on your WordPress dashboard offers one-step capture from anywhere in the admin. Tag autocomplete works there too.', 'apermo-stash' ),
 				[ 'strong' => [] ],
 			) . '</li>'
 			. '<li>' . wp_kses(
@@ -168,7 +168,7 @@ class HelpTabs {
 
 	/**
 	 * Attaches the Apermo Stash help tabs when the current screen is the
-	 * bookmark list table.
+	 * link list table.
 	 *
 	 * @param WP_Screen $screen Current admin screen.
 	 *
@@ -189,9 +189,9 @@ class HelpTabs {
 
 		$screen->add_help_tab(
 			[
-				'id'      => 'apermo-stash-add-bookmarks',
-				'title'   => esc_html__( 'Adding bookmarks', 'apermo-stash' ),
-				'content' => self::add_bookmarks_html(),
+				'id'      => 'apermo-stash-add-links',
+				'title'   => esc_html__( 'Adding links', 'apermo-stash' ),
+				'content' => self::add_links_html(),
 			],
 		);
 

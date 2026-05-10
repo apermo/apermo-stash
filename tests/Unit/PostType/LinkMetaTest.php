@@ -12,7 +12,7 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests bookmark post-meta registration.
+ * Tests link post-meta registration.
  */
 class LinkMetaTest extends TestCase {
 

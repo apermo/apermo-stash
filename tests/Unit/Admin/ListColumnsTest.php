@@ -15,7 +15,7 @@ use WP_Post;
 use WP_Term;
 
 /**
- * Tests the bookmark list table column hooks and renderers.
+ * Tests the link list table column hooks and renderers.
  */
 class ListColumnsTest extends TestCase {
 

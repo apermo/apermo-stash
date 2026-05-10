@@ -62,11 +62,11 @@ class UrlAutoSchemeTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the bookmark edit screen enqueues the script.
+	 * Verifies the link edit screen enqueues the script.
 	 *
 	 * @return void
 	 */
-	public function test_enqueues_on_bookmark_edit_screen(): void {
+	public function test_enqueues_on_link_edit_screen(): void {
 		$screen            = new WP_Screen();
 		$screen->base      = 'post';
 		$screen->post_type = LinkPostType::POST_TYPE;
@@ -91,12 +91,12 @@ class UrlAutoSchemeTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the bookmark list screen is skipped — the quick-add
+	 * Verifies the link list screen is skipped — the quick-add
 	 * form is no longer rendered there, so no URL inputs to bind.
 	 *
 	 * @return void
 	 */
-	public function test_skips_bookmark_list_screen(): void {
+	public function test_skips_link_list_screen(): void {
 		Functions\expect( 'wp_enqueue_script' )->never();
 
 		( new UrlAutoScheme() )->maybe_enqueue( 'edit.php' );

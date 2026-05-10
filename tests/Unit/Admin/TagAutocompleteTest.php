@@ -73,12 +73,12 @@ class TagAutocompleteTest extends TestCase {
 	}
 
 	/**
-	 * Verifies it skips the bookmark list screen — the quick-add form
+	 * Verifies it skips the link list screen — the quick-add form
 	 * is no longer rendered there, so there are no inputs to bind to.
 	 *
 	 * @return void
 	 */
-	public function test_skips_bookmark_list_screen(): void {
+	public function test_skips_link_list_screen(): void {
 		Functions\expect( 'wp_enqueue_script' )->never();
 
 		( new TagAutocomplete() )->maybe_enqueue( 'edit.php' );

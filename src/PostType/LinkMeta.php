@@ -7,7 +7,7 @@ namespace Apermo\Stash\PostType;
 \defined( 'ABSPATH' ) || exit();
 
 /**
- * Registers post-meta keys for the bookmark CPT.
+ * Registers post-meta keys for the link CPT.
  */
 class LinkMeta {
 
@@ -100,7 +100,7 @@ class LinkMeta {
 	}
 
 	/**
-	 * Registers all bookmark meta keys with REST exposure.
+	 * Registers all link meta keys with REST exposure.
 	 *
 	 * @return void
 	 */

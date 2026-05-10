@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 /**
- * Tests the bookmark CPT registration.
+ * Tests the link CPT registration.
  */
 class LinkPostTypeTest extends TestCase {
 
@@ -28,7 +28,7 @@ class LinkPostTypeTest extends TestCase {
 			&& $args['publicly_queryable'] === false
 			&& $args['show_ui'] === true
 			&& $args['show_in_rest'] === true
-			&& $args['rest_base'] === 'bookmarks'
+			&& $args['rest_base'] === 'links'
 			&& $args['capability_type'] === 'post'
 			&& $args['supports'] === [ 'title' ]
 			&& $args['has_archive'] === false

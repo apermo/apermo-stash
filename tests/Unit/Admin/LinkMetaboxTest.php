@@ -18,7 +18,7 @@ use WP_Post;
 use WP_Screen;
 
 /**
- * Tests the bookmark edit-screen metabox class.
+ * Tests the link edit-screen metabox class.
  */
 class LinkMetaboxTest extends TestCase {
 
@@ -125,11 +125,11 @@ class LinkMetaboxTest extends TestCase {
 	}
 
 	/**
-	 * Verifies the editor filter returns false for the bookmark CPT only.
+	 * Verifies the editor filter returns false for the link CPT only.
 	 *
 	 * @return void
 	 */
-	public function test_disable_block_editor_only_for_bookmark_cpt(): void {
+	public function test_disable_block_editor_only_for_link_cpt(): void {
 		$metabox = $this->metabox();
 
 		self::assertFalse( $metabox->disable_block_editor( true, LinkPostType::POST_TYPE ) );
@@ -149,11 +149,11 @@ class LinkMetaboxTest extends TestCase {
 	}
 
 	/**
-	 * Verifies enqueue_unsaved_changes_script enqueues on the bookmark add/edit screen.
+	 * Verifies enqueue_unsaved_changes_script enqueues on the link add/edit screen.
 	 *
 	 * @return void
 	 */
-	public function test_enqueue_unsaved_changes_script_on_bookmark_post_screen(): void {
+	public function test_enqueue_unsaved_changes_script_on_link_post_screen(): void {
 		$screen            = Mockery::mock( WP_Screen::class );
 		$screen->base      = 'post';
 		$screen->post_type = LinkPostType::POST_TYPE;

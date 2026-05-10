@@ -7,16 +7,16 @@ namespace Apermo\Stash\Admin;
 \defined( 'ABSPATH' ) || exit();
 
 /**
- * Adds a "Quick Bookmark" widget to the WordPress admin dashboard.
+ * Adds a "Quick Link" widget to the WordPress admin dashboard.
  *
  * Mirrors core's Quick Draft widget: a small paste-a-URL form that posts
- * to the same `apermo_stash_quick_add` admin-post handler used by the bookmark
+ * to the same `apermo_stash_quick_add` admin-post handler used by the link
  * list-screen quick-add. The form HTML is reused via
  * {@see QuickAdd::render_form_html} so behaviour stays in lockstep.
  */
 class DashboardWidget {
 
-	private const WIDGET_ID = 'apermo_stash_quick_bookmark';
+	private const WIDGET_ID = 'apermo_stash_quick_link';
 
 	/**
 	 * Hooks the dashboard setup.
@@ -39,7 +39,7 @@ class DashboardWidget {
 
 		wp_add_dashboard_widget(
 			self::WIDGET_ID,
-			__( 'Quick Bookmark', 'apermo-stash' ),
+			__( 'Quick Link', 'apermo-stash' ),
 			[ $this, 'render' ],
 		);
 	}
@@ -50,7 +50,7 @@ class DashboardWidget {
 	 * @return void
 	 */
 	public function render(): void {
-		echo '<p>' . esc_html__( 'Save a URL to your bookmark library.', 'apermo-stash' ) . '</p>';
+		echo '<p>' . esc_html__( 'Save a URL to your link library.', 'apermo-stash' ) . '</p>';
 		QuickAdd::render_form_html( 'apermo-stash-dashboard-widget' );
 	}
 }

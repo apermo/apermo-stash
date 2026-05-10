@@ -7,7 +7,7 @@ namespace Apermo\Stash\PostType;
 \defined( 'ABSPATH' ) || exit();
 
 /**
- * Registers the apermo_stash_tag taxonomy attached to the bookmark CPT.
+ * Registers the apermo_stash_tag taxonomy attached to the link CPT.
  */
 class TagTaxonomy {
 

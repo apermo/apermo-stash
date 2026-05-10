@@ -83,7 +83,7 @@ class MetadataFetcher {
 	 * Returns the unreachable result shape.
 	 *
 	 * Used when the host wouldn't talk to us (DNS failure, timeout, non-200,
-	 * empty body). The bookmark is still saved by the caller; the
+	 * empty body). The link is still saved by the caller; the
 	 * `reachable: false` flag lets the UI raise a "URL saved, but the
 	 * content didn't load" warning while still allowing private/VPN/
 	 * OAuth-only links through.

@@ -19,7 +19,7 @@ use WP_REST_Response;
 use WP_REST_Server;
 
 /**
- * Handles bookmark CRUD over REST.
+ * Handles link CRUD over REST.
  */
 class LinksController {
 
@@ -44,15 +44,15 @@ class LinksController {
 	/**
 	 * Returns the visibility query fragments for the current request.
 	 *
-	 * Anonymous callers see only published bookmarks. Authenticated callers
-	 * see public bookmarks from anyone plus their own private bookmarks
+	 * Anonymous callers see only published links. Authenticated callers
+	 * see public links from anyone plus their own private links
 	 * (via WP_Query's `perm => 'readable'`). Callers with
 	 * `edit_others_posts` see everything.
 	 *
 	 * The optional `public` / `private` query params narrow the result:
-	 * `public=1` returns only public bookmarks (everyone's); `private=1`
-	 * returns only the caller's own private bookmarks (since others'
-	 * private bookmarks are never readable). When both or neither flag is
+	 * `public=1` returns only public links (everyone's); `private=1`
+	 * returns only the caller's own private links (since others'
+	 * private links are never readable). When both or neither flag is
 	 * set the default "own + public" behaviour applies.
 	 *
 	 * @param WP_REST_Request $request REST request.
@@ -248,25 +248,25 @@ class LinksController {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_item' ],
-					'permission_callback' => [ Permissions::class, 'can_read_bookmark' ],
+					'permission_callback' => [ Permissions::class, 'can_read_link' ],
 				],
 				[
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => [ $this, 'update_item' ],
-					'permission_callback' => [ Permissions::class, 'can_edit_bookmark' ],
+					'permission_callback' => [ Permissions::class, 'can_edit_link' ],
 					'args'                => self::update_args(),
 				],
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_item' ],
-					'permission_callback' => [ Permissions::class, 'can_delete_bookmark' ],
+					'permission_callback' => [ Permissions::class, 'can_delete_link' ],
 				],
 			],
 		);
 	}
 
 	/**
-	 * Lists bookmarks.
+	 * Lists links.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -314,7 +314,7 @@ class LinksController {
 		$tag = sanitize_text_field( (string) ( $request->get_param( 'tag' ) ?? '' ) );
 		if ( $tag !== '' ) {
 			// Tag filter is the documented way to scope the listing; the
-			// taxonomy is small in practice (one slug per saved bookmark tag).
+			// taxonomy is small in practice (one slug per saved link tag).
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 			$args['tax_query'] = [
 				[
@@ -342,7 +342,7 @@ class LinksController {
 	}
 
 	/**
-	 * Creates a bookmark with idempotent dedupe by canonical URL.
+	 * Creates a link with idempotent dedupe by canonical URL.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -413,7 +413,7 @@ class LinksController {
 	}
 
 	/**
-	 * Returns a single bookmark.
+	 * Returns a single link.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -422,14 +422,14 @@ class LinksController {
 	public function get_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$post = get_post( (int) $request['id'] );
 		if ( $post === null || $post->post_type !== LinkPostType::POST_TYPE ) {
-			return new WP_Error( 'apermo_stash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
+			return new WP_Error( 'apermo_stash_not_found', __( 'Link not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
 		return rest_ensure_response( $this->prepare_response( $post ) );
 	}
 
 	/**
-	 * Updates an existing bookmark.
+	 * Updates an existing link.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -446,7 +446,7 @@ class LinksController {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
 		if ( $post === null || $post->post_type !== LinkPostType::POST_TYPE ) {
-			return new WP_Error( 'apermo_stash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
+			return new WP_Error( 'apermo_stash_not_found', __( 'Link not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
 		$update = [ 'ID' => $post_id ];
@@ -497,7 +497,7 @@ class LinksController {
 	}
 
 	/**
-	 * Deletes a bookmark.
+	 * Deletes a link.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
@@ -507,12 +507,12 @@ class LinksController {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
 		if ( $post === null || $post->post_type !== LinkPostType::POST_TYPE ) {
-			return new WP_Error( 'apermo_stash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
+			return new WP_Error( 'apermo_stash_not_found', __( 'Link not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
 		$deleted = wp_delete_post( $post_id, true );
 		if ( $deleted === false || $deleted === null ) {
-			return new WP_Error( 'apermo_stash_delete_failed', __( 'Could not delete bookmark.', 'apermo-stash' ), [ 'status' => 500 ] );
+			return new WP_Error( 'apermo_stash_delete_failed', __( 'Could not delete link.', 'apermo-stash' ), [ 'status' => 500 ] );
 		}
 
 		return rest_ensure_response(
@@ -524,14 +524,14 @@ class LinksController {
 	}
 
 	/**
-	 * Updates an existing bookmark to match the create-item request body.
+	 * Updates an existing link to match the create-item request body.
 	 *
 	 * Treats POST as idempotent: tags replace the existing set (rather than
 	 * append), and any field present in the request — title, description,
 	 * unread, archived, public — overwrites what is currently stored. Fields
 	 * the caller did not send are left alone.
 	 *
-	 * @param WP_Post           $existing    Existing bookmark.
+	 * @param WP_Post           $existing    Existing link.
 	 * @param WP_REST_Request   $request     REST request.
 	 * @param array<int,string> $tags        Tags from the request (may be empty).
 	 * @param string            $title       Resolved title (post-enrichment).
@@ -587,7 +587,7 @@ class LinksController {
 	}
 
 	/**
-	 * Locates a bookmark for the user by canonical URL.
+	 * Locates a link for the user by canonical URL.
 	 *
 	 * @param int    $user_id   User ID.
 	 * @param string $canonical Canonical URL.
@@ -601,7 +601,7 @@ class LinksController {
 	 * Returns the resolved title, description, and a `reachable` flag that
 	 * is null when the fetcher wasn't called and bool when it was.
 	 *
-	 * @param string $url         Bookmark URL.
+	 * @param string $url         Link URL.
 	 * @param string $title       Caller-supplied title.
 	 * @param string $description Caller-supplied description.
 	 *
@@ -625,7 +625,7 @@ class LinksController {
 	}
 
 	/**
-	 * Locates a bookmark for the user by canonical URL.
+	 * Locates a link for the user by canonical URL.
 	 *
 	 * @param int    $user_id   User ID.
 	 * @param string $canonical Canonical URL.
@@ -684,7 +684,7 @@ class LinksController {
 	}
 
 	/**
-	 * Prepares a bookmark for the REST response shape.
+	 * Prepares a link for the REST response shape.
 	 *
 	 * @param WP_Post|null $post WP post.
 	 *

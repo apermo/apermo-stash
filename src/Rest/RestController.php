@@ -14,11 +14,11 @@ class RestController {
 	public const NAMESPACE = 'apermo-stash/v1';
 
 	/**
-	 * Holds the bookmarks controller.
+	 * Holds the links controller.
 	 *
 	 * @var LinksController
 	 */
-	private LinksController $bookmarks;
+	private LinksController $links;
 
 	/**
 	 * Holds the tags controller.
@@ -37,18 +37,18 @@ class RestController {
 	/**
 	 * Constructs the registrar with its child controllers.
 	 *
-	 * @param LinksController $bookmarks Bookmarks controller.
+	 * @param LinksController $links Links controller.
 	 * @param TagsController  $tags      Tags controller.
 	 * @param CheckController $check     URL check controller.
 	 */
 	public function __construct(
-		LinksController $bookmarks,
+		LinksController $links,
 		TagsController $tags,
 		CheckController $check
 	) {
-		$this->bookmarks = $bookmarks;
-		$this->tags      = $tags;
-		$this->check     = $check;
+		$this->links = $links;
+		$this->tags  = $tags;
+		$this->check = $check;
 	}
 
 	/**
@@ -66,7 +66,7 @@ class RestController {
 	 * @return void
 	 */
 	public function register_routes(): void {
-		$this->bookmarks->register_routes( self::NAMESPACE );
+		$this->links->register_routes( self::NAMESPACE );
 		$this->tags->register_routes( self::NAMESPACE );
 		$this->check->register_routes( self::NAMESPACE );
 	}

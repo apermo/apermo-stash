@@ -180,7 +180,7 @@ class MainTest extends TestCase {
 	}
 
 	/**
-	 * Verifies boot wires the bookmark post type.
+	 * Verifies boot wires the link post type.
 	 *
 	 * @return void
 	 */

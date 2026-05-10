@@ -60,9 +60,9 @@ class TagsController {
 		[ $where, $args ] = self::build_where_clause( $visibility );
 
 		// Single aggregate replacing the previous "fetch every visible
-		// bookmark id, then ask get_terms for counts" fan-out. Joins to
+		// link id, then ask get_terms for counts" fan-out. Joins to
 		// indexed columns (post_type, post_status, taxonomy) keep this
-		// fast as the bookmark library grows.
+		// fast as the link library grows.
 		$sql = "SELECT t.term_id AS id, t.name, t.slug, COUNT(DISTINCT p.ID) AS count
 				FROM {$wpdb->terms} t
 				INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
@@ -152,12 +152,12 @@ class TagsController {
 	}
 
 	/**
-	 * Lists tags with bookmark counts that respect the requester's visibility.
+	 * Lists tags with link counts that respect the requester's visibility.
 	 *
 	 * Counts are computed in a single aggregate SQL statement that joins
 	 * the terms/term_taxonomy/term_relationships tables to the posts
 	 * table, applying the same visibility constraints used by the
-	 * bookmarks list endpoint.
+	 * links list endpoint.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *

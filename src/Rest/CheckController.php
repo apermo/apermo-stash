@@ -34,7 +34,7 @@ class CheckController {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'check' ],
-					'permission_callback' => [ Permissions::class, 'require_read_bookmarks' ],
+					'permission_callback' => [ Permissions::class, 'require_read_links' ],
 					'args'                => [
 						'url' => [
 							'type'     => 'string',
@@ -48,7 +48,7 @@ class CheckController {
 	}
 
 	/**
-	 * Returns whether a bookmark for the given URL exists in the visible scope.
+	 * Returns whether a link for the given URL exists in the visible scope.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 *
