@@ -103,7 +103,7 @@ class CorsHandlerTest extends TestCase {
 
 	/**
 	 * Verifies send_cors_response is a no-op when the request is not for
-	 * a Apermo Stash route, returning the unchanged $served value.
+	 * an Apermo Stash route, returning the unchanged $served value.
 	 *
 	 * @return void
 	 */

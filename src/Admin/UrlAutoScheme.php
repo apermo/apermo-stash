@@ -20,7 +20,7 @@ use Apermo\Stash\PostType\LinkPostType;
 class UrlAutoScheme {
 
 	/**
-	 * Returns true on screens that render a Apermo Stash URL input.
+	 * Returns true on screens that render an Apermo Stash URL input.
 	 *
 	 * @param string $hook Hook suffix passed to admin_enqueue_scripts.
 	 *
