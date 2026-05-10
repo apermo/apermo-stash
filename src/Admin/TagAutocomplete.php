@@ -60,7 +60,7 @@ class TagAutocomplete {
 			. "\t\$( function () {\n"
 			. "\t\t\$( 'input[data-apermo-stash-tag-autocomplete]' ).each( function () {\n"
 			. "\t\t\tvar \$input = \$( this );\n"
-			. "\t\t\tvar taxonomy = \$input.data( 'linkstashTagAutocomplete' ) || '" . $taxonomy . "';\n"
+			. "\t\t\tvar taxonomy = \$input.data( 'apermoStashTagAutocomplete' ) || '" . $taxonomy . "';\n"
 			. "\t\t\t\$input.autocomplete( {\n"
 			. "\t\t\t\tminLength: 1,\n"
 			. "\t\t\t\tsource: function ( request, response ) {\n"

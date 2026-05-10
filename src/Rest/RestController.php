@@ -61,7 +61,7 @@ class RestController {
 	}
 
 	/**
-	 * Registers all routes under the linkstash namespace.
+	 * Registers all routes under the apermo-stash namespace.
 	 *
 	 * @return void
 	 */

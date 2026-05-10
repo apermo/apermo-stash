@@ -159,7 +159,7 @@ class BookmarkMetaboxTest extends TestCase {
 		$screen->post_type = BookmarkPostType::POST_TYPE;
 		Functions\when( 'get_current_screen' )->justReturn( $screen );
 		Functions\when( 'plugins_url' )->alias(
-			static fn ( string $path ): string => '/wp-content/plugins/linkstash/' . $path,
+			static fn ( string $path ): string => '/wp-content/plugins/apermo-stash/' . $path,
 		);
 
 		$enqueued = null;
