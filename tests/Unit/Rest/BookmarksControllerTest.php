@@ -68,7 +68,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_register_routes_registers_two_route_groups(): void {
 		Functions\expect( 'register_rest_route' )->twice();
 
-		$this->controller()->register_routes( 'linkstash/v1' );
+		$this->controller()->register_routes( 'apermo-stash/v1' );
 	}
 
 	/**

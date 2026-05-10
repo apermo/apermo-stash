@@ -124,7 +124,7 @@ class CorsHandlerTest extends TestCase {
 	 */
 	public function test_send_cors_response_skips_unknown_origin(): void {
 		$_SERVER['REQUEST_METHOD'] = 'POST';
-		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['REQUEST_URI']    = '/wp-json/apermo-stash/v1/bookmarks';
 		$_SERVER['HTTP_ORIGIN']    = 'https://attacker.tld';
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
 		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
@@ -140,7 +140,7 @@ class CorsHandlerTest extends TestCase {
 	 */
 	public function test_send_cors_response_serves_options_preflight(): void {
 		$_SERVER['REQUEST_METHOD'] = 'OPTIONS';
-		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['REQUEST_URI']    = '/wp-json/apermo-stash/v1/bookmarks';
 		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
 		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );
@@ -158,7 +158,7 @@ class CorsHandlerTest extends TestCase {
 	 */
 	public function test_send_cors_response_passes_through_post(): void {
 		$_SERVER['REQUEST_METHOD'] = 'POST';
-		$_SERVER['REQUEST_URI']    = '/wp-json/linkstash/v1/bookmarks';
+		$_SERVER['REQUEST_URI']    = '/wp-json/apermo-stash/v1/bookmarks';
 		$_SERVER['HTTP_ORIGIN']    = 'chrome-extension://abc';
 		Functions\when( 'rest_get_url_prefix' )->justReturn( 'wp-json' );
 		Filters\expectApplied( 'linkstash_allowed_origins' )->andReturn( [ 'chrome-extension://*' ] );

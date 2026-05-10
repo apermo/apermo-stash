@@ -56,7 +56,7 @@ class CheckControllerTest extends TestCase {
 			->once()
 			->withArgs(
 				static function ( string $rest_namespace, string $route, array $config ): bool {
-					if ( $rest_namespace !== 'linkstash/v1' || $route !== '/check' ) {
+					if ( $rest_namespace !== 'apermo-stash/v1' || $route !== '/check' ) {
 						return false;
 					}
 					$permission = $config[0]['permission_callback'] ?? null;
@@ -65,7 +65,7 @@ class CheckControllerTest extends TestCase {
 				},
 			);
 
-		( new CheckController() )->register_routes( 'linkstash/v1' );
+		( new CheckController() )->register_routes( 'apermo-stash/v1' );
 	}
 
 	/**

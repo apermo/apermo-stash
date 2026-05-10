@@ -76,6 +76,6 @@ class RestControllerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_namespace_constant(): void {
-		self::assertSame( 'linkstash/v1', RestController::NAMESPACE );
+		self::assertSame( 'apermo-stash/v1', RestController::NAMESPACE );
 	}
 }

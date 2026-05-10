@@ -79,10 +79,10 @@ class TagsControllerTest extends TestCase {
 		Functions\expect( 'register_rest_route' )
 			->once()
 			->withArgs(
-				static fn ( string $rest_namespace, string $route ): bool => $rest_namespace === 'linkstash/v1' && $route === '/tags',
+				static fn ( string $rest_namespace, string $route ): bool => $rest_namespace === 'apermo-stash/v1' && $route === '/tags',
 			);
 
-		( new TagsController() )->register_routes( 'linkstash/v1' );
+		( new TagsController() )->register_routes( 'apermo-stash/v1' );
 	}
 
 	/**

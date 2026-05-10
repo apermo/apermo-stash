@@ -7,11 +7,11 @@ namespace Apermo\Stash\Rest;
 \defined( 'ABSPATH' ) || exit();
 
 /**
- * Registers the linkstash/v1 REST namespace and routes.
+ * Registers the apermo-stash/v1 REST namespace and routes.
  */
 class RestController {
 
-	public const NAMESPACE = 'linkstash/v1';
+	public const NAMESPACE = 'apermo-stash/v1';
 
 	/**
 	 * Holds the bookmarks controller.
