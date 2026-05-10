@@ -55,7 +55,7 @@ class UrlAutoSchemeTest extends TestCase {
 	 */
 	public function test_enqueues_on_dashboard(): void {
 		Functions\when( 'wp_register_script' )->justReturn( true );
-		Functions\expect( 'wp_enqueue_script' )->once()->with( 'linkstash-url-auto-scheme' );
+		Functions\expect( 'wp_enqueue_script' )->once()->with( 'apermo-stash-url-auto-scheme' );
 		Functions\when( 'wp_add_inline_script' )->justReturn( true );
 
 		( new UrlAutoScheme() )->maybe_enqueue( 'index.php' );

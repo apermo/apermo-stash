@@ -145,7 +145,7 @@ class BookmarkMetabox {
 		}
 
 		wp_enqueue_script(
-			'linkstash-unsaved-changes',
+			'apermo-stash-unsaved-changes',
 			plugins_url( 'assets/js/unsaved-changes.js', Main::file() ),
 			[],
 			Main::VERSION,
@@ -211,15 +211,15 @@ class BookmarkMetabox {
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_FIELD );
 		?>
 		<p>
-			<label for="linkstash-url"><strong><?php esc_html_e( 'URL', 'apermo-stash' ); ?></strong></label><br />
+			<label for="apermo-stash-url"><strong><?php esc_html_e( 'URL', 'apermo-stash' ); ?></strong></label><br />
 			<input type="url"
-					id="linkstash-url"
+					id="apermo-stash-url"
 					name="apermo_stash_url"
 					value="<?php echo esc_attr( $url ); ?>"
 					required
 					class="widefat"
 					placeholder="https://&hellip;"
-					data-linkstash-url-input />
+					data-apermo-stash-url-input />
 		</p>
 		<?php if ( $unreachable && $url !== '' ) { ?>
 			<div class="notice notice-warning inline" style="margin: 0.5rem 0; padding: 0.5rem 0.75rem;">
@@ -252,7 +252,7 @@ class BookmarkMetabox {
 	public function render_note_meta_box( WP_Post $post ): void {
 		?>
 		<textarea name="apermo_stash_note"
-					id="linkstash-note"
+					id="apermo-stash-note"
 					class="widefat"
 					rows="8"
 					placeholder="<?php esc_attr_e( 'Optional note&hellip;', 'apermo-stash' ); ?>"><?php echo esc_textarea( $post->post_content ); ?></textarea>

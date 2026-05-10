@@ -49,7 +49,7 @@ class TagAutocomplete {
 
 	/**
 	 * Returns the inline adapter script that wires jQuery UI autocomplete
-	 * to inputs marked with `data-linkstash-tag-autocomplete="<taxonomy>"`.
+	 * to inputs marked with `data-apermo-stash-tag-autocomplete="<taxonomy>"`.
 	 *
 	 * @return string
 	 */
@@ -58,7 +58,7 @@ class TagAutocomplete {
 
 		return "( function ( \$ ) {\n"
 			. "\t\$( function () {\n"
-			. "\t\t\$( 'input[data-linkstash-tag-autocomplete]' ).each( function () {\n"
+			. "\t\t\$( 'input[data-apermo-stash-tag-autocomplete]' ).each( function () {\n"
 			. "\t\t\tvar \$input = \$( this );\n"
 			. "\t\t\tvar taxonomy = \$input.data( 'linkstashTagAutocomplete' ) || '" . $taxonomy . "';\n"
 			. "\t\t\t\$input.autocomplete( {\n"
@@ -122,8 +122,8 @@ class TagAutocomplete {
 
 		wp_enqueue_script( 'jquery-ui-autocomplete' );
 		wp_add_inline_script( 'jquery-ui-autocomplete', self::adapter_js() );
-		wp_register_style( 'linkstash-tag-autocomplete', false, [], '0.1.0' );
-		wp_enqueue_style( 'linkstash-tag-autocomplete' );
-		wp_add_inline_style( 'linkstash-tag-autocomplete', self::dropdown_css() );
+		wp_register_style( 'apermo-stash-tag-autocomplete', false, [], '0.1.0' );
+		wp_enqueue_style( 'apermo-stash-tag-autocomplete' );
+		wp_add_inline_style( 'apermo-stash-tag-autocomplete', self::dropdown_css() );
 	}
 }

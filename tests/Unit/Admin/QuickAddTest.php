@@ -77,10 +77,10 @@ class QuickAddTest extends TestCase {
 	 */
 	public function test_render_form_html_outputs_form(): void {
 		\ob_start();
-		QuickAdd::render_form_html( 'linkstash-dashboard-widget' );
+		QuickAdd::render_form_html( 'apermo-stash-dashboard-widget' );
 		$output = (string) \ob_get_clean();
 
-		self::assertStringContainsString( 'linkstash-dashboard-widget', $output );
+		self::assertStringContainsString( 'apermo-stash-dashboard-widget', $output );
 		self::assertStringContainsString( 'name="url"', $output );
 		self::assertStringContainsString( 'name="tags"', $output );
 		self::assertStringContainsString( 'name="public"', $output );

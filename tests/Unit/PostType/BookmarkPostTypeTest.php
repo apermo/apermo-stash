@@ -115,7 +115,7 @@ class BookmarkPostTypeTest extends TestCase {
 		( new BookmarkPostType() )->inline_menu_icon();
 		$output = (string) \ob_get_clean();
 
-		self::assertStringContainsString( '<script id="linkstash-menu-icon">', $output );
+		self::assertStringContainsString( '<script id="apermo-stash-menu-icon">', $output );
 		self::assertStringContainsString( '#menu-posts-' . BookmarkPostType::POST_TYPE . ' .wp-menu-image', $output );
 		self::assertStringContainsString( 'd.innerHTML=', $output );
 		self::assertStringContainsString( '<svg', $output );

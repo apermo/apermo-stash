@@ -85,7 +85,7 @@ class HelpTabsTest extends TestCase {
 
 		$ids = \array_column( $registered, 'id' );
 		self::assertSame(
-			[ 'linkstash-overview', 'linkstash-add-bookmarks', 'linkstash-extension' ],
+			[ 'apermo-stash-overview', 'apermo-stash-add-bookmarks', 'linkstash-extension' ],
 			$ids,
 		);
 		self::assertStringContainsString( 'github.com/apermo/linkstash-extension', $registered[2]['content'] );

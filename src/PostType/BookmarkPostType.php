@@ -147,7 +147,7 @@ class BookmarkPostType {
 		// constants composed from a class constant. No user data flows in.
 		$selector = '#menu-posts-' . self::POST_TYPE . ' .wp-menu-image';
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo '<script id="linkstash-menu-icon">'
+		echo '<script id="apermo-stash-menu-icon">'
 			. '(function(){'
 			. 'var d=document.querySelector(' . wp_json_encode( $selector ) . ');'
 			. 'if(d){d.innerHTML=' . wp_json_encode( $markup ) . ';}'

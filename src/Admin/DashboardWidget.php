@@ -51,6 +51,6 @@ class DashboardWidget {
 	 */
 	public function render(): void {
 		echo '<p>' . esc_html__( 'Save a URL to your bookmark library.', 'apermo-stash' ) . '</p>';
-		QuickAdd::render_form_html( 'linkstash-dashboard-widget' );
+		QuickAdd::render_form_html( 'apermo-stash-dashboard-widget' );
 	}
 }

@@ -79,7 +79,7 @@ class ListColumns {
 		$post      = get_post( $post_id );
 		$is_public = $post !== null && $post->post_status === 'publish';
 		\printf(
-			'<span class="linkstash-badge linkstash-badge--%1$s">%2$s</span>',
+			'<span class="apermo-stash-badge apermo-stash-badge--%1$s">%2$s</span>',
 			esc_attr( $is_public ? 'public' : 'private' ),
 			esc_html( $is_public ? __( 'Public', 'apermo-stash' ) : __( 'Private', 'apermo-stash' ) ),
 		);

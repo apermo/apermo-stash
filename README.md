@@ -63,7 +63,7 @@ Base path: `/wp-json/linkstash/v1`.
 | Method | Path | Description |
 |---|---|---|
 | `GET` | `/bookmarks` | List bookmarks (filters: `tag`, `q`, `unread`, `archived`, `public`/`private`, `page`, `per_page`) |
-| `POST` | `/bookmarks` | Create a bookmark (idempotent — same URL returns existing record with `X-LinkStash-Existing: 1`) |
+| `POST` | `/bookmarks` | Create a bookmark (idempotent — same URL returns existing record with `X-Apermo-Stash-Existing: 1`) |
 | `GET` | `/bookmarks/{id}` | Fetch a single bookmark |
 | `PATCH` | `/bookmarks/{id}` | Update fields |
 | `DELETE` | `/bookmarks/{id}` | Delete a bookmark |

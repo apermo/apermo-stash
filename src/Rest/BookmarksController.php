@@ -406,7 +406,7 @@ class BookmarksController {
 		$response = rest_ensure_response( $this->prepare_response( get_post( $post_id ) ) );
 		$response->set_status( 201 );
 		if ( $meta_fetched !== null ) {
-			$response->header( 'X-LinkStash-Meta-Fetched', $meta_fetched ? '1' : '0' );
+			$response->header( 'X-Apermo-Stash-Meta-Fetched', $meta_fetched ? '1' : '0' );
 		}
 
 		return $response;
@@ -581,7 +581,7 @@ class BookmarksController {
 		$fresh = get_post( $existing->ID );
 		$response = rest_ensure_response( $this->prepare_response( $fresh ) );
 		$response->set_status( 200 );
-		$response->header( 'X-LinkStash-Existing', '1' );
+		$response->header( 'X-Apermo-Stash-Existing', '1' );
 
 		return $response;
 	}

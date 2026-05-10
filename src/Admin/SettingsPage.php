@@ -125,8 +125,8 @@ class SettingsPage {
 			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION_CREATE ); ?>" />
 			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( wp_create_nonce( self::ACTION_CREATE ) ); ?>" />
 			<p>
-				<label for="linkstash-token-name"><?php esc_html_e( 'Name', 'apermo-stash' ); ?></label>
-				<input id="linkstash-token-name" type="text" name="token_name" required class="regular-text" placeholder="<?php esc_attr_e( 'Chrome extension on laptop', 'apermo-stash' ); ?>" />
+				<label for="apermo-stash-token-name"><?php esc_html_e( 'Name', 'apermo-stash' ); ?></label>
+				<input id="apermo-stash-token-name" type="text" name="token_name" required class="regular-text" placeholder="<?php esc_attr_e( 'Chrome extension on laptop', 'apermo-stash' ); ?>" />
 				<button type="submit" class="button button-primary"><?php esc_html_e( 'Generate', 'apermo-stash' ); ?></button>
 			</p>
 		</form>

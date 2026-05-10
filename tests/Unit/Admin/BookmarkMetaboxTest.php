@@ -173,7 +173,7 @@ class BookmarkMetaboxTest extends TestCase {
 
 		$this->metabox()->enqueue_unsaved_changes_script();
 
-		self::assertSame( 'linkstash-unsaved-changes', $enqueued );
+		self::assertSame( 'apermo-stash-unsaved-changes', $enqueued );
 	}
 
 	/**

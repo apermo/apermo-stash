@@ -88,7 +88,7 @@ class HelpTabs {
 				],
 			) . '</li>'
 			. '</ul>'
-			. '<p>' . esc_html__( 'LinkStash dedupes by canonical URL: saving the same page twice updates the existing record instead of creating a duplicate. The X-LinkStash-Existing response header on a re-save tells API clients which path was taken.', 'apermo-stash' ) . '</p>';
+			. '<p>' . esc_html__( 'LinkStash dedupes by canonical URL: saving the same page twice updates the existing record instead of creating a duplicate. The X-Apermo-Stash-Existing response header on a re-save tells API clients which path was taken.', 'apermo-stash' ) . '</p>';
 	}
 
 	/**
@@ -181,7 +181,7 @@ class HelpTabs {
 
 		$screen->add_help_tab(
 			[
-				'id'      => 'linkstash-overview',
+				'id'      => 'apermo-stash-overview',
 				'title'   => esc_html__( 'Overview', 'apermo-stash' ),
 				'content' => self::overview_html(),
 			],
@@ -189,7 +189,7 @@ class HelpTabs {
 
 		$screen->add_help_tab(
 			[
-				'id'      => 'linkstash-add-bookmarks',
+				'id'      => 'apermo-stash-add-bookmarks',
 				'title'   => esc_html__( 'Adding bookmarks', 'apermo-stash' ),
 				'content' => self::add_bookmarks_html(),
 			],

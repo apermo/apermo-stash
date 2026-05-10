@@ -299,7 +299,7 @@ class BookmarksControllerTest extends TestCase {
 
 		self::assertInstanceOf( WP_REST_Response::class, $response );
 		self::assertSame( 200, $response->status );
-		self::assertSame( '1', $response->headers['X-LinkStash-Existing'] );
+		self::assertSame( '1', $response->headers['X-Apermo-Stash-Existing'] );
 	}
 
 	/**

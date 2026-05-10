@@ -87,17 +87,17 @@ class QuickAdd {
 	 *
 	 * @return void
 	 */
-	public static function render_form_html( string $css_class = 'linkstash-quick-add' ): void {
+	public static function render_form_html( string $css_class = 'apermo-stash-quick-add' ): void {
 		$nonce = wp_create_nonce( self::ACTION );
 		?>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="<?php echo esc_attr( $css_class ); ?>" style="margin: 0.5rem 0;">
 			<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
 			<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>" />
 			<p>
-				<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'apermo-stash' ); ?>" required class="widefat" data-linkstash-url-input />
+				<input type="url" name="url" placeholder="<?php esc_attr_e( 'https://…', 'apermo-stash' ); ?>" required class="widefat" data-apermo-stash-url-input />
 			</p>
 			<p>
-				<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'apermo-stash' ); ?>" class="widefat" data-linkstash-tag-autocomplete="<?php echo esc_attr( TagTaxonomy::TAXONOMY ); ?>" autocomplete="off" />
+				<input type="text" name="tags" placeholder="<?php esc_attr_e( 'tags, comma, separated', 'apermo-stash' ); ?>" class="widefat" data-apermo-stash-tag-autocomplete="<?php echo esc_attr( TagTaxonomy::TAXONOMY ); ?>" autocomplete="off" />
 			</p>
 			<p>
 				<label>

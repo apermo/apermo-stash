@@ -12,7 +12,7 @@ use Apermo\Stash\PostType\BookmarkPostType;
  * Prepends `https://` to bare URL inputs when the user tabs away.
  *
  * Saves the user from typing the scheme on every quick-add. Targets any
- * `<input type="url">` that opts in via `data-linkstash-url-input`. The
+ * `<input type="url">` that opts in via `data-apermo-stash-url-input`. The
  * blur handler is conservative: it leaves anything that already looks
  * scheme-prefixed alone (`http://`, `https://`, `mailto:`, `//host/...`,
  * etc.).
@@ -59,7 +59,7 @@ class UrlAutoScheme {
 			. "\t\t} );\n"
 			. "\t}\n"
 			. "\tfunction init() {\n"
-			. "\t\tdocument.querySelectorAll( 'input[data-linkstash-url-input]' ).forEach( attach );\n"
+			. "\t\tdocument.querySelectorAll( 'input[data-apermo-stash-url-input]' ).forEach( attach );\n"
 			. "\t}\n"
 			. "\tif ( document.readyState === 'loading' ) {\n"
 			. "\t\tdocument.addEventListener( 'DOMContentLoaded', init );\n"
@@ -91,8 +91,8 @@ class UrlAutoScheme {
 			return;
 		}
 
-		wp_register_script( 'linkstash-url-auto-scheme', false, [], '0.1.0', true );
-		wp_enqueue_script( 'linkstash-url-auto-scheme' );
-		wp_add_inline_script( 'linkstash-url-auto-scheme', self::handler_js() );
+		wp_register_script( 'apermo-stash-url-auto-scheme', false, [], '0.1.0', true );
+		wp_enqueue_script( 'apermo-stash-url-auto-scheme' );
+		wp_add_inline_script( 'apermo-stash-url-auto-scheme', self::handler_js() );
 	}
 }

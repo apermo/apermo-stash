@@ -96,7 +96,7 @@ class DashboardWidgetTest extends TestCase {
 		( new DashboardWidget() )->render();
 		$output = (string) \ob_get_clean();
 
-		self::assertStringContainsString( 'linkstash-dashboard-widget', $output );
+		self::assertStringContainsString( 'apermo-stash-dashboard-widget', $output );
 		self::assertStringContainsString( 'name="url"', $output );
 		self::assertStringContainsString( 'name="tags"', $output );
 		self::assertStringContainsString( 'name="public"', $output );

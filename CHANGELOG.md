@@ -163,7 +163,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `determine_current_user` filter that authenticates `Authorization: Bearer`
   requests.
 - REST namespace `linkstash/v1` with bookmark CRUD, idempotent create
-  (returns existing record with `X-LinkStash-Existing: 1` on duplicate URL),
+  (returns existing record with `X-Apermo-Stash-Existing: 1` on duplicate URL),
   tag listing with counts, and `GET /check?url=` for browser-extension
   "already saved" badges.
 - Public/private visibility enforcement on REST reads via WordPress's

@@ -164,7 +164,7 @@ class ListColumnsTest extends TestCase {
 
 		$output = $this->capture_render( 'visibility', 7 );
 
-		self::assertStringContainsString( 'linkstash-badge--public', $output );
+		self::assertStringContainsString( 'apermo-stash-badge--public', $output );
 		self::assertStringContainsString( 'Public', $output );
 	}
 
@@ -180,7 +180,7 @@ class ListColumnsTest extends TestCase {
 
 		$output = $this->capture_render( 'visibility', 7 );
 
-		self::assertStringContainsString( 'linkstash-badge--private', $output );
+		self::assertStringContainsString( 'apermo-stash-badge--private', $output );
 		self::assertStringContainsString( 'Private', $output );
 	}
 
