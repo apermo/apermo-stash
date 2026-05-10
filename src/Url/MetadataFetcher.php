@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Url;
 
+use Apermo\Stash\Main;
+
 \defined( 'ABSPATH' ) || exit();
 
 /**
@@ -116,7 +118,7 @@ class MetadataFetcher {
 			[
 				'timeout'     => self::TIMEOUT_SECONDS,
 				'redirection' => 3,
-				'user-agent'  => 'Apermo Stash/0.1 (+https://github.com/apermo/apermo-stash)',
+				'user-agent'  => 'Apermo Stash/' . Main::VERSION . ' (+https://github.com/apermo/apermo-stash)',
 			],
 		);
 
