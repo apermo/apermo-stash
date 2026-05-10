@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\Main;
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\Url\Canonicalizer;
-use Apermo\LinkStash\Url\DisplayUrl;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\Main;
+use Apermo\Stash\PostType\BookmarkMeta;
+use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\Url\Canonicalizer;
+use Apermo\Stash\Url\DisplayUrl;
+use Apermo\Stash\Url\MetadataFetcher;
 use WP_Post;
 
 /**

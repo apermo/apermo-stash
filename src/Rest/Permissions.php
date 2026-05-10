@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Rest;
+namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\BookmarkPostType;
 use WP_Error;
 use WP_REST_Request;
 

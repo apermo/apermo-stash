@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Rest\Fixtures;
+namespace Apermo\Stash\Tests\Unit\Rest\Fixtures;
 
 /**
  * Stands in for the WordPress $wpdb global in unit tests.

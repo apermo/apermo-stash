@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Rest;
+namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\Rest\BookmarksController;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\Rest\BookmarksController;
+use Apermo\Stash\Url\MetadataFetcher;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;

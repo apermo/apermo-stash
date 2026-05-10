@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
-use Apermo\LinkStash\PostType\TagTaxonomy;
+use Apermo\Stash\PostType\TagTaxonomy;
 
 \defined( 'ABSPATH' ) || exit();
 

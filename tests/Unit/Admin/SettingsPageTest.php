@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\SettingsPage;
-use Apermo\LinkStash\Auth\TokenStore;
-use Apermo\LinkStash\Main;
+use Apermo\Stash\Admin\SettingsPage;
+use Apermo\Stash\Auth\TokenStore;
+use Apermo\Stash\Main;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Rest;
+namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\Rest\Permissions;
+use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\Rest\Permissions;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;

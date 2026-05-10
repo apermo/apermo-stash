@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Rest;
+namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
+use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;

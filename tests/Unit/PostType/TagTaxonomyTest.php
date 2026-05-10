@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\PostType;
+namespace Apermo\Stash\Tests\Unit\PostType;
 
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
+use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit;
+namespace Apermo\Stash\Tests\Unit;
 
-use Apermo\LinkStash\Main;
+use Apermo\Stash\Main;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\BookmarkMetabox;
-use Apermo\LinkStash\Main;
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\Admin\BookmarkMetabox;
+use Apermo\Stash\Main;
+use Apermo\Stash\PostType\BookmarkMeta;
+use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\Url\MetadataFetcher;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;

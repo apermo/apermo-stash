@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\PostType;
+namespace Apermo\Stash\PostType;
 
 \defined( 'ABSPATH' ) || exit();
 

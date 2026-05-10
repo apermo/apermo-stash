@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Admin;
+namespace Apermo\Stash\Tests\Unit\Admin;
 
-use Apermo\LinkStash\Admin\Notices;
-use Apermo\LinkStash\PostType\BookmarkPostType;
+use Apermo\Stash\Admin\Notices;
+use Apermo\Stash\PostType\BookmarkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Rest;
+namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\LinkStash\Rest\CheckController;
-use Apermo\LinkStash\Rest\Permissions;
+use Apermo\Stash\Rest\CheckController;
+use Apermo\Stash\Rest\Permissions;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;

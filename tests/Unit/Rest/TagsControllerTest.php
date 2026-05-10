@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Tests\Unit\Rest;
+namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\LinkStash\Rest\TagsController;
-use Apermo\LinkStash\Tests\Unit\Rest\Fixtures\WpdbMockForTags;
+use Apermo\Stash\Rest\TagsController;
+use Apermo\Stash\Tests\Unit\Rest\Fixtures\WpdbMockForTags;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;

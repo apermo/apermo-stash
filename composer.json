@@ -23,12 +23,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Apermo\\LinkStash\\": "src/"
+            "Apermo\\Stash\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Apermo\\LinkStash\\Tests\\": "tests/"
+            "Apermo\\Stash\\Tests\\": "tests/"
         }
     },
     "scripts": {

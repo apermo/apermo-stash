@@ -25,13 +25,13 @@
 
     <!--
         Project prefix for global functions, hooks, constants,
-        and namespace roots. E.g. prefix "Apermo\LinkStash" allows
-        namespace Apermo\LinkStash\Admin but flags Other\Admin.
+        and namespace roots. E.g. prefix "Apermo\Stash" allows
+        namespace Apermo\Stash\Admin but flags Other\Admin.
     -->
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
         <properties>
             <property name="prefixes" type="array">
-                <element value="Apermo\LinkStash"/>
+                <element value="Apermo\Stash"/>
                 <element value="linkstash"/>
             </property>
         </properties>

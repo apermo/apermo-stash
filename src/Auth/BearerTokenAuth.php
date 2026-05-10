@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Auth;
+namespace Apermo\Stash\Auth;
 
 \defined( 'ABSPATH' ) || exit();
 

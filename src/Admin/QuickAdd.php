@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
-use Apermo\LinkStash\Url\Canonicalizer;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\PostType\BookmarkMeta;
+use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
+use Apermo\Stash\Url\Canonicalizer;
+use Apermo\Stash\Url\MetadataFetcher;
 
 /**
  * Renders the paste-a-URL quick-add form on the bookmark list screen

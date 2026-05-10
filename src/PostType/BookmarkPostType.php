@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\PostType;
+namespace Apermo\Stash\PostType;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\Main;
+use Apermo\Stash\Main;
 
 /**
  * Registers the linkstash_bookmark custom post type.

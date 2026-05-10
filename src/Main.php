@@ -2,31 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash;
+namespace Apermo\Stash;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\Admin\BookmarkMetabox;
-use Apermo\LinkStash\Admin\DashboardWidget;
-use Apermo\LinkStash\Admin\HelpTabs;
-use Apermo\LinkStash\Admin\ListColumns;
-use Apermo\LinkStash\Admin\ListFilter;
-use Apermo\LinkStash\Admin\Notices;
-use Apermo\LinkStash\Admin\QuickAdd;
-use Apermo\LinkStash\Admin\SettingsPage;
-use Apermo\LinkStash\Admin\TagAutocomplete;
-use Apermo\LinkStash\Admin\UrlAutoScheme;
-use Apermo\LinkStash\Auth\BearerTokenAuth;
-use Apermo\LinkStash\Auth\TokenStore;
-use Apermo\LinkStash\PostType\BookmarkMeta;
-use Apermo\LinkStash\PostType\BookmarkPostType;
-use Apermo\LinkStash\PostType\TagTaxonomy;
-use Apermo\LinkStash\Rest\BookmarksController;
-use Apermo\LinkStash\Rest\CheckController;
-use Apermo\LinkStash\Rest\CorsHandler;
-use Apermo\LinkStash\Rest\RestController;
-use Apermo\LinkStash\Rest\TagsController;
-use Apermo\LinkStash\Url\MetadataFetcher;
+use Apermo\Stash\Admin\BookmarkMetabox;
+use Apermo\Stash\Admin\DashboardWidget;
+use Apermo\Stash\Admin\HelpTabs;
+use Apermo\Stash\Admin\ListColumns;
+use Apermo\Stash\Admin\ListFilter;
+use Apermo\Stash\Admin\Notices;
+use Apermo\Stash\Admin\QuickAdd;
+use Apermo\Stash\Admin\SettingsPage;
+use Apermo\Stash\Admin\TagAutocomplete;
+use Apermo\Stash\Admin\UrlAutoScheme;
+use Apermo\Stash\Auth\BearerTokenAuth;
+use Apermo\Stash\Auth\TokenStore;
+use Apermo\Stash\PostType\BookmarkMeta;
+use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\TagTaxonomy;
+use Apermo\Stash\Rest\BookmarksController;
+use Apermo\Stash\Rest\CheckController;
+use Apermo\Stash\Rest\CorsHandler;
+use Apermo\Stash\Rest\RestController;
+use Apermo\Stash\Rest\TagsController;
+use Apermo\Stash\Url\MetadataFetcher;
 
 /**
  * Bootstraps the plugin.

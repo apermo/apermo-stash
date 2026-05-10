@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Apermo\LinkStash\Admin;
+namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\LinkStash\Auth\TokenStore;
-use Apermo\LinkStash\Main;
+use Apermo\Stash\Auth\TokenStore;
+use Apermo\Stash\Main;
 
 /**
  * Renders the Settings → LinkStash page that manages API tokens.
