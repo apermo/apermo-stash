@@ -5,7 +5,7 @@
  * Description: A self-hosted bookmark collection with a token-protected REST API.
  * Version:     0.1.3
  * Author:      Christoph Daum
- * Author URI:  https://apermo.de
+ * Author URI:  https://christoph-daum.com
  * License:     GPL-2.0-or-later
  * Text Domain: apermo-stash
  * Requires at least: 6.4
