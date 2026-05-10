@@ -6,6 +6,7 @@ namespace Apermo\Stash\Tests\Unit\Rest;
 
 use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\Rest\LinksController;
+use Apermo\Stash\Rest\Permissions;
 use Apermo\Stash\Url\MetadataFetcher;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
@@ -69,6 +70,31 @@ class LinksControllerTest extends TestCase {
 		Functions\expect( 'register_rest_route' )->twice();
 
 		$this->controller()->register_routes( 'apermo-stash/v1' );
+	}
+
+	/**
+	 * Verifies the GET /links collection route requires read_links —
+	 * anonymous callers no longer have unauthenticated access to the
+	 * link library.
+	 *
+	 * @return void
+	 */
+	public function test_collection_get_requires_read_links(): void {
+		$captured = [];
+		Functions\when( 'register_rest_route' )->alias(
+			static function ( string $rest_namespace, string $route, array $args ) use ( &$captured ): bool {
+				$captured[ $route ] = $args;
+				return true;
+			},
+		);
+
+		$this->controller()->register_routes( 'apermo-stash/v1' );
+
+		self::assertArrayHasKey( '/links', $captured );
+		self::assertSame(
+			[ Permissions::class, 'require_read_links' ],
+			$captured['/links'][0]['permission_callback'],
+		);
 	}
 
 	/**

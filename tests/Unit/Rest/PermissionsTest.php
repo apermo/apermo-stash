@@ -41,15 +41,6 @@ class PermissionsTest extends TestCase {
 	}
 
 	/**
-	 * Verifies allow_anyone is unconditional.
-	 *
-	 * @return void
-	 */
-	public function test_allow_anyone(): void {
-		self::assertTrue( Permissions::allow_anyone() );
-	}
-
-	/**
 	 * Verifies require_edit_posts returns an error for users without the cap.
 	 *
 	 * @return void

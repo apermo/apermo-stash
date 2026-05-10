@@ -229,7 +229,7 @@ class LinksController {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'list_items' ],
-					'permission_callback' => [ Permissions::class, 'allow_anyone' ],
+					'permission_callback' => [ Permissions::class, 'require_read_links' ],
 					'args'                => self::list_args(),
 				],
 				[

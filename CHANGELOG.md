@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-10
+
 ### Changed
 
 - **Rename: LinkStash → Apermo Stash.** Slug `linkstash` →
@@ -33,6 +35,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Author URI on the plugin header is now
   `https://christoph-daum.com` (was `https://apermo.de`); the author
   is the person Christoph Daum, not the Apermo brand.
+
+### Security
+
+- **`GET /links` and `GET /tags` now require `edit_posts`.** Both
+  routes previously used `Permissions::allow_anyone` and were
+  reachable by unauthenticated callers; the wp.org Plugin Review
+  Team flagged this. Reads now require the same capability as
+  writes. The Chrome extension already authenticates via Bearer
+  token so its flow is unaffected, but any external caller that
+  relied on the routes being public will now see 403. The
+  `Permissions::allow_anyone` helper was removed since no
+  registration uses it any more — re-introducing public access in
+  the future should add a named callback rather than resurrecting
+  the generic always-true.
 
 ## [0.1.3] - 2026-05-03
 

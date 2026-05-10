@@ -16,16 +16,6 @@ use WP_REST_Request;
 class Permissions {
 
 	/**
-	 * Allows the request through unconditionally; visibility is enforced at
-	 * the query level instead of denying access wholesale.
-	 *
-	 * @return bool
-	 */
-	public static function allow_anyone(): bool {
-		return true;
-	}
-
-	/**
 	 * Allows write requests when the resolved user can edit links.
 	 *
 	 * @return bool|WP_Error

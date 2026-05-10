@@ -33,7 +33,7 @@ use Apermo\Stash\Url\MetadataFetcher;
  */
 class Main {
 
-	public const VERSION = '0.1.3';
+	public const VERSION = '0.2.0';
 
 	private const STARTER_TAGS_SEEDED_OPTION = 'apermo_stash_starter_tags_seeded';
 
