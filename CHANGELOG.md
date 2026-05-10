@@ -49,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fire after ours and overwrite the value; on a barebones WP it was
   still a latent bug because core would always overwrite the origin
   on direct POSTs.) `CorsHandler::send_cors_headers` now removes the
-  core hook for Apermo Stash routes when the origin matches the
+  core hook for LinkStash routes when the origin matches the
   allow-list, and emits the complete CORS header set itself
   (`Access-Control-Allow-Origin`, `-Allow-Methods`, `-Allow-Headers`,
   `-Allow-Credentials`, `-Expose-Headers`, `Vary`). Other namespaces
@@ -88,11 +88,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Favorite** flag on bookmarks (replaces Unread / Archived).
   Single boolean meta `_linkstash_favorite`; rendered as a star
   badge in the new "Favorite" list-table column; filterable via
-  `GET /apermo-stash/v1/links?favorite=1`. The Add/Edit screen
+  `GET /linkstash/v1/bookmarks?favorite=1`. The Add/Edit screen
   shows a single "Favorite" checkbox in the URL meta box.
 - Starter tags created on first activation: `read-later`,
   `reference`, `inspiration`, `archive`. A one-shot
-  `apermo_stash_starter_tags_seeded` option records that the seed has
+  `linkstash_starter_tags_seeded` option records that the seed has
   run, so subsequent (re-)activations are no-ops — tags the user
   deletes are never resurrected. The marker is cleared on uninstall
   so a fresh reinstall reseeds. Tags cover the categorisation use
@@ -110,13 +110,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   companion Chrome extension.
 - "Settings" link in the plugin row actions on the Plugins listing
   screen.
-- Custom admin-menu icon: a monochromatic Apermo Stash logo
+- Custom admin-menu icon: a monochromatic LinkStash logo
   (`assets/menu-icon.svg`) used as a CSS `mask-image` so the icon
   adopts the WordPress admin color scheme — grey-ish in idle state,
   the scheme's highlight on hover/active — instead of the brand's
   blue/orange. Replaces the previous `dashicons-admin-links` icon.
 - Contextual help tabs on the bookmark list screen
-  (`edit.php?post_type=apermo_stash_link`): Overview (what each
+  (`edit.php?post_type=linkstash_bookmark`): Overview (what each
   list column means), Adding bookmarks (Add New / dashboard widget /
   browser extension / REST API), and Browser extension (Chrome Web
   Store review status + install-from-source pointer + configuration
@@ -125,8 +125,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Settings page moved from **Tools → Apermo Stash** to **Settings →
-  Apermo Stash** (`tools.php?page=linkstash` → `options-general.php?page=linkstash`).
+- Settings page moved from **Tools → LinkStash** to **Settings →
+  LinkStash** (`tools.php?page=linkstash` → `options-general.php?page=linkstash`).
   Existing tokens are unaffected; only the menu location and URL move.
 - Bumped the `Version` plugin header, `Main::VERSION`, and `readme.txt`
   Stable tag to 0.1.1.
@@ -137,15 +137,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The previous column key `tags` is reserved by core for the
   `post_tag` taxonomy; core's built-in handler claimed the cell and
   found nothing because the bookmark CPT doesn't have `post_tag`
-  attached. Switched to a `apermo_stash_tag` column key with our own
+  attached. Switched to a `linkstash_tag` column key with our own
   renderer that emits one anchor per tag pointing at the
   filter-by-tag URL — clicking a tag now narrows the list to that
   tag.
 
 ### Security
 
-- `GET /apermo-stash/v1/check?url=` now requires the same `edit_posts`
-  capability as the rest of the Apermo Stash REST surface, instead of
+- `GET /linkstash/v1/check?url=` now requires the same `edit_posts`
+  capability as the rest of the LinkStash REST surface, instead of
   allowing anonymous callers to probe whether a public bookmark
   exists. The companion Chrome extension already sends a Bearer
   token on every call, so this is transparent for it; ad-hoc
@@ -154,12 +154,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   when the caller is not authorised to read a private bookmark, so
   the response is indistinguishable from "post does not exist" —
   preventing ID-enumeration of private bookmarks via the
-  `GET /links/{id}` endpoint.
+  `GET /bookmarks/{id}` endpoint.
 - README + readme.txt now document the single outbound HTTP request
   the plugin makes (the metadata fetch on save, via
   `wp_safe_remote_get`, which blocks loopback and private IP
   ranges) and how to narrow the CORS allow-list to a specific
-  extension ID via the `apermo_stash_allowed_origins` filter.
+  extension ID via the `linkstash_allowed_origins` filter.
 
 ### Removed
 
@@ -179,8 +179,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Custom post type `apermo_stash_link` with REST exposure, custom non-hierarchical
-  taxonomy `apermo_stash_tag`, and post meta for URL, canonical URL, unread, and
+- Custom post type `linkstash_bookmark` with REST exposure, custom non-hierarchical
+  taxonomy `linkstash_tag`, and post meta for URL, canonical URL, unread, and
   archived flags.
 - URL canonicalization helper (strips `utm_*`, `fbclid`, `gclid`, lowercases
   scheme and host, drops fragment, sorts remaining query parameters).
@@ -189,14 +189,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bearer-token store backed by user meta (SHA-256 hashed) and a
   `determine_current_user` filter that authenticates `Authorization: Bearer`
   requests.
-- REST namespace `apermo-stash/v1` with bookmark CRUD, idempotent create
-  (returns existing record with `X-Apermo-Stash-Existing: 1` on duplicate URL),
+- REST namespace `linkstash/v1` with bookmark CRUD, idempotent create
+  (returns existing record with `X-LinkStash-Existing: 1` on duplicate URL),
   tag listing with counts, and `GET /check?url=` for browser-extension
   "already saved" badges.
 - Public/private visibility enforcement on REST reads via WordPress's
   native `post_status` (`publish` versus `private`).
 - CORS allow-list (default `chrome-extension://*`, extensible via the
-  `apermo_stash_allowed_origins` filter) and `OPTIONS` preflight handling.
+  `linkstash_allowed_origins` filter) and `OPTIONS` preflight handling.
 - Admin: bookmark list columns (URL, Tags, Visibility, Flags), quick-add
-  form, and Tools → Apermo Stash settings page for token CRUD.
+  form, and Tools → LinkStash settings page for token CRUD.
 - `uninstall.php` clears plugin-owned data while preserving bookmarks.
