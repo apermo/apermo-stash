@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   text domain `linkstash` → `apermo-stash`, REST namespace
   `linkstash/v1` → `apermo-stash/v1`, Composer package
   `apermo/linkstash` → `apermo/apermo-stash`. The post type
-  (`apermo_stash_bookmark`), taxonomy (`apermo_stash_tag`), options,
+  (`apermo_stash_link`), taxonomy (`apermo_stash_tag`), options,
   user/post meta keys, transient keys, query parameters, filter hooks,
   HTTP headers (`X-Apermo-Stash-Existing`,
   `X-Apermo-Stash-Meta-Fetched`), HTML data attributes, and CSS class
@@ -107,7 +107,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the scheme's highlight on hover/active — instead of the brand's
   blue/orange. Replaces the previous `dashicons-admin-links` icon.
 - Contextual help tabs on the bookmark list screen
-  (`edit.php?post_type=apermo_stash_bookmark`): Overview (what each
+  (`edit.php?post_type=apermo_stash_link`): Overview (what each
   list column means), Adding bookmarks (Add New / dashboard widget /
   browser extension / REST API), and Browser extension (Chrome Web
   Store review status + install-from-source pointer + configuration
@@ -170,7 +170,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Custom post type `apermo_stash_bookmark` with REST exposure, custom non-hierarchical
+- Custom post type `apermo_stash_link` with REST exposure, custom non-hierarchical
   taxonomy `apermo_stash_tag`, and post meta for URL, canonical URL, unread, and
   archived flags.
 - URL canonicalization helper (strips `utm_*`, `fbclid`, `gclid`, lowercases

@@ -131,7 +131,7 @@ class ListColumnsTest extends TestCase {
 
 		$output = $this->capture_render( 'apermo_stash_tag', 7 );
 
-		self::assertStringContainsString( 'post_type=apermo_stash_bookmark', $output );
+		self::assertStringContainsString( 'post_type=apermo_stash_link', $output );
 		self::assertStringContainsString( 'apermo_stash_tag=reading', $output );
 		self::assertStringContainsString( 'apermo_stash_tag=archive', $output );
 		self::assertStringContainsString( '>reading</a>', $output );

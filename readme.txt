@@ -22,7 +22,7 @@ extensions and your own scripts.
 
 = Highlights =
 
-* **Bookmarks as a custom post type.** Every URL is a `apermo_stash_bookmark`
+* **Bookmarks as a custom post type.** Every URL is a `apermo_stash_link`
   post — searchable, filterable, taggable, and reachable through
   WordPress's existing tooling.
 * **Public or private per-bookmark.** Visibility uses native
@@ -93,7 +93,7 @@ or edit the current tab from the popup, and offers a right-click
 
 = Where are my bookmarks stored? =
 
-In your WordPress database, as posts of type `apermo_stash_bookmark`.
+In your WordPress database, as posts of type `apermo_stash_link`.
 The URL, canonical URL, favorite flag, and unreachable flag live in
 post meta. Tags use a custom non-hierarchical taxonomy
 (`apermo_stash_tag`), separate from your standard post tags.

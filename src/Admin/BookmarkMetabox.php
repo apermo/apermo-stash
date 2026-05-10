@@ -179,7 +179,7 @@ class BookmarkMetabox {
 		// uses 'high' priority so it renders directly under the title and
 		// above the Notes panel.
 		add_meta_box(
-			'apermo_stash_bookmark_url',
+			'apermo_stash_link_url',
 			__( 'Bookmark URL', 'apermo-stash' ),
 			[ $this, 'render_url_meta_box' ],
 			BookmarkPostType::POST_TYPE,
@@ -188,7 +188,7 @@ class BookmarkMetabox {
 		);
 
 		add_meta_box(
-			'apermo_stash_bookmark_note',
+			'apermo_stash_link_note',
 			__( 'Notes', 'apermo-stash' ),
 			[ $this, 'render_note_meta_box' ],
 			BookmarkPostType::POST_TYPE,

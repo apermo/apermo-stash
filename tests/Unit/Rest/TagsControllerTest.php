@@ -146,7 +146,7 @@ class TagsControllerTest extends TestCase {
 		self::assertStringContainsString( 'tt.taxonomy = %s', $where );
 		self::assertStringContainsString( 'p.post_status IN (%s)', $where );
 		self::assertStringNotContainsString( 'post_author', $where );
-		self::assertSame( [ 'apermo_stash_bookmark', 'apermo_stash_tag', 'publish' ], $args );
+		self::assertSame( [ 'apermo_stash_link', 'apermo_stash_tag', 'publish' ], $args );
 	}
 
 	/**
@@ -167,7 +167,7 @@ class TagsControllerTest extends TestCase {
 
 		self::assertStringContainsString( "(p.post_status = 'publish' OR p.post_author = %d)", $where );
 		self::assertSame(
-			[ 'apermo_stash_bookmark', 'apermo_stash_tag', 'publish', 'private', 7 ],
+			[ 'apermo_stash_link', 'apermo_stash_tag', 'publish', 'private', 7 ],
 			$args,
 		);
 	}
@@ -188,6 +188,6 @@ class TagsControllerTest extends TestCase {
 
 		self::assertStringContainsString( 'p.post_author IN (%d)', $where );
 		self::assertStringNotContainsString( "(p.post_status = 'publish'", $where );
-		self::assertSame( [ 'apermo_stash_bookmark', 'apermo_stash_tag', 'private', 7 ], $args );
+		self::assertSame( [ 'apermo_stash_link', 'apermo_stash_tag', 'private', 7 ], $args );
 	}
 }
