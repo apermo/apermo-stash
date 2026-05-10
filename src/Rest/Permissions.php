@@ -43,7 +43,7 @@ class Permissions {
 	}
 
 	/**
-	 * Allows read-only requests against the link library when the
+	 * Allows read-only requests against the bookmark library when the
 	 * resolved user can edit links.
 	 *
 	 * Same capability check as `require_edit_posts` — link reads via

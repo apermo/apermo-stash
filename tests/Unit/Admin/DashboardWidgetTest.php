@@ -10,7 +10,7 @@ use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests the dashboard "Quick Link" widget.
+ * Tests the dashboard "Quick Bookmark" widget.
  */
 class DashboardWidgetTest extends TestCase {
 

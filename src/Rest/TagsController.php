@@ -62,7 +62,7 @@ class TagsController {
 		// Single aggregate replacing the previous "fetch every visible
 		// link id, then ask get_terms for counts" fan-out. Joins to
 		// indexed columns (post_type, post_status, taxonomy) keep this
-		// fast as the link library grows.
+		// fast as the bookmark library grows.
 		$sql = "SELECT t.term_id AS id, t.name, t.slug, COUNT(DISTINCT p.ID) AS count
 				FROM {$wpdb->terms} t
 				INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
