@@ -30,7 +30,7 @@ class TagTaxonomy {
 	public function register_taxonomy(): void {
 		register_taxonomy(
 			self::TAXONOMY,
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			[
 				'labels'            => [
 					'name'          => __( 'Tags', 'apermo-stash' ),

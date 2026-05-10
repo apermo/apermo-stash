@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\Stash\Rest\BookmarksController;
 use Apermo\Stash\Rest\CheckController;
+use Apermo\Stash\Rest\LinksController;
 use Apermo\Stash\Rest\RestController;
 use Apermo\Stash\Rest\TagsController;
 use Brain\Monkey;
@@ -43,7 +43,7 @@ class RestControllerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_register_hooks_rest_api_init(): void {
-		$bookmarks = Mockery::mock( BookmarksController::class );
+		$bookmarks = Mockery::mock( LinksController::class );
 		$tags      = Mockery::mock( TagsController::class );
 		$check     = Mockery::mock( CheckController::class );
 
@@ -59,7 +59,7 @@ class RestControllerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_register_routes_delegates_to_children(): void {
-		$bookmarks = Mockery::mock( BookmarksController::class );
+		$bookmarks = Mockery::mock( LinksController::class );
 		$tags      = Mockery::mock( TagsController::class );
 		$check     = Mockery::mock( CheckController::class );
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Apermo\Stash\Tests\Unit\Admin;
 
 use Apermo\Stash\Admin\QuickAdd;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\Url\MetadataFetcher;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
@@ -126,7 +126,7 @@ class QuickAddTest extends TestCase {
 		$method = ( new ReflectionClass( QuickAdd::class ) )->getMethod( 'list_url' );
 		$url    = (string) $method->invoke( null, 'saved' );
 
-		self::assertStringContainsString( 'post_type=' . BookmarkPostType::POST_TYPE, $url );
+		self::assertStringContainsString( 'post_type=' . LinkPostType::POST_TYPE, $url );
 		self::assertStringContainsString( 'apermo_stash_notice=saved', $url );
 	}
 

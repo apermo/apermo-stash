@@ -6,7 +6,7 @@ namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\PostType\TagTaxonomy;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -105,7 +105,7 @@ class TagsController {
 	 */
 	public static function build_where_clause( array $visibility ): array {
 		$args  = [
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			TagTaxonomy::TAXONOMY,
 		];
 		$where = 'p.post_type = %s AND tt.taxonomy = %s';
@@ -164,7 +164,7 @@ class TagsController {
 	 * @return WP_REST_Response
 	 */
 	public function list_items( WP_REST_Request $request ): WP_REST_Response {
-		$visibility = BookmarksController::visibility_filter( $request );
+		$visibility = LinksController::visibility_filter( $request );
 		$rows       = self::fetch_term_counts( $visibility );
 
 		$items = [];

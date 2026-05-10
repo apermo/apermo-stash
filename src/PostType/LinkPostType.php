@@ -11,7 +11,7 @@ use Apermo\Stash\Main;
 /**
  * Registers the apermo_stash_link custom post type.
  */
-class BookmarkPostType {
+class LinkPostType {
 
 	public const POST_TYPE = 'apermo_stash_link';
 

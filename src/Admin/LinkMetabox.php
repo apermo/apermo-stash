@@ -7,8 +7,8 @@ namespace Apermo\Stash\Admin;
 \defined( 'ABSPATH' ) || exit();
 
 use Apermo\Stash\Main;
-use Apermo\Stash\PostType\BookmarkMeta;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\Url\Canonicalizer;
 use Apermo\Stash\Url\DisplayUrl;
 use Apermo\Stash\Url\MetadataFetcher;
@@ -23,7 +23,7 @@ use WP_Post;
  * used instead. Saving falls back to a simplified URL as the post_title
  * when the user does not supply an explicit label.
  */
-class BookmarkMetabox {
+class LinkMetabox {
 
 	private const NONCE_FIELD  = 'apermo_stash_metabox_nonce';
 	private const NONCE_ACTION = 'apermo_stash_save_metabox';
@@ -103,7 +103,7 @@ class BookmarkMetabox {
 	 * @return void
 	 */
 	private function update_post_fields( int $post_id, array $fields ): void {
-		$hook_name = 'save_post_' . BookmarkPostType::POST_TYPE;
+		$hook_name = 'save_post_' . LinkPostType::POST_TYPE;
 
 		remove_action( $hook_name, [ $this, 'save_post' ], 10 );
 		wp_update_post( \array_merge( [ 'ID' => $post_id ], $fields ) );
@@ -116,8 +116,8 @@ class BookmarkMetabox {
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'add_meta_boxes_' . BookmarkPostType::POST_TYPE, [ $this, 'register_meta_boxes' ] );
-		add_action( 'save_post_' . BookmarkPostType::POST_TYPE, [ $this, 'save_post' ], 10, 2 );
+		add_action( 'add_meta_boxes_' . LinkPostType::POST_TYPE, [ $this, 'register_meta_boxes' ] );
+		add_action( 'save_post_' . LinkPostType::POST_TYPE, [ $this, 'save_post' ], 10, 2 );
 		add_filter( 'use_block_editor_for_post_type', [ $this, 'disable_block_editor' ], 10, 2 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_unsaved_changes_script' ] );
 	}
@@ -139,7 +139,7 @@ class BookmarkMetabox {
 		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 		if ( $screen === null
 			|| $screen->base !== 'post'
-			|| $screen->post_type !== BookmarkPostType::POST_TYPE
+			|| $screen->post_type !== LinkPostType::POST_TYPE
 		) {
 			return;
 		}
@@ -162,7 +162,7 @@ class BookmarkMetabox {
 	 * @return bool
 	 */
 	public function disable_block_editor( bool $use_block_editor, string $post_type ): bool {
-		if ( $post_type === BookmarkPostType::POST_TYPE ) {
+		if ( $post_type === LinkPostType::POST_TYPE ) {
 			return false;
 		}
 
@@ -182,7 +182,7 @@ class BookmarkMetabox {
 			'apermo_stash_link_url',
 			__( 'Bookmark URL', 'apermo-stash' ),
 			[ $this, 'render_url_meta_box' ],
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			'normal',
 			'high',
 		);
@@ -191,7 +191,7 @@ class BookmarkMetabox {
 			'apermo_stash_link_note',
 			__( 'Notes', 'apermo-stash' ),
 			[ $this, 'render_note_meta_box' ],
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			'normal',
 			'default',
 		);
@@ -205,9 +205,9 @@ class BookmarkMetabox {
 	 * @return void
 	 */
 	public function render_url_meta_box( WP_Post $post ): void {
-		$url         = (string) get_post_meta( $post->ID, BookmarkMeta::META_URL, true );
-		$favorite    = (bool) get_post_meta( $post->ID, BookmarkMeta::META_FAVORITE, true );
-		$unreachable = (bool) get_post_meta( $post->ID, BookmarkMeta::META_UNREACHABLE, true );
+		$url         = (string) get_post_meta( $post->ID, LinkMeta::META_URL, true );
+		$favorite    = (bool) get_post_meta( $post->ID, LinkMeta::META_FAVORITE, true );
+		$unreachable = (bool) get_post_meta( $post->ID, LinkMeta::META_UNREACHABLE, true );
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_FIELD );
 		?>
 		<p>
@@ -279,21 +279,21 @@ class BookmarkMetabox {
 		$url       = self::read_text( 'apermo_stash_url' );
 		$canonical = Canonicalizer::canonicalize( $url );
 		if ( $url !== '' && $canonical !== '' ) {
-			update_post_meta( $post_id, BookmarkMeta::META_URL, esc_url_raw( $url ) );
-			update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
+			update_post_meta( $post_id, LinkMeta::META_URL, esc_url_raw( $url ) );
+			update_post_meta( $post_id, LinkMeta::META_URL_CANONICAL, $canonical );
 
 			// Re-check reachability on every save, even when the URL
 			// itself didn't change — a previously-down host coming back
 			// up should clear the warning automatically the next time
 			// the user touches the bookmark.
 			$result = $this->fetcher->fetch( $url );
-			update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, BookmarkMeta::bool_to_meta( ! $result['reachable'] ) );
+			update_post_meta( $post_id, LinkMeta::META_UNREACHABLE, LinkMeta::bool_to_meta( ! $result['reachable'] ) );
 		}
 
 		update_post_meta(
 			$post_id,
-			BookmarkMeta::META_FAVORITE,
-			BookmarkMeta::bool_to_meta( isset( $_POST['apermo_stash_favorite'] ) ),
+			LinkMeta::META_FAVORITE,
+			LinkMeta::bool_to_meta( isset( $_POST['apermo_stash_favorite'] ) ),
 		);
 
 		$note_raw = isset( $_POST['apermo_stash_note'] ) && \is_string( $_POST['apermo_stash_note'] )
@@ -307,7 +307,7 @@ class BookmarkMetabox {
 		}
 
 		if ( \trim( $post->post_title ) === '' ) {
-			$resolved_url = $url !== '' ? $url : (string) get_post_meta( $post_id, BookmarkMeta::META_URL, true );
+			$resolved_url = $url !== '' ? $url : (string) get_post_meta( $post_id, LinkMeta::META_URL, true );
 			$display      = DisplayUrl::simplify( $resolved_url );
 			if ( $display !== '' ) {
 				$update['post_title'] = $display;

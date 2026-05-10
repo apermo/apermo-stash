@@ -16,9 +16,9 @@ class RestController {
 	/**
 	 * Holds the bookmarks controller.
 	 *
-	 * @var BookmarksController
+	 * @var LinksController
 	 */
-	private BookmarksController $bookmarks;
+	private LinksController $bookmarks;
 
 	/**
 	 * Holds the tags controller.
@@ -37,12 +37,12 @@ class RestController {
 	/**
 	 * Constructs the registrar with its child controllers.
 	 *
-	 * @param BookmarksController $bookmarks Bookmarks controller.
-	 * @param TagsController      $tags      Tags controller.
-	 * @param CheckController     $check     URL check controller.
+	 * @param LinksController $bookmarks Bookmarks controller.
+	 * @param TagsController  $tags      Tags controller.
+	 * @param CheckController $check     URL check controller.
 	 */
 	public function __construct(
-		BookmarksController $bookmarks,
+		LinksController $bookmarks,
 		TagsController $tags,
 		CheckController $check
 	) {

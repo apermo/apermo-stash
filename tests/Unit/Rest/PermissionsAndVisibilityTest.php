@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\Stash\Rest\BookmarksController;
+use Apermo\Stash\Rest\LinksController;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -49,7 +49,7 @@ class PermissionsAndVisibilityTest extends TestCase {
 		Functions\when( 'get_current_user_id' )->justReturn( 0 );
 
 		$request = $this->request();
-		$result  = BookmarksController::visibility_filter( $request );
+		$result  = LinksController::visibility_filter( $request );
 
 		self::assertSame( [ 'publish' ], $result['post_status'] );
 		self::assertNull( $result['author'] );
@@ -66,7 +66,7 @@ class PermissionsAndVisibilityTest extends TestCase {
 		Functions\when( 'current_user_can' )->justReturn( false );
 
 		$request = $this->request();
-		$result  = BookmarksController::visibility_filter( $request );
+		$result  = LinksController::visibility_filter( $request );
 
 		self::assertSame( [ 'publish', 'private' ], $result['post_status'] );
 		self::assertNull( $result['author'] );
@@ -83,7 +83,7 @@ class PermissionsAndVisibilityTest extends TestCase {
 		Functions\when( 'current_user_can' )->justReturn( false );
 
 		$request = $this->request( [ 'public' => true ] );
-		$result  = BookmarksController::visibility_filter( $request );
+		$result  = LinksController::visibility_filter( $request );
 
 		self::assertSame( [ 'publish' ], $result['post_status'] );
 		self::assertNull( $result['author'] );
@@ -100,7 +100,7 @@ class PermissionsAndVisibilityTest extends TestCase {
 		Functions\when( 'current_user_can' )->justReturn( false );
 
 		$request = $this->request( [ 'private' => true ] );
-		$result  = BookmarksController::visibility_filter( $request );
+		$result  = LinksController::visibility_filter( $request );
 
 		self::assertSame( [ 'private' ], $result['post_status'] );
 		self::assertSame( [ 7 ], $result['author'] );
@@ -117,7 +117,7 @@ class PermissionsAndVisibilityTest extends TestCase {
 		Functions\when( 'current_user_can' )->justReturn( true );
 
 		$request = $this->request();
-		$result  = BookmarksController::visibility_filter( $request );
+		$result  = LinksController::visibility_filter( $request );
 
 		self::assertSame( [ 'publish', 'private' ], $result['post_status'] );
 		self::assertNull( $result['author'] );

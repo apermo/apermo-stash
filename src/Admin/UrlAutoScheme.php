@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Admin;
 
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 
 \defined( 'ABSPATH' ) || exit();
 
@@ -39,7 +39,7 @@ class UrlAutoScheme {
 
 		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
-		return $screen !== null && $screen->post_type === BookmarkPostType::POST_TYPE;
+		return $screen !== null && $screen->post_type === LinkPostType::POST_TYPE;
 	}
 
 	/**

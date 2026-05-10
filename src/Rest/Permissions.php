@@ -6,7 +6,7 @@ namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 use WP_Error;
 use WP_REST_Request;
 
@@ -82,7 +82,7 @@ class Permissions {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
 
-		if ( $post !== null && $post->post_type === BookmarkPostType::POST_TYPE ) {
+		if ( $post !== null && $post->post_type === LinkPostType::POST_TYPE ) {
 			if ( $post->post_status === 'publish' ) {
 				return true;
 			}

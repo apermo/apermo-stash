@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Apermo\Stash\Tests\Unit\Admin;
 
 use Apermo\Stash\Admin\HelpTabs;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -67,7 +67,7 @@ class HelpTabsTest extends TestCase {
 		$sidebar    = '';
 
 		$screen     = Mockery::mock( WP_Screen::class );
-		$screen->id = 'edit-' . BookmarkPostType::POST_TYPE;
+		$screen->id = 'edit-' . LinkPostType::POST_TYPE;
 		$screen->shouldReceive( 'add_help_tab' )
 			->andReturnUsing(
 				static function ( array $entry ) use ( &$registered ): void {

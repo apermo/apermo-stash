@@ -6,8 +6,8 @@ namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\Stash\PostType\BookmarkMeta;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\PostType\TagTaxonomy;
 use Apermo\Stash\Url\Canonicalizer;
 use Apermo\Stash\Url\MetadataFetcher;
@@ -21,7 +21,7 @@ use WP_REST_Server;
 /**
  * Handles bookmark CRUD over REST.
  */
-class BookmarksController {
+class LinksController {
 
 	private const MAX_PER_PAGE = 100;
 
@@ -206,8 +206,8 @@ class BookmarksController {
 		$favorite = $request->get_param( 'favorite' );
 		if ( $favorite !== null ) {
 			$meta_query[] = [
-				'key'   => BookmarkMeta::META_FAVORITE,
-				'value' => BookmarkMeta::sanitize_bool_meta( $favorite ),
+				'key'   => LinkMeta::META_FAVORITE,
+				'value' => LinkMeta::sanitize_bool_meta( $favorite ),
 			];
 		}
 
@@ -296,7 +296,7 @@ class BookmarksController {
 		$visibility = self::visibility_filter( $request );
 
 		$args = [
-			'post_type'      => BookmarkPostType::POST_TYPE,
+			'post_type'      => LinkPostType::POST_TYPE,
 			'paged'          => $page,
 			'posts_per_page' => $per_page,
 			'orderby'        => 'date',
@@ -382,7 +382,7 @@ class BookmarksController {
 
 		$post_id = wp_insert_post(
 			[
-				'post_type'    => BookmarkPostType::POST_TYPE,
+				'post_type'    => LinkPostType::POST_TYPE,
 				'post_status'  => $is_public === true ? 'publish' : 'private',
 				'post_title'   => $title !== '' ? $title : $url,
 				'post_content' => $description,
@@ -395,9 +395,9 @@ class BookmarksController {
 			return $post_id;
 		}
 
-		update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
-		update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
-		update_post_meta( $post_id, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( self::optional_bool( $request, 'favorite' ) ?? false ) );
+		update_post_meta( $post_id, LinkMeta::META_URL, $url );
+		update_post_meta( $post_id, LinkMeta::META_URL_CANONICAL, $canonical );
+		update_post_meta( $post_id, LinkMeta::META_FAVORITE, LinkMeta::bool_to_meta( self::optional_bool( $request, 'favorite' ) ?? false ) );
 
 		if ( $tags !== [] ) {
 			wp_set_object_terms( $post_id, $tags, TagTaxonomy::TAXONOMY, false );
@@ -421,7 +421,7 @@ class BookmarksController {
 	 */
 	public function get_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$post = get_post( (int) $request['id'] );
-		if ( $post === null || $post->post_type !== BookmarkPostType::POST_TYPE ) {
+		if ( $post === null || $post->post_type !== LinkPostType::POST_TYPE ) {
 			return new WP_Error( 'apermo_stash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
@@ -445,7 +445,7 @@ class BookmarksController {
 	public function update_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
-		if ( $post === null || $post->post_type !== BookmarkPostType::POST_TYPE ) {
+		if ( $post === null || $post->post_type !== LinkPostType::POST_TYPE ) {
 			return new WP_Error( 'apermo_stash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
@@ -479,13 +479,13 @@ class BookmarksController {
 					[ 'status' => 400 ],
 				);
 			}
-			update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
-			update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
+			update_post_meta( $post_id, LinkMeta::META_URL, $url );
+			update_post_meta( $post_id, LinkMeta::META_URL_CANONICAL, $canonical );
 		}
 
 		$favorite = self::optional_bool( $request, 'favorite' );
 		if ( $favorite !== null ) {
-			update_post_meta( $post_id, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( $favorite ) );
+			update_post_meta( $post_id, LinkMeta::META_FAVORITE, LinkMeta::bool_to_meta( $favorite ) );
 		}
 
 		if ( $request->has_param( 'tags' ) ) {
@@ -506,7 +506,7 @@ class BookmarksController {
 	public function delete_item( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$post_id = (int) $request['id'];
 		$post    = get_post( $post_id );
-		if ( $post === null || $post->post_type !== BookmarkPostType::POST_TYPE ) {
+		if ( $post === null || $post->post_type !== LinkPostType::POST_TYPE ) {
 			return new WP_Error( 'apermo_stash_not_found', __( 'Bookmark not found.', 'apermo-stash' ), [ 'status' => 404 ] );
 		}
 
@@ -573,7 +573,7 @@ class BookmarksController {
 
 		$favorite = self::optional_bool( $request, 'favorite' );
 		if ( $favorite !== null ) {
-			update_post_meta( $existing->ID, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( $favorite ) );
+			update_post_meta( $existing->ID, LinkMeta::META_FAVORITE, LinkMeta::bool_to_meta( $favorite ) );
 		}
 
 		// Re-fetch by ID so prepare_response sees the post_status that
@@ -635,7 +635,7 @@ class BookmarksController {
 	private function find_by_canonical( int $user_id, string $canonical ): ?WP_Post {
 		$query = new WP_Query(
 			[
-				'post_type'      => BookmarkPostType::POST_TYPE,
+				'post_type'      => LinkPostType::POST_TYPE,
 				'author'         => $user_id,
 				'posts_per_page' => 1,
 				'post_status'    => [ 'publish', 'private' ],
@@ -645,7 +645,7 @@ class BookmarksController {
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 				'meta_query'     => [
 					[
-						'key'   => BookmarkMeta::META_URL_CANONICAL,
+						'key'   => LinkMeta::META_URL_CANONICAL,
 						'value' => $canonical,
 					],
 				],
@@ -705,11 +705,11 @@ class BookmarksController {
 
 		return [
 			'id'          => $post->ID,
-			'url'         => (string) get_post_meta( $post->ID, BookmarkMeta::META_URL, true ),
+			'url'         => (string) get_post_meta( $post->ID, LinkMeta::META_URL, true ),
 			'title'       => $post->post_title,
 			'description' => $post->post_content,
 			'tags'        => $tags,
-			'favorite'    => (bool) get_post_meta( $post->ID, BookmarkMeta::META_FAVORITE, true ),
+			'favorite'    => (bool) get_post_meta( $post->ID, LinkMeta::META_FAVORITE, true ),
 			'public'      => $post->post_status === 'publish',
 			'created'     => mysql2date( 'c', $post->post_date_gmt, false ),
 			'modified'    => mysql2date( 'c', $post->post_modified_gmt, false ),

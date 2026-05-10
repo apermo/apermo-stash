@@ -6,8 +6,8 @@ namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\Stash\PostType\BookmarkMeta;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
 use WP_Query;
 
 /**
@@ -39,7 +39,7 @@ class ListFilter {
 		if ( ! is_admin() || ! $query->is_main_query() ) {
 			return;
 		}
-		if ( $query->get( 'post_type' ) !== BookmarkPostType::POST_TYPE ) {
+		if ( $query->get( 'post_type' ) !== LinkPostType::POST_TYPE ) {
 			return;
 		}
 
@@ -55,7 +55,7 @@ class ListFilter {
 		$existing = \is_array( $existing ) ? $existing : [];
 
 		$existing['apermo_stash_favorite'] = [
-			'key'   => BookmarkMeta::META_FAVORITE,
+			'key'   => LinkMeta::META_FAVORITE,
 			'value' => '1',
 		];
 		$query->set( 'meta_query', $existing );

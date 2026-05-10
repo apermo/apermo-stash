@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Tests\Unit\PostType;
 
-use Apermo\Stash\PostType\BookmarkMeta;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests bookmark post-meta registration.
  */
-class BookmarkMetaTest extends TestCase {
+class LinkMetaTest extends TestCase {
 
 	/**
 	 * Sets up Brain Monkey.
@@ -42,7 +42,7 @@ class BookmarkMetaTest extends TestCase {
 	 * @return void
 	 */
 	public function test_register_hooks_init(): void {
-		$meta = new BookmarkMeta();
+		$meta = new LinkMeta();
 		$meta->register();
 
 		self::assertNotFalse( has_action( 'init', [ $meta, 'register_post_meta' ] ) );
@@ -56,9 +56,9 @@ class BookmarkMetaTest extends TestCase {
 	public function test_register_post_meta_registers_all_keys(): void {
 		Functions\expect( 'register_post_meta' )
 			->times( 4 )
-			->with( BookmarkPostType::POST_TYPE, Mockery::type( 'string' ), Mockery::type( 'array' ) );
+			->with( LinkPostType::POST_TYPE, Mockery::type( 'string' ), Mockery::type( 'array' ) );
 
-		( new BookmarkMeta() )->register_post_meta();
+		( new LinkMeta() )->register_post_meta();
 	}
 
 	/**
@@ -67,9 +67,9 @@ class BookmarkMetaTest extends TestCase {
 	 * @return void
 	 */
 	public function test_meta_key_constants(): void {
-		self::assertSame( '_apermo_stash_url', BookmarkMeta::META_URL );
-		self::assertSame( '_apermo_stash_url_canonical', BookmarkMeta::META_URL_CANONICAL );
-		self::assertSame( '_apermo_stash_favorite', BookmarkMeta::META_FAVORITE );
+		self::assertSame( '_apermo_stash_url', LinkMeta::META_URL );
+		self::assertSame( '_apermo_stash_url_canonical', LinkMeta::META_URL_CANONICAL );
+		self::assertSame( '_apermo_stash_favorite', LinkMeta::META_FAVORITE );
 	}
 
 	/**
@@ -78,8 +78,8 @@ class BookmarkMetaTest extends TestCase {
 	 * @return void
 	 */
 	public function test_bool_to_meta(): void {
-		self::assertSame( '1', BookmarkMeta::bool_to_meta( true ) );
-		self::assertSame( '0', BookmarkMeta::bool_to_meta( false ) );
+		self::assertSame( '1', LinkMeta::bool_to_meta( true ) );
+		self::assertSame( '0', LinkMeta::bool_to_meta( false ) );
 	}
 
 	/**
@@ -92,11 +92,11 @@ class BookmarkMetaTest extends TestCase {
 			static fn ( $value ): bool => \in_array( $value, [ true, 1, '1', 'true', 'on', 'yes' ], true ),
 		);
 
-		self::assertSame( '1', BookmarkMeta::sanitize_bool_meta( true ) );
-		self::assertSame( '1', BookmarkMeta::sanitize_bool_meta( '1' ) );
-		self::assertSame( '0', BookmarkMeta::sanitize_bool_meta( false ) );
-		self::assertSame( '0', BookmarkMeta::sanitize_bool_meta( '' ) );
+		self::assertSame( '1', LinkMeta::sanitize_bool_meta( true ) );
+		self::assertSame( '1', LinkMeta::sanitize_bool_meta( '1' ) );
+		self::assertSame( '0', LinkMeta::sanitize_bool_meta( false ) );
+		self::assertSame( '0', LinkMeta::sanitize_bool_meta( '' ) );
 		// Non-scalar input is treated as false.
-		self::assertSame( '0', BookmarkMeta::sanitize_bool_meta( [ 'unexpected' ] ) );
+		self::assertSame( '0', LinkMeta::sanitize_bool_meta( [ 'unexpected' ] ) );
 	}
 }

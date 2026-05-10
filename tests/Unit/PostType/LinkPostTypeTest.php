@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Tests\Unit\PostType;
 
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -14,7 +14,7 @@ use ReflectionClass;
 /**
  * Tests the bookmark CPT registration.
  */
-class BookmarkPostTypeTest extends TestCase {
+class LinkPostTypeTest extends TestCase {
 
 	/**
 	 * Matches the expected register_post_type arguments.
@@ -62,7 +62,7 @@ class BookmarkPostTypeTest extends TestCase {
 	 * @return void
 	 */
 	public function test_register_hooks_init(): void {
-		$post_type = new BookmarkPostType();
+		$post_type = new LinkPostType();
 		$post_type->register();
 
 		self::assertNotFalse( has_action( 'init', [ $post_type, 'register_post_type' ] ) );
@@ -84,11 +84,11 @@ class BookmarkPostTypeTest extends TestCase {
 			},
 		);
 
-		( new BookmarkPostType() )->enqueue_menu_icon_styles();
+		( new LinkPostType() )->enqueue_menu_icon_styles();
 
 		self::assertNotNull( $captured );
 		self::assertSame( 'wp-admin', $captured[0] );
-		self::assertStringContainsString( '#menu-posts-' . BookmarkPostType::POST_TYPE, $captured[1] );
+		self::assertStringContainsString( '#menu-posts-' . LinkPostType::POST_TYPE, $captured[1] );
 		self::assertStringContainsString( '#a7aaad', $captured[1] );
 		self::assertStringContainsString( '--wp-admin-theme-color', $captured[1] );
 		self::assertStringContainsString( ' svg{', $captured[1] );
@@ -107,16 +107,16 @@ class BookmarkPostTypeTest extends TestCase {
 
 		// Reset the static cache via a new class instance is not enough; the
 		// cache is class-level. Use reflection so the test is hermetic.
-		$reflection = new ReflectionClass( BookmarkPostType::class );
+		$reflection = new ReflectionClass( LinkPostType::class );
 		$cache_prop = $reflection->getProperty( 'svg_cache' );
 		$cache_prop->setValue( null, '<svg viewBox="0 0 10 10"><path d="M0,0"/></svg>' );
 
 		\ob_start();
-		( new BookmarkPostType() )->inline_menu_icon();
+		( new LinkPostType() )->inline_menu_icon();
 		$output = (string) \ob_get_clean();
 
 		self::assertStringContainsString( '<script id="apermo-stash-menu-icon">', $output );
-		self::assertStringContainsString( '#menu-posts-' . BookmarkPostType::POST_TYPE . ' .wp-menu-image', $output );
+		self::assertStringContainsString( '#menu-posts-' . LinkPostType::POST_TYPE . ' .wp-menu-image', $output );
 		self::assertStringContainsString( 'd.innerHTML=', $output );
 		self::assertStringContainsString( '<svg', $output );
 
@@ -129,12 +129,12 @@ class BookmarkPostTypeTest extends TestCase {
 	 * @return void
 	 */
 	public function test_inline_menu_icon_silent_when_svg_missing(): void {
-		$reflection = new ReflectionClass( BookmarkPostType::class );
+		$reflection = new ReflectionClass( LinkPostType::class );
 		$cache_prop = $reflection->getProperty( 'svg_cache' );
 		$cache_prop->setValue( null, '' );
 
 		\ob_start();
-		( new BookmarkPostType() )->inline_menu_icon();
+		( new LinkPostType() )->inline_menu_icon();
 		$output = (string) \ob_get_clean();
 
 		self::assertSame( '', $output );
@@ -158,11 +158,11 @@ class BookmarkPostTypeTest extends TestCase {
 		Functions\expect( 'register_post_type' )
 			->once()
 			->with(
-				BookmarkPostType::POST_TYPE,
+				LinkPostType::POST_TYPE,
 				Mockery::on( [ self::class, 'matchExpectedArgs' ] ),
 			);
 
-		( new BookmarkPostType() )->register_post_type();
+		( new LinkPostType() )->register_post_type();
 	}
 
 	/**
@@ -171,6 +171,6 @@ class BookmarkPostTypeTest extends TestCase {
 	 * @return void
 	 */
 	public function test_post_type_constant(): void {
-		self::assertSame( 'apermo_stash_link', BookmarkPostType::POST_TYPE );
+		self::assertSame( 'apermo_stash_link', LinkPostType::POST_TYPE );
 	}
 }

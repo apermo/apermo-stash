@@ -6,8 +6,8 @@ namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\Stash\PostType\BookmarkMeta;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\PostType\TagTaxonomy;
 
 /**
@@ -23,7 +23,7 @@ class ListColumns {
 	 * @return void
 	 */
 	private static function render_url( int $post_id ): void {
-		$url = (string) get_post_meta( $post_id, BookmarkMeta::META_URL, true );
+		$url = (string) get_post_meta( $post_id, LinkMeta::META_URL, true );
 		if ( $url === '' ) {
 			return;
 		}
@@ -52,7 +52,7 @@ class ListColumns {
 		foreach ( $terms as $term ) {
 			$url = add_query_arg(
 				[
-					'post_type'           => BookmarkPostType::POST_TYPE,
+					'post_type'           => LinkPostType::POST_TYPE,
 					TagTaxonomy::TAXONOMY => $term->slug,
 				],
 				admin_url( 'edit.php' ),
@@ -93,7 +93,7 @@ class ListColumns {
 	 * @return void
 	 */
 	private static function render_favorite( int $post_id ): void {
-		$favorite = (bool) get_post_meta( $post_id, BookmarkMeta::META_FAVORITE, true );
+		$favorite = (bool) get_post_meta( $post_id, LinkMeta::META_FAVORITE, true );
 
 		echo $favorite
 			? '<span aria-label="' . esc_attr__( 'Favorite', 'apermo-stash' ) . '">&#9733;</span>'
@@ -106,7 +106,7 @@ class ListColumns {
 	 * @return void
 	 */
 	public function register(): void {
-		$post_type = BookmarkPostType::POST_TYPE;
+		$post_type = LinkPostType::POST_TYPE;
 
 		add_filter( "manage_{$post_type}_posts_columns", [ $this, 'filter_columns' ] );
 		add_action( "manage_{$post_type}_posts_custom_column", [ $this, 'render_column' ], 10, 2 );

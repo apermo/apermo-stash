@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Admin;
 
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 
 \defined( 'ABSPATH' ) || exit();
 
@@ -70,7 +70,7 @@ class Notices {
 		$screen = \function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 		if ( $screen === null
 			|| $screen->base !== 'edit'
-			|| $screen->post_type !== BookmarkPostType::POST_TYPE
+			|| $screen->post_type !== LinkPostType::POST_TYPE
 		) {
 			return;
 		}

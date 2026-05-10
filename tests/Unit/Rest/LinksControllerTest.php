@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\Stash\PostType\BookmarkPostType;
-use Apermo\Stash\Rest\BookmarksController;
+use Apermo\Stash\PostType\LinkPostType;
+use Apermo\Stash\Rest\LinksController;
 use Apermo\Stash\Url\MetadataFetcher;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
@@ -18,9 +18,9 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 /**
- * Tests the BookmarksController REST handlers.
+ * Tests the LinksController REST handlers.
  */
-class BookmarksControllerTest extends TestCase {
+class LinksControllerTest extends TestCase {
 
 	/**
 	 * Sets up Brain Monkey and the WP_Query stub queue.
@@ -150,7 +150,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_get_item_returns_response_for_known_bookmark(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
-		$post->post_type = BookmarkPostType::POST_TYPE;
+		$post->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_post' )->justReturn( $post );
 
 		$request         = new WP_REST_Request();
@@ -187,7 +187,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_update_item_rejects_invalid_url_update(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
-		$post->post_type = BookmarkPostType::POST_TYPE;
+		$post->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_post' )->justReturn( $post );
 
 		$request         = new WP_REST_Request();
@@ -227,7 +227,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_delete_item_returns_success(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
-		$post->post_type = BookmarkPostType::POST_TYPE;
+		$post->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_post' )->justReturn( $post );
 		Functions\when( 'wp_delete_post' )->justReturn( $post );
 
@@ -310,7 +310,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_update_item_applies_changes(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
-		$post->post_type = BookmarkPostType::POST_TYPE;
+		$post->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_post' )->justReturn( $post );
 		Functions\when( 'wp_update_post' )->justReturn( 7 );
 		Functions\when( 'is_wp_error' )->justReturn( false );
@@ -340,7 +340,7 @@ class BookmarksControllerTest extends TestCase {
 	public function test_delete_item_returns_500_on_failure(): void {
 		$post            = new WP_Post();
 		$post->ID        = 7;
-		$post->post_type = BookmarkPostType::POST_TYPE;
+		$post->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_post' )->justReturn( $post );
 		Functions\when( 'wp_delete_post' )->justReturn( false );
 
@@ -356,9 +356,9 @@ class BookmarksControllerTest extends TestCase {
 	/**
 	 * Builds a controller wired to a Mockery'd metadata fetcher.
 	 *
-	 * @return BookmarksController
+	 * @return LinksController
 	 */
-	private function controller(): BookmarksController {
+	private function controller(): LinksController {
 		$fetcher = Mockery::mock( MetadataFetcher::class );
 		$fetcher->shouldReceive( 'fetch' )->andReturn(
 			[
@@ -368,6 +368,6 @@ class BookmarksControllerTest extends TestCase {
 			],
 		);
 
-		return new BookmarksController( $fetcher );
+		return new LinksController( $fetcher );
 	}
 }

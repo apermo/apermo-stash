@@ -6,8 +6,8 @@ namespace Apermo\Stash\Rest;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\Stash\PostType\BookmarkMeta;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\Url\Canonicalizer;
 use WP_Query;
 use WP_REST_Request;
@@ -62,10 +62,10 @@ class CheckController {
 			return rest_ensure_response( [ 'exists' => false ] );
 		}
 
-		$visibility = BookmarksController::visibility_filter( $request );
+		$visibility = LinksController::visibility_filter( $request );
 
 		$args = [
-			'post_type'      => BookmarkPostType::POST_TYPE,
+			'post_type'      => LinkPostType::POST_TYPE,
 			'post_status'    => $visibility['post_status'],
 			'posts_per_page' => 1,
 			'fields'         => 'ids',
@@ -75,7 +75,7 @@ class CheckController {
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			'meta_query'     => [
 				[
-					'key'   => BookmarkMeta::META_URL_CANONICAL,
+					'key'   => LinkMeta::META_URL_CANONICAL,
 					'value' => $canonical,
 				],
 			],

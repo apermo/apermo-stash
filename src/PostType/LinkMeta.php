@@ -9,7 +9,7 @@ namespace Apermo\Stash\PostType;
 /**
  * Registers post-meta keys for the bookmark CPT.
  */
-class BookmarkMeta {
+class LinkMeta {
 
 	public const META_URL           = '_apermo_stash_url';
 	public const META_URL_CANONICAL = '_apermo_stash_url_canonical';
@@ -26,7 +26,7 @@ class BookmarkMeta {
 	 */
 	private static function register_string_meta( string $key, callable $auth_cb ): void {
 		register_post_meta(
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			$key,
 			[
 				'type'              => 'string',
@@ -49,7 +49,7 @@ class BookmarkMeta {
 	 */
 	private static function register_bool_meta( string $key, callable $auth_cb ): void {
 		register_post_meta(
-			BookmarkPostType::POST_TYPE,
+			LinkPostType::POST_TYPE,
 			$key,
 			[
 				'type'              => 'boolean',

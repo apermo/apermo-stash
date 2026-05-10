@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Apermo\Stash\Tests\Unit\Admin;
 
 use Apermo\Stash\Admin\Notices;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
@@ -94,7 +94,7 @@ class NoticesTest extends TestCase {
 	 * @return void
 	 */
 	public function test_silent_without_notice_param(): void {
-		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
 
 		\ob_start();
 		( new Notices() )->maybe_render();
@@ -109,7 +109,7 @@ class NoticesTest extends TestCase {
 	 * @return void
 	 */
 	public function test_renders_saved_unreachable_warning(): void {
-		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
 		$_GET['apermo_stash_notice'] = 'saved-unreachable';
 
 		\ob_start();
@@ -126,7 +126,7 @@ class NoticesTest extends TestCase {
 	 * @return void
 	 */
 	public function test_renders_saved_success(): void {
-		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
 		$_GET['apermo_stash_notice'] = 'saved';
 
 		\ob_start();
@@ -142,7 +142,7 @@ class NoticesTest extends TestCase {
 	 * @return void
 	 */
 	public function test_unknown_slug_renders_nothing(): void {
-		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', BookmarkPostType::POST_TYPE ) );
+		Functions\when( 'get_current_screen' )->justReturn( self::screen( 'edit', LinkPostType::POST_TYPE ) );
 		$_GET['apermo_stash_notice'] = 'random-junk';
 
 		\ob_start();

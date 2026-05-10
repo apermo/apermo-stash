@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Apermo\Stash\Tests\Unit\Admin;
 
 use Apermo\Stash\Admin\UrlAutoScheme;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
@@ -69,7 +69,7 @@ class UrlAutoSchemeTest extends TestCase {
 	public function test_enqueues_on_bookmark_edit_screen(): void {
 		$screen            = new WP_Screen();
 		$screen->base      = 'post';
-		$screen->post_type = BookmarkPostType::POST_TYPE;
+		$screen->post_type = LinkPostType::POST_TYPE;
 		Functions\when( 'get_current_screen' )->justReturn( $screen );
 
 		Functions\when( 'wp_register_script' )->justReturn( true );

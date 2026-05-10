@@ -6,8 +6,8 @@ namespace Apermo\Stash\Admin;
 
 \defined( 'ABSPATH' ) || exit();
 
-use Apermo\Stash\PostType\BookmarkMeta;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\PostType\TagTaxonomy;
 use Apermo\Stash\Url\Canonicalizer;
 use Apermo\Stash\Url\MetadataFetcher;
@@ -70,7 +70,7 @@ class QuickAdd {
 	private static function list_url( string $notice ): string {
 		return add_query_arg(
 			[
-				'post_type'           => BookmarkPostType::POST_TYPE,
+				'post_type'           => LinkPostType::POST_TYPE,
 				'apermo_stash_notice' => $notice,
 			],
 			admin_url( 'edit.php' ),
@@ -158,7 +158,7 @@ class QuickAdd {
 
 		$post_id = wp_insert_post(
 			[
-				'post_type'    => BookmarkPostType::POST_TYPE,
+				'post_type'    => LinkPostType::POST_TYPE,
 				'post_status'  => $is_public ? 'publish' : 'private',
 				'post_title'   => $meta['title'] ?? $url,
 				'post_content' => $meta['description'] ?? '',
@@ -172,10 +172,10 @@ class QuickAdd {
 			exit();
 		}
 
-		update_post_meta( $post_id, BookmarkMeta::META_URL, $url );
-		update_post_meta( $post_id, BookmarkMeta::META_URL_CANONICAL, $canonical );
-		update_post_meta( $post_id, BookmarkMeta::META_FAVORITE, BookmarkMeta::bool_to_meta( false ) );
-		update_post_meta( $post_id, BookmarkMeta::META_UNREACHABLE, BookmarkMeta::bool_to_meta( ! $meta['reachable'] ) );
+		update_post_meta( $post_id, LinkMeta::META_URL, $url );
+		update_post_meta( $post_id, LinkMeta::META_URL_CANONICAL, $canonical );
+		update_post_meta( $post_id, LinkMeta::META_FAVORITE, LinkMeta::bool_to_meta( false ) );
+		update_post_meta( $post_id, LinkMeta::META_UNREACHABLE, LinkMeta::bool_to_meta( ! $meta['reachable'] ) );
 
 		if ( $tags !== [] ) {
 			wp_set_object_terms( $post_id, $tags, TagTaxonomy::TAXONOMY, false );

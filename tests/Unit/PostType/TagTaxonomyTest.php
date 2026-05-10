@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Tests\Unit\PostType;
 
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\PostType\TagTaxonomy;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
@@ -81,7 +81,7 @@ class TagTaxonomyTest extends TestCase {
 			->once()
 			->with(
 				TagTaxonomy::TAXONOMY,
-				BookmarkPostType::POST_TYPE,
+				LinkPostType::POST_TYPE,
 				Mockery::on( [ self::class, 'matchExpectedArgs' ] ),
 			);
 

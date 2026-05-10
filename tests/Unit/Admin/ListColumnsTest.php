@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Apermo\Stash\Tests\Unit\Admin;
 
 use Apermo\Stash\Admin\ListColumns;
-use Apermo\Stash\PostType\BookmarkMeta;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\PostType\TagTaxonomy;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
@@ -54,7 +54,7 @@ class ListColumnsTest extends TestCase {
 		$columns = new ListColumns();
 		$columns->register();
 
-		$post_type = BookmarkPostType::POST_TYPE;
+		$post_type = LinkPostType::POST_TYPE;
 		self::assertNotFalse( has_filter( "manage_{$post_type}_posts_columns", [ $columns, 'filter_columns' ] ) );
 		self::assertNotFalse( has_action( "manage_{$post_type}_posts_custom_column", [ $columns, 'render_column' ] ) );
 	}
@@ -88,7 +88,7 @@ class ListColumnsTest extends TestCase {
 	 */
 	public function test_render_url_column(): void {
 		Functions\when( 'get_post_meta' )->alias(
-			static fn ( int $id, string $key ): string => $key === BookmarkMeta::META_URL ? 'https://example.tld' : '',
+			static fn ( int $id, string $key ): string => $key === LinkMeta::META_URL ? 'https://example.tld' : '',
 		);
 
 		$output = $this->capture_render( 'url', 7 );
@@ -192,7 +192,7 @@ class ListColumnsTest extends TestCase {
 	public function test_render_favorite_column_renders_star(): void {
 		Functions\when( 'esc_attr__' )->returnArg();
 		Functions\when( 'get_post_meta' )->alias(
-			static fn ( int $id, string $key ): bool => $key === BookmarkMeta::META_FAVORITE,
+			static fn ( int $id, string $key ): bool => $key === LinkMeta::META_FAVORITE,
 		);
 
 		$output = $this->capture_render( 'favorite', 7 );

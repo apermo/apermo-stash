@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Apermo\Stash\Tests\Unit\Admin;
 
 use Apermo\Stash\Admin\ListFilter;
-use Apermo\Stash\PostType\BookmarkMeta;
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkMeta;
+use Apermo\Stash\PostType\LinkPostType;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -63,7 +63,7 @@ class ListFilterTest extends TestCase {
 
 		$query = Mockery::mock( WP_Query::class );
 		$query->shouldReceive( 'is_main_query' )->andReturn( true );
-		$query->shouldReceive( 'get' )->with( 'post_type' )->andReturn( BookmarkPostType::POST_TYPE );
+		$query->shouldReceive( 'get' )->with( 'post_type' )->andReturn( LinkPostType::POST_TYPE );
 		$query->shouldReceive( 'get' )->with( 'meta_query' )->andReturn( '' );
 
 		$captured = null;
@@ -80,7 +80,7 @@ class ListFilterTest extends TestCase {
 		( new ListFilter() )->apply_favorite_filter( $query );
 
 		self::assertIsArray( $captured );
-		self::assertSame( BookmarkMeta::META_FAVORITE, $captured['apermo_stash_favorite']['key'] );
+		self::assertSame( LinkMeta::META_FAVORITE, $captured['apermo_stash_favorite']['key'] );
 		self::assertSame( '1', $captured['apermo_stash_favorite']['value'] );
 	}
 
@@ -108,7 +108,7 @@ class ListFilterTest extends TestCase {
 	public function test_apply_favorite_filter_skips_when_param_absent(): void {
 		$query = Mockery::mock( WP_Query::class );
 		$query->shouldReceive( 'is_main_query' )->andReturn( true );
-		$query->shouldReceive( 'get' )->with( 'post_type' )->andReturn( BookmarkPostType::POST_TYPE );
+		$query->shouldReceive( 'get' )->with( 'post_type' )->andReturn( LinkPostType::POST_TYPE );
 		$query->shouldNotReceive( 'set' );
 
 		( new ListFilter() )->apply_favorite_filter( $query );

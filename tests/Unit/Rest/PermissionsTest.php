@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apermo\Stash\Tests\Unit\Rest;
 
-use Apermo\Stash\PostType\BookmarkPostType;
+use Apermo\Stash\PostType\LinkPostType;
 use Apermo\Stash\Rest\Permissions;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
@@ -156,7 +156,7 @@ class PermissionsTest extends TestCase {
 	 */
 	public function test_can_read_bookmark_allows_publish(): void {
 		$post              = new WP_Post();
-		$post->post_type   = BookmarkPostType::POST_TYPE;
+		$post->post_type   = LinkPostType::POST_TYPE;
 		$post->post_status = 'publish';
 		Functions\when( 'get_post' )->justReturn( $post );
 
@@ -173,7 +173,7 @@ class PermissionsTest extends TestCase {
 	 */
 	public function test_can_read_bookmark_allows_owner_on_private(): void {
 		$post              = new WP_Post();
-		$post->post_type   = BookmarkPostType::POST_TYPE;
+		$post->post_type   = LinkPostType::POST_TYPE;
 		$post->post_status = 'private';
 		$post->post_author = 11;
 		Functions\when( 'get_post' )->justReturn( $post );
@@ -192,7 +192,7 @@ class PermissionsTest extends TestCase {
 	 */
 	public function test_can_read_bookmark_allows_admin(): void {
 		$post              = new WP_Post();
-		$post->post_type   = BookmarkPostType::POST_TYPE;
+		$post->post_type   = LinkPostType::POST_TYPE;
 		$post->post_status = 'private';
 		$post->post_author = 11;
 		Functions\when( 'get_post' )->justReturn( $post );
@@ -214,7 +214,7 @@ class PermissionsTest extends TestCase {
 	 */
 	public function test_can_read_bookmark_denies_non_owner_with_404(): void {
 		$post              = new WP_Post();
-		$post->post_type   = BookmarkPostType::POST_TYPE;
+		$post->post_type   = LinkPostType::POST_TYPE;
 		$post->post_status = 'private';
 		$post->post_author = 11;
 		Functions\when( 'get_post' )->justReturn( $post );
