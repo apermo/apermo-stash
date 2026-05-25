@@ -1,0 +1,25 @@
+# Mirrors apermo/reusable-workflows reusable-conventional-commits.yml.
+# Keep ALLOWED and MAX in lock-step with that workflow's defaults
+# (also referenced from .github/workflows/pr-validation.yml).
+
+ALLOWED='feat|fix|docs|style|refactor|test|chore|perf|ci|build'
+MAX=72
+MSG=$(head -n1 "$1")
+
+# Skip messages git itself generates.
+case "$MSG" in
+    Merge*|Revert\ \"*) exit 0 ;;
+esac
+
+if ! printf '%s\n' "$MSG" | grep -qE "^(${ALLOWED})(\(.+\))?!?: .{1,}$"; then
+    echo "✘ Commit subject must match: <type>[(scope)][!]: <description>" >&2
+    echo "  Allowed types: ${ALLOWED}" >&2
+    echo "  Got: $MSG" >&2
+    exit 1
+fi
+
+if [ ${#MSG} -gt $MAX ]; then
+    echo "✘ Commit subject is ${#MSG} chars, max ${MAX}." >&2
+    echo "  Got: $MSG" >&2
+    exit 1
+fi
