@@ -2,9 +2,9 @@
 Contributors: apermo
 Tags: links, bookmarks, rest-api, self-hosted, archive
 Requires at least: 6.4
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -168,6 +168,17 @@ defense-in-depth narrowing of the CORS surface.
 5. Companion Chrome extension popup saving the current tab.
 
 == Changelog ==
+
+= 0.2.1 =
+* Added: local `.husky/commit-msg` hook mirroring the
+  conventional-commit rules already enforced by CI's
+  `pr-validation` workflow.
+* Fixed: "Please run composer install" admin notice no longer
+  false-positives when the plugin runs inside a Composer-managed
+  parent project (Bedrock and similar). `plugin.php` now loads
+  the local autoloader if present and only shows the notice when
+  `Main` is still unreachable.
+* Changed: "Tested up to" bumped from 6.9 to 7.0.
 
 = 0.2.0 =
 * Renamed plugin: LinkStash → Apermo Stash. Slug, namespace,

@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-25
+
+### Added
+
+- Local `.husky/commit-msg` hook validating the conventional-commit
+  prefix and 72-character subject length. Mirrors the rules
+  `pr-validation` already enforces in CI, so invalid commits now
+  fail at `git commit` time instead of only after `git push`.
+  Activates automatically on the next `npm install` via the
+  existing `prepare` script. Synced from template
+  [`apermo/template-wordpress` #43](https://github.com/apermo/template-wordpress/pull/43).
+
+### Fixed
+
+- "Please run `composer install`" admin notice no longer
+  false-positives when the plugin runs inside a Composer-managed
+  parent project (Bedrock and similar) that supplies the autoloader
+  itself. `plugin.php` now loads the local `vendor/autoload.php`
+  if present and only shows the notice when `Main` is still not
+  reachable. Synced from template
+  [`apermo/template-wordpress` #46](https://github.com/apermo/template-wordpress/pull/46).
+
+### Changed
+
+- `readme.txt` "Tested up to" bumped from 6.9 to 7.0 so Plugin
+  Check stops flagging `outdated_tested_upto_header`.
+
 ## [0.2.0] - 2026-05-10
 
 ### Changed
