@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Bump GitHub Actions off the deprecated Node 20 runtime: `actions/checkout`
+  v4→v5. GitHub forces JavaScript actions onto Node 24 starting 2026-06-16.
+
 ## [0.2.1] - 2026-05-25
 
 ### Added
