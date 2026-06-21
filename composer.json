@@ -38,7 +38,8 @@
         "test:integration": "phpunit --testsuite Integration",
         "analyse": "phpstan analyse --memory-limit=1G",
         "cs": "phpcs",
-        "cs:fix": "phpcbf"
+        "cs:fix": "phpcbf",
+        "make-pot": "wp i18n make-pot . languages/apermo-stash.pot --domain=apermo-stash --exclude=vendor,tests,e2e,.ddev,node_modules"
     },
     "config": {
         "allow-plugins": {
