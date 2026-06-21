@@ -4,7 +4,7 @@ Tags: links, bookmarks, rest-api, self-hosted, archive
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.1
+Stable tag: 0.2.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -168,6 +168,12 @@ defense-in-depth narrowing of the CORS surface.
 5. Companion Chrome extension popup saving the current tab.
 
 == Changelog ==
+
+= 0.2.2 =
+* Added: self-hosted translation delivery via the Traduttore
+  Registry. The plugin registers against the GlotPress server at
+  translate.chrdm.de on `init`, so installs receive translations
+  without a wp.org language pack.
 
 = 0.2.1 =
 * Added: local `.husky/commit-msg` hook mirroring the
