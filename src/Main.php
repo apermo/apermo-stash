@@ -33,7 +33,7 @@ use Apermo\Stash\Url\MetadataFetcher;
  */
 class Main {
 
-	public const VERSION = '0.2.1';
+	public const VERSION = '0.2.2';
 
 	private const STARTER_TAGS_SEEDED_OPTION = 'apermo_stash_starter_tags_seeded';
 
@@ -142,6 +142,7 @@ class Main {
 	 * @return void
 	 */
 	public static function boot(): void {
+		( new I18n() )->register();
 		( new LinkPostType() )->register();
 		( new TagTaxonomy() )->register();
 		( new LinkMeta() )->register();
