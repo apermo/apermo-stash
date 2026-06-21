@@ -142,6 +142,7 @@ class Main {
 	 * @return void
 	 */
 	public static function boot(): void {
+		( new I18n() )->register();
 		( new LinkPostType() )->register();
 		( new TagTaxonomy() )->register();
 		( new LinkMeta() )->register();

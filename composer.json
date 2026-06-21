@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.1",
+        "wearerequired/traduttore-registry": "^2.1"
     },
     "require-dev": {
         "apermo/apermo-coding-standards": "^3.0",
